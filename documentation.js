@@ -29,7 +29,7 @@ const tweetObj = {
     createdAt: DATE,
     replyToUserIds: [STRING] | NULL,
     replyToTweetId: STRING | NULL,
-    quotingTweetId: STRING | NULL, // must parse twitter link from body
+    quotingTweetId: STRING | NULL, // parse twitter link from body?
   },
   references: {
     repliesFrom: [
@@ -38,9 +38,14 @@ const tweetObj = {
         id: STRING,
       },
     ],
-    retweetsFrom: [STRING],
-    quotesFrom: [STRING],
-    likesFrom: [STRING],
+    retweetsFrom: [STRING], // user ids
+    quotesFrom: [
+      {
+        userId: [STRING],
+        tweetId: [STRING],
+      },
+    ],
+    likesFrom: [STRING], // user ids
   },
 };
 
@@ -99,6 +104,8 @@ const userObj = {
         authorId: STRING,
         type: STRING, // status | reply | retweet | quote
         containsMedia: BOOLEAN,
+        liked: BOOLEAN,
+        retweeted: BOOLEAN,
       },
     ],
   },
@@ -107,8 +114,8 @@ const userObj = {
 const userState = {}; // same as above
 const appState = {
   path: STRING,
-  view: STRING, //  timeline (default) | profile | full-tweet | search
-  profileViewMode: STRING, // TWEETS (default) | TWEETS_AND_REPLIES | MEDIA | LIKES
+  view: STRING, //  timeline (default) | profile | tweet-thread | search
+  profileViewMode: STRING, // tweets (default) | tweets-and-replies | media | likes
   showModal: BOOLEAN,
   modalType: STRING, // status | reply | quote
   NUM_INITIAL_TWEETS: NUMBER, // 5
@@ -130,8 +137,8 @@ const functions = {
   },
   app: {
     //navigation
-    goto: (path) => {},
-    setView: (view) => {}, //  timeline (default) | profile | full-tweet | search
+    goto: (path) => {}, // set path in appState
+    setView: (view) => {}, //  timeline (default) | profile | tweet-thread | search
 
     //tweets
     newTweet: (mode) => {}, // mode: status | reply | qrt
@@ -139,7 +146,7 @@ const functions = {
     postTweet: async (tweetId) => {}, // update tweetCount, global tweet collection, localTimelines on success
     deleteTweet: async (tweetId) => {}, // REQUIRE AUTHORIZATION
     fetchTweet: async (tweetId, queryType) => {}, // query: all | userdata | tweetdata | followdata
-    fullViewTweet: (tweetId) => {}, // show replies from either direction
+    viewTweetThread: (tweetId) => {}, // show replies from either direction
     loadReplies: async (tweetId) => {},
     like: (tweetId) => {}, // MUST BE SIGNED IN
     retweet: (tweetId) => {}, // MUST BE SIGNED IN, push retweet to all follower's localTimelines
@@ -149,7 +156,7 @@ const functions = {
     fetchUser: async (userId, queryType) => {}, // query: all | userdata | tweetdata | followdata
     followUser: (userId) => {}, // MUST BE SIGNED IN
     unfollowUser: (userId) => {}, // MUST BE SIGNED IN
-    setProfileViewMode: (mode) => {}, // TWEETS (default) | TWEETS_AND_REPLIES | MEDIA | LIKES
+    setProfileViewMode: (mode) => {}, // tweets (default) | tweets-and-replies | media | likes
     displayUserTweets: (userId, mode) => {}, // based on above
 
     //timeline
@@ -169,26 +176,32 @@ const functions = {
 // component hierarchy
 const components = {
   app: {
-    navigation: {}, // 275px, hide labels @ 1280px, dock menu to bottom @ 500px
+    navigation: {
+      // 275px, hide labels @ 1280px, dock menu to bottom @ 500px
+      home,
+      explore,
+      profile,
+      tweetButton,
+    },
     sidebar: {
-      // max width 350px
+      // hide @ 1000px, max width 350px
       searchBar,
       signUp, // if logged out
       mediaGallery, // view = profile
       fakeTrending,
       footer,
-    }, // hide @ 1000px
+    },
 
     // different views, max width is 600px
     main: {
       timeline: {
-        tweetList: {
-          tweet: {
+        tweetList: [
+          (tweet = {
             avatar,
             authorInfo: {
-              avatar, //  48x48, on profile min width is 48px up to 25% of profile width
+              avatar, //  32x32 (mobile), 48x48 elsewhere, on profile min width is 48px up to 25% of profile width
               name,
-              username,
+              username, // use word-wrap break and text-overflow when container is too small: https://developer.mozilla.org/en-US/docs/Web/CSS/text-overflow
               timeSincePosted, // regular view
               userOptions, // follow
               replyTo, // optional
@@ -196,15 +209,15 @@ const components = {
               media,
               metrics, // regular or fullview mode
               creationDate, // fullview mode
-              onClick: functions.app.fullViewTweet(),
+              onClick: functions.app.viewTweetThread(),
             },
-          },
-        },
+          }),
+        ],
       },
       profile: {
         mediaGallery: {},
       },
-      tweet: {},
+      TweetThread: {},
       search: {},
     },
 
@@ -213,7 +226,8 @@ const components = {
 };
 
 const notes = [
+  "vue router docs: https://router.vuejs.org/guide/",
   "fade in loaded tweets on scroll down",
   "other features: notifications, DMs",
-  "collection for followed user tweets?",
+  "scaling up concerns: pagination",
 ];
