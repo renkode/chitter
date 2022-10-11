@@ -13,12 +13,13 @@ const tweetObj = {
     id: STRING,
     type: STRING, // status | reply | quote
     text: STRING, // max 250 chars
-    hashtags: [STRING],
-    media: [
-      {
-        url: STRING, // max 4, max file size 5 mb
-      },
-    ],
+    hashtags: [STRING] | NULL,
+    media:
+      [
+        {
+          url: STRING, // max 4, max file size 5 mb
+        },
+      ] | NULL,
     authorId: STRING,
     metrics: {
       replyCount: NUMBER,
@@ -27,9 +28,16 @@ const tweetObj = {
       quoteCount: NUMBER,
     },
     createdAt: DATE,
-    replyToUserIds: [STRING] | NULL,
-    replyToTweetId: STRING | NULL,
-    quotingTweetId: STRING | NULL, // parse twitter link from body?
+    replyingTo:
+      {
+        userIds: [STRING],
+        tweetId: STRING,
+      } | NULL,
+    quoting:
+      {
+        userId: STRING,
+        tweetId: STRING,
+      } | NULL, // parse twitter link from body?
   },
   references: {
     repliesFrom: [
@@ -58,7 +66,7 @@ const userObj = {
     biography: {
       description: {
         text: STRING, // max 160 chars
-        hashtags: [STRING],
+        hashtags: [STRING] | NULL,
       },
       location: STRING,
       website: STRING,
@@ -74,7 +82,6 @@ const userObj = {
     tweetCount: NUMBER,
     pinnedTweetId: STRING,
     createdAt: DATE,
-    quote,
   },
   tweetData: {
     authoredTweets: [
@@ -184,7 +191,7 @@ const components = {
       tweetButton,
     },
     sidebar: {
-      // hide @ 1000px, max width 350px
+      // hide @ 1000px, 350px -> 290px @ 1100px breakpoint
       searchBar,
       signUp, // if logged out
       mediaGallery, // view = profile
@@ -226,6 +233,7 @@ const components = {
 };
 
 const notes = [
+  "vue rules: https://vuejs.org/style-guide/rules-essential.html",
   "vue router docs: https://router.vuejs.org/guide/",
   "fade in loaded tweets on scroll down",
   "other features: notifications, DMs",

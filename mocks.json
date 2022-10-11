@@ -1,0 +1,73 @@
+{
+  "tweets": [
+    {
+      "data": {
+        "id": 1,
+        "type": "status",
+        "text": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+        "hashtags": null,
+        "media": null,
+        "authorId": 1,
+        "metrics": {
+          "replyCount": 0,
+          "retweetCount": 0,
+          "likeCount": 1,
+          "quoteCount": 0
+        },
+        "createdAt": "2019-06-04T23:12:08.000Z",
+        "replyingTo": null,
+        "quoting": null
+      },
+      "references": {
+        "repliesFrom": [],
+        "retweetsFrom": [],
+        "quotesFrom": [],
+        "likesFrom": [2]
+      }
+    }
+  ],
+  "users": [
+    {
+      "userData": {
+        "id": 1,
+        "name": "ren",
+        "username": "renkode",
+        "biography": {
+          "description": {
+            "text": "lorem ipsum",
+            "hashtags": null
+          },
+          "location": "nowhere",
+          "website": "https://github.com/renkode/"
+        },
+        "imgs": {
+          "avatarUrl": "https://avatars.githubusercontent.com/u/12991989?s=400&u=ea6fc0d74de85872ce04e5b40aacde2c99b73fc5&v=4",
+          "headerUrl": ""
+        },
+        "followData": {
+          "followingCount": 0,
+          "followerCount": 0
+        },
+        "tweetCount": 1,
+        "pinnedTweetId": "",
+        "createdAt": "2019-06-03T23:12:08.000Z"
+      },
+      "tweetData": {
+        "authoredTweets": [
+          {
+            "id": 1,
+            "type": "status",
+            "containsMedia": false
+          }
+        ],
+        "retweets": [],
+        "likedTweets": []
+      },
+      "followData": {
+        "followingUserIds": [],
+        "followerUserIds": [],
+        "localTimeline": []
+      }
+    }
+  ]
+}
