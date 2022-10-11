@@ -191,7 +191,7 @@ const components = {
       tweetButton,
     },
     sidebar: {
-      // hide @ 1000px, 350px -> 290px @ 1100px breakpoint
+      // hide @ 1005px, 350px -> 290px @ 1100px breakpoint
       searchBar,
       signUp, // if logged out
       mediaGallery, // view = profile
@@ -199,7 +199,7 @@ const components = {
       footer,
     },
 
-    // different views, max width is 600px
+    // different views, max width is 600px, fluid @ 700px
     main: {
       timeline: {
         tweetList: [
