@@ -6,26 +6,26 @@
       <ul>
         <li>
           <span class="nav-icon"
-            ><v-icon name="gi-bird-house" scale="1.5" fill="white" /></span
-          >Home
+            ><v-icon name="gi-bird-house" scale="2.0" fill="white" /></span
+          ><span class="nav-label">Home</span>
         </li>
         <li>
           <span class="nav-icon"
             ><v-icon
               name="md-accesstime-round"
-              scale="1.25"
+              scale="1.5"
               fill="white" /></span
-          >Timeline
+          ><span class="nav-label">Timeline</span>
         </li>
         <li>
           <span class="nav-icon"
-            ><v-icon name="bi-person" scale="1.5" fill="white" /></span
-          >Profile
+            ><v-icon name="bi-person" scale="1.8" fill="white" /></span
+          ><span class="nav-label">Profile</span>
         </li>
       </ul>
       <button class="new-tweet-btn">
         <span class="new-tweet-btn-feather"
-          ><v-icon name="gi-feather" scale="1.5"
+          ><v-icon name="gi-feather" scale="1.8"
         /></span>
         <span class="new-tweet-btn-label">Tweet</span>
       </button>
@@ -62,13 +62,14 @@ li {
   align-items: center;
   transition: background-color 0.15s ease;
   margin-bottom: 0.5rem;
+  cursor: pointer;
 }
 
 li:hover {
   background-color: rgba(255, 255, 255, 0.144);
 }
 
-.nav-icon {
+li .nav-icon {
   height: 26px;
   width: 26px;
   display: flex;
@@ -128,6 +129,20 @@ li:hover {
     justify-content: center;
     align-items: center;
   }
+  li {
+    border-radius: 25px;
+    width: min-content;
+    width: 50px;
+    height: 50px;
+    justify-content: center;
+    padding: 0;
+  }
+  li .nav-icon {
+    margin: 0;
+  }
+  .nav-label {
+    display: none;
+  }
 }
 
 @media screen and (max-width: 1005px) {
@@ -146,25 +161,50 @@ li:hover {
   .nav-sidebar {
     border-top: rgba(255, 255, 255, 0.384) 1px solid;
     position: absolute;
-    bottom: 1%;
+    bottom: 0;
     height: 3.5rem;
     width: 100vw;
     flex-direction: row;
     justify-content: center;
     align-items: center;
   }
+  nav {
+    width: 100%;
+  }
   ul {
+    width: 100%;
+    height: 100%;
     display: flex;
     flex-direction: row;
+    justify-content: space-around;
+    align-items: center;
+    margin: 0;
+  }
+
+  li {
+    margin: 0;
+    padding: 0;
+    display: flex;
     justify-content: center;
     align-items: center;
+  }
+
+  .nav-icon {
+    margin: 0;
+  }
+  .nav-label {
+    display: none;
   }
 
   .new-tweet-btn,
   .new-tweet-btn-feather {
     width: 56px;
     height: 56px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
   }
+
   .new-tweet-btn {
     border-radius: 28px;
     position: absolute;

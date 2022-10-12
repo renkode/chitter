@@ -22,7 +22,7 @@ onUnmounted(() => {
       <div class="media-wrapper">
         <div class="search-tweet">
           <span class="search-icon">
-            <v-icon name="hi-search" fill="#ffffffd5"
+            <v-icon name="hi-search" fill="#ffffffd5" scale="1.3"
           /></span>
           <input type="search" placeholder="Search Chitter" />
         </div>
@@ -163,6 +163,12 @@ a:not(:hover) {
 @media screen and (max-width: 1100px) {
   .media-wrapper {
     width: 290px;
+  }
+}
+
+@media screen and (max-height: 500px) {
+  .media-wrapper {
+    width: 350px;
   }
 }
 </style>

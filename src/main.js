@@ -9,9 +9,25 @@ import {
   GiBirdHouse,
   MdAccesstimeRound,
   BiPerson,
+  FaRegularComment,
+  LaRetweetSolid,
+  FaRegularHeart,
+  GiShare,
+  HiDotsHorizontal,
 } from "oh-vue-icons/icons";
 
-addIcons(HiSearch, GiFeather, GiBirdHouse, MdAccesstimeRound, BiPerson);
+addIcons(
+  HiSearch,
+  GiFeather,
+  GiBirdHouse,
+  MdAccesstimeRound,
+  BiPerson,
+  FaRegularComment,
+  LaRetweetSolid,
+  FaRegularHeart,
+  GiShare,
+  HiDotsHorizontal
+);
 
 const app = createApp(App);
 app.component("v-icon", OhVueIcon);

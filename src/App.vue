@@ -18,6 +18,12 @@ html,
 body {
   width: 100%;
   height: 100%;
+}
+
+html,
+body,
+.nav-sidebar,
+.media-sidebar {
   background-color: rgb(38, 42, 46);
 }
 #app {
@@ -28,6 +34,11 @@ body {
   color: white;
   display: flex;
   flex-direction: row;
+  justify-content: center;
+}
+
+body {
+  display: flex;
   justify-content: center;
 }
 </style>

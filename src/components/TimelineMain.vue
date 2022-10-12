@@ -9,7 +9,6 @@ import TweetSC from "./TweetSC.vue";
       <div class="compose-tweet-container"></div>
       <div class="tweet-list">
         <TweetSC />
-        hos
       </div>
     </div>
   </div>
@@ -23,30 +22,29 @@ import TweetSC from "./TweetSC.vue";
 }
 
 .timeline-wrapper {
-  width: 100%;
+  width: 600px;
   height: 100%;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
+  border: rgba(255, 255, 255, 0.25) 1px solid;
+  border-top: 0;
+  border-bottom: 0;
 }
 
 .timeline-header {
   font-size: 1.2rem;
   height: 53px;
-  width: 598px;
+  width: 100%;
   display: flex;
   align-items: center;
+  padding-left: 16px;
 }
 
 .compose-tweet-container,
 .tweet-list {
-  border: rgba(255, 255, 255, 0.384) 1px solid;
-  border-top: 0;
-  width: 600px;
-}
-
-.tweet-list {
-  height: 100%;
+  border-bottom: rgba(255, 255, 255, 0.25) 1px solid;
+  width: 598px;
 }
 
 @media screen and (max-width: 1005px) {
@@ -57,13 +55,25 @@ import TweetSC from "./TweetSC.vue";
 }
 
 @media screen and (max-width: 700px) {
-  .main-wrapper {
-    max-width: 600px;
-  }
+  .main-wrapper,
+  .timeline-wrapper,
   .timeline-header,
   .compose-tweet-container,
   .tweet-list {
     width: 100%;
+  }
+}
+
+@media screen and (max-height: 500px) {
+  .main-wrapper {
+    display: flex;
+    justify-content: center;
+  }
+}
+
+@media screen and (max-width: 500px) {
+  .timeline-wrapper {
+    border: rgba(255, 255, 255, 0) 1px solid;
   }
 }
 </style>
