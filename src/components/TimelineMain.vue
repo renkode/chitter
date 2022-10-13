@@ -1,5 +1,26 @@
 <script setup>
+import { ref } from "vue";
 import TweetSC from "./TweetSC.vue";
+
+const pic = ref([
+  "https://pbs.twimg.com/media/Fe5_0Q4WAAA6-L6?format=jpg&name=large",
+]);
+const pics2 = ref([
+  "https://pbs.twimg.com/media/Fe6DN2jVIAEE4Xt?format=png&name=large",
+  "https://pbs.twimg.com/media/Fe2FJ3vUcAA_6zX?format=jpg&name=large",
+]);
+const pics3 = ref([
+  "https://pbs.twimg.com/media/Fe5WTVmXoAITutA?format=jpg&name=large",
+  "https://pbs.twimg.com/media/Fe5WT7-XoBoEEWt?format=jpg&name=large",
+  "https://pbs.twimg.com/media/Fe0r_ZgWAAEN8px?format=jpg&name=large",
+]);
+const pics4 = ref([
+  "https://pbs.twimg.com/media/Fb6m91SWAAMsMeb?format=jpg&name=large",
+  "https://pbs.twimg.com/media/Fb6nCfbXwAMLCBi?format=jpg&name=large",
+  "https://pbs.twimg.com/media/Fb6nEFlXoAAE98n?format=jpg&name=large",
+  "https://pbs.twimg.com/media/Fb6nFGsWIAM9e-R?format=jpg&name=large",
+]);
+console.log(pic, pics2, pics3, pics4);
 </script>
 
 <template>
@@ -8,7 +29,16 @@ import TweetSC from "./TweetSC.vue";
       <div class="timeline-header">Home</div>
       <div class="compose-tweet-container"></div>
       <div class="tweet-list">
-        <TweetSC />
+        <TweetSC
+          text="I think most people underestimate how little being 5’4 is. I’m
+            literally hopping around on my phone rn to type tjis out"
+          :media="pic"
+        />
+        <TweetSC
+          text="lmao has survived the transition from early internet, and yet rofl has not. Much to consider."
+          :media="pics2"
+        />
+        <!-- <TweetSC /> -->
       </div>
     </div>
   </div>
@@ -23,7 +53,7 @@ import TweetSC from "./TweetSC.vue";
 
 .timeline-wrapper {
   width: 600px;
-  height: 100%;
+  height: auto;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
@@ -34,16 +64,28 @@ import TweetSC from "./TweetSC.vue";
 
 .timeline-header {
   font-size: 1.2rem;
+  min-height: 53px;
   height: 53px;
   width: 100%;
+  padding-left: 16px;
+  background-color: rgba(38, 42, 46, 0.836);
+  backdrop-filter: blur(10px);
   display: flex;
   align-items: center;
-  padding-left: 16px;
+  position: sticky;
+  top: 0;
+}
+
+.compose-tweet-container {
+  border-bottom: rgba(255, 255, 255, 0.25) 1px solid;
+}
+
+.tweet-list {
+  height: 100%;
 }
 
 .compose-tweet-container,
 .tweet-list {
-  border-bottom: rgba(255, 255, 255, 0.25) 1px solid;
   width: 598px;
 }
 

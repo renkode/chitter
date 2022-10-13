@@ -13,6 +13,7 @@ import TimelineMain from "./components/TimelineMain.vue";
 <style>
 * {
   box-sizing: border-box;
+  scrollbar-width: thin;
 }
 html,
 body {

@@ -1,5 +1,23 @@
 <script setup>
-import { ref } from "vue";
+import { ref, defineProps, computed } from "vue";
+const props = defineProps({ text: String, media: Array });
+
+const getMediaClass = computed(() => {
+  if (!props.media || props.media.length === 0) return;
+  switch (props.media.length) {
+    case 1:
+      return "one-img";
+    case 2:
+      return "two-img";
+    case 3:
+      return "three-img";
+    case 4:
+      return "four-img";
+    default:
+      return "";
+  }
+});
+
 const pfpUrl = ref(
   "https://pbs.twimg.com/profile_images/1566523505155268608/AEzCad1D_400x400.png"
 );
@@ -31,8 +49,14 @@ const pfpUrl = ref(
         </div>
         <div class="tweet-content">
           <div class="tweet-text">
-            I think most people underestimate how little being 5’4 is. I’m
-            literally hopping around on my phone rn to type tjis out
+            {{ props.text }}
+          </div>
+          <div class="tweet-media" :class="[getMediaClass]">
+            <img
+              v-for="img in props.media"
+              :key="props.media.indexOf(img)"
+              :src="img"
+            />
           </div>
         </div>
 
@@ -66,7 +90,8 @@ const pfpUrl = ref(
 
 <style scoped>
 .tweet-container {
-  padding: 0.75rem 1rem;
+  border-bottom: rgba(255, 255, 255, 0.25) 1px solid;
+  padding: 0.75rem 1rem 0.4rem 1rem;
   width: 598px;
   display: flex;
   flex-direction: column;
@@ -112,12 +137,24 @@ const pfpUrl = ref(
   align-items: center;
 }
 
+.user-info-wrapper {
+}
+
 .username a,
 .tweet-time,
 .separator,
 .tweet-metric {
   vertical-align: center;
   color: rgba(255, 255, 255, 0.5);
+}
+
+.display-name,
+.username {
+  /* display: inline-block;
+  overflow: hidden; */
+  white-space: nowrap;
+  word-wrap: break-word;
+  text-overflow: ellipsis;
 }
 
 .username {
@@ -149,7 +186,7 @@ const pfpUrl = ref(
 }
 
 .tweet-content {
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.4rem;
 }
 
 .tweet-actions-wrapper {
@@ -162,12 +199,17 @@ const pfpUrl = ref(
 }
 
 .tweet-action-icon {
-  width: 35px;
-  height: 35px;
+  width: 34px;
+  height: 34px;
   border-radius: 999px;
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+.extra-btn {
+  position: relative;
+  left: 8px;
 }
 
 .tweet-action-icon,
@@ -213,13 +255,42 @@ const pfpUrl = ref(
 }
 
 .tweet-metrics {
+  position: relative;
+  left: -8px;
   display: flex;
   align-items: center;
 }
 
 .tweet-metric {
-  margin-left: 8px;
+  position: relative;
+  left: 4px;
   font-size: 0.9rem;
+}
+
+.tweet-media {
+  width: 100%;
+  margin-top: 0.5rem;
+  border: rgba(255, 255, 255, 0.25) 1px solid;
+  border-radius: 20px;
+  overflow: hidden;
+}
+
+.tweet-media img {
+  background-size: cover;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.two-img {
+  display: grid;
+  gap: 2px;
+  grid-template-columns: 1fr 1fr;
+  /* grid-template-rows: max(285px, 1fr); */
+  max-height: 285px;
 }
 
 @media screen and (max-width: 700px) {

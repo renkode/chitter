@@ -34,12 +34,13 @@
 </template>
 <style scoped>
 .nav-sidebar {
-  width: 100%;
-  max-height: 100vh;
+  height: 100%;
+  min-height: 100vh;
   display: flex;
   justify-content: flex-end;
   align-items: center;
   flex-shrink: 2;
+  z-index: 3;
 }
 
 nav {
@@ -160,7 +161,7 @@ li .nav-icon {
 @media screen and (max-width: 500px), (max-height: 500px) {
   .nav-sidebar {
     border-top: rgba(255, 255, 255, 0.384) 1px solid;
-    position: absolute;
+    position: fixed;
     bottom: 0;
     height: 3.5rem;
     width: 100vw;
@@ -209,7 +210,8 @@ li .nav-icon {
     border-radius: 28px;
     position: absolute;
     bottom: 135%;
-    right: 5%;
+    right: 3%;
+    box-shadow: 0px 0px 6px rgba(123, 213, 255, 0.425);
   }
 }
 </style>
