@@ -3,7 +3,7 @@ import { ref } from "vue";
 import TweetSC from "./TweetSC.vue";
 
 const pic = ref([
-  "https://pbs.twimg.com/media/Fe5_0Q4WAAA6-L6?format=jpg&name=large",
+  "https://pbs.twimg.com/media/Fe7KWHjUAAARNev?format=png&name=900x900",
 ]);
 const pics2 = ref([
   "https://pbs.twimg.com/media/Fe6DN2jVIAEE4Xt?format=png&name=large",
@@ -30,15 +30,20 @@ console.log(pic, pics2, pics3, pics4);
       <div class="compose-tweet-container"></div>
       <div class="tweet-list">
         <TweetSC
-          text="I think most people underestimate how little being 5’4 is. I’m
-            literally hopping around on my phone rn to type tjis out"
+          text="I think most people underestimate how little being 5’4 is. I’m literally hopping around on my phone rn to type tjis out"
           :media="pic"
         />
         <TweetSC
           text="lmao has survived the transition from early internet, and yet rofl has not. Much to consider."
           :media="pics2"
         />
-        <!-- <TweetSC /> -->
+        <TweetSC
+          text="38 y/o gf who still says “sweet summer child”: they’re debating whether PAWG is a slur and i just can’t with the hellsite today.
+
+Me [heard “PAWG” and got so hard i got nauseous]: i think i hauve Covid"
+          :media="pics3"
+        />
+        <TweetSC text="aheem heem" :media="pics4" />
       </div>
     </div>
   </div>
@@ -74,6 +79,7 @@ console.log(pic, pics2, pics3, pics4);
   align-items: center;
   position: sticky;
   top: 0;
+  z-index: 2;
 }
 
 .compose-tweet-container {

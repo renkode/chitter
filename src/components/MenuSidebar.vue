@@ -164,6 +164,7 @@ li .nav-icon {
     position: fixed;
     bottom: 0;
     height: 3.5rem;
+    min-height: 3.5rem;
     width: 100vw;
     flex-direction: row;
     justify-content: center;

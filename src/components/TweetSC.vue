@@ -170,6 +170,10 @@ const pfpUrl = ref(
   word-wrap: break-word;
 }
 
+.tweet-text {
+  white-space: pre-wrap;
+}
+
 .user-info-wrapper a,
 .display-name:visited,
 .username:visited {
@@ -254,6 +258,10 @@ const pfpUrl = ref(
   fill: rgb(226, 28, 104);
 }
 
+svg {
+  z-index: 0;
+}
+
 .tweet-metrics {
   position: relative;
   left: -8px;
@@ -268,7 +276,8 @@ const pfpUrl = ref(
 }
 
 .tweet-media {
-  width: 100%;
+  max-width: 100%;
+  width: fit-content;
   margin-top: 0.5rem;
   border: rgba(255, 255, 255, 0.25) 1px solid;
   border-radius: 20px;
@@ -280,17 +289,53 @@ const pfpUrl = ref(
   display: flex;
   align-items: center;
   justify-content: flex-start;
-  width: 100%;
+  max-width: 100%;
   height: 100%;
+  max-height: 510px;
   object-fit: cover;
 }
 
-.two-img {
+.two-img,
+.three-img,
+.four-img {
   display: grid;
   gap: 2px;
   grid-template-columns: 1fr 1fr;
-  /* grid-template-rows: max(285px, 1fr); */
   max-height: 285px;
+  width: 100%;
+}
+
+.three-img {
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr 1fr;
+  grid-template-areas:
+    "first second"
+    "first third";
+}
+
+.three-img img {
+  width: 100%;
+}
+
+.three-img img:first-child {
+  grid-area: first;
+}
+
+.three-img img:nth-child(2) {
+  grid-area: second;
+}
+
+.three-img img:last-child {
+  grid-area: third;
+}
+
+.four-img {
+  grid-template-rows: 1fr 1fr;
+  grid-template-areas: none;
+}
+
+.four-img img {
+  width: 100%;
 }
 
 @media screen and (max-width: 700px) {
