@@ -34,6 +34,7 @@
 </template>
 <style scoped>
 .nav-sidebar {
+  width: 100%;
   height: 100%;
   min-height: 100vh;
   display: flex;
@@ -44,6 +45,8 @@
 }
 
 nav {
+  position: fixed;
+  top: 0;
   height: 100%;
   width: 275px;
 }
@@ -153,8 +156,10 @@ li .nav-icon {
 }
 
 @media screen and (max-width: 700px) {
-  .nav-sidebar {
-    width: 88px;
+  .nav-sidebar,
+  nav {
+    min-width: 88px;
+    max-width: 88px;
   }
 }
 
@@ -166,12 +171,17 @@ li .nav-icon {
     height: 3.5rem;
     min-height: 3.5rem;
     width: 100vw;
+    max-width: 100vw;
     flex-direction: row;
     justify-content: center;
     align-items: center;
   }
   nav {
+    max-height: 3.5rem;
     width: 100%;
+    max-width: 100vw;
+    top: auto;
+    bottom: 0;
   }
   ul {
     width: 100%;

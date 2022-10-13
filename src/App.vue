@@ -16,7 +16,8 @@ import TimelineMain from "./components/TimelineMain.vue";
   scrollbar-width: thin;
 }
 html,
-body {
+body,
+#app {
   width: 100%;
   height: 100%;
 }
@@ -35,7 +36,6 @@ body,
   color: white;
   display: flex;
   flex-direction: row;
-  justify-content: center;
 }
 
 body {

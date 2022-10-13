@@ -3,7 +3,7 @@ import { ref } from "vue";
 import TweetSC from "./TweetSC.vue";
 
 const pic = ref([
-  "https://pbs.twimg.com/media/Fe7KWHjUAAARNev?format=png&name=900x900",
+  "https://pbs.twimg.com/media/FeyTT0TaEAE4HGa?format=jpg&name=large",
 ]);
 const pics2 = ref([
   "https://pbs.twimg.com/media/Fe6DN2jVIAEE4Xt?format=png&name=large",
@@ -20,7 +20,6 @@ const pics4 = ref([
   "https://pbs.twimg.com/media/Fb6nEFlXoAAE98n?format=jpg&name=large",
   "https://pbs.twimg.com/media/Fb6nFGsWIAM9e-R?format=jpg&name=large",
 ]);
-console.log(pic, pics2, pics3, pics4);
 </script>
 
 <template>
@@ -58,7 +57,7 @@ Me [heard “PAWG” and got so hard i got nauseous]: i think i hauve Covid"
 
 .timeline-wrapper {
   width: 600px;
-  height: auto;
+  height: fit-content;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
@@ -87,7 +86,7 @@ Me [heard “PAWG” and got so hard i got nauseous]: i think i hauve Covid"
 }
 
 .tweet-list {
-  height: 100%;
+  height: fit-content;
 }
 
 .compose-tweet-container,

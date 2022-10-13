@@ -73,7 +73,9 @@ onUnmounted(() => {
 }
 
 .media-wrapper {
-  width: 350px;
+  position: fixed;
+  top: 0;
+  max-width: 350px;
   max-height: 100vh;
 }
 
