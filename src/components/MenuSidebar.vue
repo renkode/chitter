@@ -10,12 +10,12 @@ const props = defineProps({
   <div class="nav-sidebar">
     <nav>
       <ul>
-        <li>
+        <li class="nav-item">
           <span class="nav-icon"
             ><v-icon name="gi-bird-house" scale="2.0" fill="white" /></span
           ><span class="nav-label">Home</span>
         </li>
-        <li>
+        <li class="nav-item">
           <span class="nav-icon"
             ><v-icon
               name="md-accesstime-round"
@@ -23,7 +23,7 @@ const props = defineProps({
               fill="white" /></span
           ><span class="nav-label">Timeline</span>
         </li>
-        <li>
+        <li class="nav-item">
           <span class="nav-icon"
             ><v-icon name="bi-person" scale="1.8" fill="white" /></span
           ><span class="nav-label">Profile</span>
@@ -101,6 +101,10 @@ li .nav-icon {
   margin-right: 18px;
 }
 
+.nav-item {
+  font-size: 1.3rem;
+}
+
 .nav-user {
   width: 95%;
   height: 64px;
@@ -163,6 +167,7 @@ li .nav-icon {
 }
 
 .new-tweet-btn-label {
+  font-size: 1.2rem;
   font-weight: bold;
 }
 

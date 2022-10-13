@@ -123,9 +123,6 @@ const pfpUrl = ref(
   align-items: center;
 }
 
-.user-info-wrapper {
-}
-
 .username,
 .username a,
 .tweet-time,
@@ -139,7 +136,6 @@ const pfpUrl = ref(
 .username {
   /* display: inline-block;
   overflow: hidden; */
-  font-size: 15px;
   white-space: nowrap;
   word-wrap: break-word;
   text-overflow: ellipsis;

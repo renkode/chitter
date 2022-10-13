@@ -3,7 +3,7 @@ import { ref } from "vue";
 import TweetSC from "./TweetSC.vue";
 
 const pic = ref([
-  "https://pbs.twimg.com/media/FeyTT0TaEAE4HGa?format=jpg&name=large",
+  "https://pbs.twimg.com/media/Fe60ymvXgAE0I8N?format=png&name=large",
 ]);
 const pics2 = ref([
   "https://pbs.twimg.com/media/Fe6DN2jVIAEE4Xt?format=png&name=large",

@@ -121,7 +121,7 @@ input {
 }
 
 .trending-header {
-  font-size: 1.4rem;
+  font-size: 1.5rem;
   font-weight: bold;
   padding: 14px;
 }
@@ -141,10 +141,14 @@ input {
   background-color: rgba(255, 255, 255, 0.07);
 }
 
+.trend-headline {
+  font-size: 1.1rem;
+}
+
 .trend-type,
 .trend-tweets,
 footer {
-  font-size: 0.8rem;
+  font-size: 0.9rem;
   color: rgba(255, 255, 255, 0.384);
 }
 
