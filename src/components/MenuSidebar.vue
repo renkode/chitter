@@ -10,6 +10,11 @@ const props = defineProps({
   <div class="nav-sidebar">
     <nav>
       <ul>
+        <li class="nav-item nav-logo">
+          <span class="nav-icon"
+            ><v-icon name="bi-twitter" scale="2.0" fill="white"
+          /></span>
+        </li>
         <li class="nav-item">
           <span class="nav-icon"
             ><v-icon name="gi-bird-house" scale="2.0" fill="white" /></span
@@ -37,7 +42,10 @@ const props = defineProps({
       </button>
       <li class="nav-user">
         <div class="user-info-and-btn">
-          <ProfilePicture :profilePicUrl="props.user.profilePicUrl" size="40" />
+          <ProfilePicture
+            :profilePicUrl="props.user.profilePicUrl"
+            :size="40"
+          />
           <div class="user-info-wrapper">
             <span class="display-name">{{ props.user.displayName }}</span>
             <span class="username">@{{ props.user.username }}</span>
@@ -58,7 +66,7 @@ const props = defineProps({
   display: flex;
   justify-content: flex-end;
   align-items: center;
-  flex-shrink: 2;
+  flex-shrink: 2.25;
   z-index: 3;
 }
 
@@ -79,11 +87,12 @@ li {
   border-radius: 25px;
   width: min-content;
   height: 50px;
-  padding: 4px 30px 4px 10px;
+  padding: 4px 10px;
   display: flex;
+  justify-content: center;
   align-items: center;
   transition: background-color 0.15s ease;
-  margin-bottom: 0.5rem;
+  margin-bottom: 1rem;
   cursor: pointer;
 }
 
@@ -101,8 +110,22 @@ li .nav-icon {
   margin-right: 18px;
 }
 
+li.nav-item.nav-logo {
+  width: 50px;
+  padding: 4px;
+  border-radius: 99px;
+}
+
+li.nav-item.nav-logo .nav-icon {
+  margin: 0;
+}
+
 .nav-item {
   font-size: 1.3rem;
+}
+
+.nav-label {
+  padding-right: 20px;
 }
 
 .nav-user {
@@ -216,7 +239,8 @@ li .nav-icon {
     height: 64px;
     width: 64px;
   }
-  .user-info-and-btn {
+  .user-info-wrapper,
+  .extra-btn {
     display: none;
   }
 }
@@ -295,6 +319,14 @@ li .nav-icon {
     bottom: 135%;
     right: 3%;
     box-shadow: 0px 0px 6px rgba(123, 213, 255, 0.425);
+  }
+  .new-tweet-btn-label {
+    display: none;
+  }
+
+  .nav-user,
+  li.nav-item.nav-logo {
+    display: none;
   }
 }
 </style>

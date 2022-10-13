@@ -14,6 +14,7 @@ import {
   FaRegularHeart,
   GiShare,
   HiDotsHorizontal,
+  BiTwitter,
 } from "oh-vue-icons/icons";
 
 addIcons(
@@ -26,7 +27,8 @@ addIcons(
   LaRetweetSolid,
   FaRegularHeart,
   GiShare,
-  HiDotsHorizontal
+  HiDotsHorizontal,
+  BiTwitter
 );
 
 const app = createApp(App);

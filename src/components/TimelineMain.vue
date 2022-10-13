@@ -29,11 +29,11 @@ const pics4 = ref([
       <div class="compose-tweet-container"></div>
       <div class="tweet-list">
         <TweetSC
-          text="I think most people underestimate how little being 5’4 is. I’m literally hopping around on my phone rn to type tjis out"
+          text="I think most people underestimate how little being 5’4 is. I’m literally hopping around on my phone rn to type tjis out #girl"
           :media="pic"
         />
         <TweetSC
-          text="lmao has survived the transition from early internet, and yet rofl has not. Much to consider."
+          text="lmao has survived the transition from early internet, and yet rofl has not. Much to consider. https://oh-vue-icons.js.org/"
           :media="pics2"
         />
         <TweetSC

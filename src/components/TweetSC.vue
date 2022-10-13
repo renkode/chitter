@@ -1,5 +1,5 @@
 <script setup>
-import { ref, defineProps, computed } from "vue";
+import { ref, defineProps, computed, onMounted } from "vue";
 import ProfilePicture from "./ProfilePicture.vue";
 const props = defineProps({ text: String, media: Array });
 
@@ -22,6 +22,31 @@ const getMediaClass = computed(() => {
 const pfpUrl = ref(
   "https://pbs.twimg.com/profile_images/1566523505155268608/AEzCad1D_400x400.png"
 );
+
+// embed hashtags and links inside tweets
+const parseHashtagsAndLinks = computed(() => {
+  if (!props.text || props.text.length === 0) return;
+  const arr = props.text.split(" ");
+  const urlRegex = new RegExp(
+    /[-a-zA-Z0-9@:%._~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_.~#?&//=]*)?/gi
+  );
+  const hashtagRegex = new RegExp(/(#+[a-zA-Z0-9(_)]{1,})/g);
+  const newArr = arr.map((str) => {
+    if (str.match(urlRegex)) {
+      return `<a class="link" href="${str}">${str}</a>`;
+    } else if (str.match(hashtagRegex)) {
+      return `<a class="hashtag" href="#">${str}</a>`;
+    } else {
+      return str;
+    }
+  });
+  return newArr.join(" ");
+});
+
+const tweetText = ref(null);
+onMounted(() => {
+  tweetText.value.innerHTML = parseHashtagsAndLinks.value;
+});
 </script>
 
 <template>
@@ -29,7 +54,7 @@ const pfpUrl = ref(
     <!-- <div class="user-retweet">lorem ipsum Retweeted</div> -->
     <div class="tweet-body">
       <div class="profile-pic-container">
-        <ProfilePicture :profilePicUrl="pfpUrl" size="48" />
+        <ProfilePicture :profilePicUrl="pfpUrl" :size="48" />
       </div>
       <div class="tweet-data">
         <div class="user-info-and-btn">
@@ -46,9 +71,7 @@ const pfpUrl = ref(
           /></span>
         </div>
         <div class="tweet-content">
-          <div class="tweet-text">
-            {{ props.text }}
-          </div>
+          <div class="tweet-text" ref="tweetText"></div>
           <div class="tweet-media" :class="[getMediaClass]">
             <img
               v-for="img in props.media"
@@ -320,6 +343,18 @@ svg {
 
 .four-img img {
   width: 100%;
+}
+
+.hashtag,
+.link {
+  color: #1d9bf0;
+  text-decoration: none;
+}
+
+.hashtag:hover,
+.link:hover {
+  color: #1d9bf0;
+  text-decoration: underline;
 }
 
 @media screen and (max-width: 700px) {

@@ -21,6 +21,7 @@ const props = defineProps({
 <style scoped>
 .profile-pic {
   background-size: cover;
+  background-color: rgb(175, 175, 175);
   cursor: pointer;
   transition: box-shadow 0.15s ease;
 }
