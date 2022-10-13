@@ -1,5 +1,6 @@
 <script setup>
 import { ref, defineProps, computed } from "vue";
+import ProfilePicture from "./ProfilePicture.vue";
 const props = defineProps({ text: String, media: Array });
 
 const getMediaClass = computed(() => {
@@ -28,10 +29,7 @@ const pfpUrl = ref(
     <!-- <div class="user-retweet">lorem ipsum Retweeted</div> -->
     <div class="tweet-body">
       <div class="profile-pic-container">
-        <div
-          class="profile-pic"
-          :style="{ backgroundImage: `url(${pfpUrl})` }"
-        ></div>
+        <ProfilePicture :profilePicUrl="pfpUrl" size="48" />
       </div>
       <div class="tweet-data">
         <div class="user-info-and-btn">
@@ -88,7 +86,7 @@ const pfpUrl = ref(
   </div>
 </template>
 
-<style scoped>
+<style>
 .tweet-container {
   border-bottom: rgba(255, 255, 255, 0.25) 1px solid;
   padding: 0.75rem 1rem 0.4rem 1rem;
@@ -110,18 +108,6 @@ const pfpUrl = ref(
 .profile-pic-container {
   height: 100%;
 }
-.profile-pic {
-  border-radius: 24px;
-  width: 48px;
-  height: 48px;
-  background-size: cover;
-  cursor: pointer;
-  transition: box-shadow 0.15s ease;
-}
-
-.profile-pic:hover {
-  box-shadow: rgba(0, 0, 0, 0.2) 0px 0px 48px inset;
-}
 
 .tweet-data {
   padding-left: 1rem;
@@ -140,6 +126,7 @@ const pfpUrl = ref(
 .user-info-wrapper {
 }
 
+.username,
 .username a,
 .tweet-time,
 .separator,
@@ -152,6 +139,7 @@ const pfpUrl = ref(
 .username {
   /* display: inline-block;
   overflow: hidden; */
+  font-size: 15px;
   white-space: nowrap;
   word-wrap: break-word;
   text-overflow: ellipsis;

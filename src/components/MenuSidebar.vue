@@ -1,4 +1,10 @@
-<script setup></script>
+<script setup>
+import { defineProps } from "vue";
+import ProfilePicture from "./ProfilePicture.vue";
+const props = defineProps({
+  user: { profilePicUrl: String, displayName: String, username: String },
+});
+</script>
 
 <template>
   <div class="nav-sidebar">
@@ -29,6 +35,18 @@
         /></span>
         <span class="new-tweet-btn-label">Tweet</span>
       </button>
+      <li class="nav-user">
+        <div class="user-info-and-btn">
+          <ProfilePicture :profilePicUrl="props.user.profilePicUrl" size="40" />
+          <div class="user-info-wrapper">
+            <span class="display-name">{{ props.user.displayName }}</span>
+            <span class="username">@{{ props.user.username }}</span>
+          </div>
+        </div>
+        <span class="tweet-action-icon extra-btn"
+          ><v-icon name="hi-dots-horizontal" scale="1.0" fill="#ffffff80"
+        /></span>
+      </li>
     </nav>
   </div>
 </template>
@@ -83,6 +101,48 @@ li .nav-icon {
   margin-right: 18px;
 }
 
+.nav-user {
+  width: 95%;
+  height: 64px;
+  border-radius: 32px;
+  position: absolute;
+  bottom: 0;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.user-info-and-btn {
+  width: auto;
+  height: 100%;
+  margin-bottom: 0;
+}
+
+.user-info-wrapper {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.profile-pic {
+  margin-right: 0.5rem;
+}
+
+.username {
+  margin-left: 0;
+}
+
+.extra-btn {
+  position: static;
+}
+
+.extra-btn:hover {
+  background-color: rgba(255, 255, 255, 0);
+}
+
 .new-tweet-btn {
   border: 0;
   border-radius: 25px;
@@ -134,7 +194,7 @@ li .nav-icon {
     align-items: center;
   }
   li {
-    border-radius: 25px;
+    border-radius: 99px;
     width: min-content;
     width: 50px;
     height: 50px;
@@ -145,6 +205,13 @@ li .nav-icon {
     margin: 0;
   }
   .nav-label {
+    display: none;
+  }
+  .nav-user {
+    height: 64px;
+    width: 64px;
+  }
+  .user-info-and-btn {
     display: none;
   }
 }
