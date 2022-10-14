@@ -19,7 +19,7 @@ export const useTweetStore = defineStore("tweets", {
           media: [
             "https://pbs.twimg.com/media/Fe_VPZRXwAcQJ8r?format=jpg&name=large",
           ],
-          authorId: 1,
+          authorId: 2,
           metrics: {
             replyCount: 4,
             retweetCount: 329,
@@ -148,7 +148,7 @@ export const useTweetStore = defineStore("tweets", {
     },
     // getTimeSinceCreation(id) {
     //   console.log(this.tweets);
-    //   const time = this.tweets.filter((t) => t.data.id === id)[0].data
+    //   const time = this.tweets.filter((t) => t.data.id == id)[0].data
     //     .createdAt;
     //   console.log(time);
     //   if (!time) return "Unknown";

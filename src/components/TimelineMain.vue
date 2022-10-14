@@ -1,11 +1,11 @@
 <script setup>
 import { ref } from "vue";
 import { useTweetStore } from "@/stores/tweets.js";
+import { useUsersStore } from "@/stores/users.js";
 import TweetSC from "./TweetSC.vue";
 
-const store = useTweetStore();
-
-const log = (s) => console.log(s);
+const tweetStore = useTweetStore();
+const usersStore = useUsersStore();
 </script>
 
 <template>
@@ -15,12 +15,10 @@ const log = (s) => console.log(s);
       <div class="compose-tweet-container"></div>
       <div class="tweet-list">
         <TweetSC
-          v-for="tweet in store.tweets"
+          v-for="tweet in tweetStore.tweets"
           :key="tweet.data.id"
-          :text="tweet.data.text"
-          :media="tweet.data.media"
-          :metrics="tweet.data.metrics"
-          :time="tweet.data.createdAt"
+          :userData="usersStore.getUserData(tweet.data.authorId)"
+          :tweetData="tweet.data"
         />
       </div>
     </div>

@@ -7,16 +7,11 @@ import formatDateMixin from "../mixins/formatDateMixin.js";
 var relativeTime = require("dayjs/plugin/relativeTime");
 dayjs.extend(relativeTime);
 
-const props = defineProps({
-  text: String,
-  media: Array,
-  metrics: Object,
-  time: String,
-});
+const props = defineProps({ userData: Object, tweetData: Object });
 
 const getMediaClass = computed(() => {
-  if (!props.media || props.media.length === 0) return;
-  switch (props.media.length) {
+  if (!props.tweetData.media || props.tweetData.media.length === 0) return;
+  switch (props.tweetData.media.length) {
     case 1:
       return "one-img";
     case 2:
@@ -36,7 +31,7 @@ const pfpUrl = ref(
 
 // embed @'s, hashtags and links inside tweets
 const embedLinks = computed(() => {
-  if (!props.text || props.text.length === 0) return;
+  if (!props.tweetData.text || props.tweetData.text.length === 0) return;
 
   const urlRegex = new RegExp(
     /[-a-zA-Z0-9@:%._~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_.~#?&//=]*)?/gi
@@ -44,7 +39,7 @@ const embedLinks = computed(() => {
   const hashtagRegex = new RegExp(/(#+[a-zA-Z0-9(_)]{1,})/g);
   const atRegex = new RegExp(/(@+[a-zA-Z0-9(_)]{1,})/g);
 
-  const embedArr = props.text.split(" ").map((str) => {
+  const embedArr = props.tweetData.text.split(" ").map((str) => {
     switch (true) {
       case urlRegex.test(str):
         return `<a class="tweet-link" href="${str}" target="_blank">${str}</a>`;
@@ -59,33 +54,6 @@ const embedLinks = computed(() => {
   return embedArr.join(" ");
 });
 
-const currentTime = ref(dayjs().toISOString());
-const getTimeSinceCreation = ref(
-  formatDateMixin.formatDate(props.time, currentTime.value)
-);
-const tweetText = ref(null);
-
-onMounted(() => {
-  // set tweet text
-  tweetText.value.innerHTML = embedLinks.value;
-  // update tweet time every 30s (if tweet isn't a day old);
-  if (dayjs(currentTime.value).diff(dayjs(props.time), "hour") > 23) return;
-  const timer = setInterval(() => {
-    if (
-      getTimeSinceCreation.value !==
-      formatDateMixin.formatDate(props.time, currentTime.value)
-    ) {
-      getTimeSinceCreation.value = formatDateMixin.formatDate(
-        props.time,
-        currentTime.value
-      );
-    }
-  }, 30000);
-  return () => {
-    clearInterval(timer);
-  };
-});
-
 const isTweetMenuOpen = ref(false);
 const toggleTweetMenu = (e) => {
   e.preventDefault();
@@ -95,6 +63,36 @@ const toggleTweetMenu = (e) => {
 const doSomething = () => {
   console.log("tweet menu action");
 };
+
+const currentTime = ref(dayjs().toISOString());
+const getTimeSinceCreation = ref(
+  formatDateMixin.formatDate(props.tweetData.createdAt, currentTime.value)
+);
+const tweetText = ref(null);
+
+onMounted(() => {
+  // set tweet text
+  tweetText.value.innerHTML = embedLinks.value;
+  // update tweet time every 30s (if tweet isn't a day old);
+  if (
+    dayjs(currentTime.value).diff(dayjs(props.tweetData.createdAt), "hour") > 23
+  )
+    return;
+  const timer = setInterval(() => {
+    if (
+      getTimeSinceCreation.value !==
+      formatDateMixin.formatDate(props.tweetData.createdAt, currentTime.value)
+    ) {
+      getTimeSinceCreation.value = formatDateMixin.formatDate(
+        props.tweetData.createdAt,
+        currentTime.value
+      );
+    }
+  }, 30000);
+  return () => {
+    clearInterval(timer);
+  };
+});
 </script>
 
 <template>
@@ -102,15 +100,20 @@ const doSomething = () => {
     <!-- <div class="user-retweet">lorem ipsum Retweeted</div> -->
     <div class="tweet-body">
       <div class="profile-pic-container">
-        <ProfilePicture :profilePicUrl="pfpUrl" :size="48" />
+        <ProfilePicture
+          :profilePicUrl="props.userData.imgs.avatarUrl"
+          :size="48"
+        />
       </div>
       <div class="tweet-data">
         <div class="user-info-and-btn">
           <div class="user-info-wrapper">
             <span class="display-name"
-              ><a href="#">among us forever 🍆</a></span
+              ><a href="#">{{ props.userData.name }}</a></span
             >
-            <span class="username"><a href="#">@renkode</a></span>
+            <span class="username"
+              ><a href="#">@{{ props.userData.username }}</a></span
+            >
             <span class="separator">·</span>
             <span class="tweet-time">{{ getTimeSinceCreation }}</span>
           </div>
@@ -150,11 +153,11 @@ const doSomething = () => {
           <div
             class="tweet-media"
             :class="[getMediaClass]"
-            v-if="props.media.length > 0"
+            v-if="props.tweetData.media.length > 0"
           >
             <img
-              v-for="img in props.media"
-              :key="props.media.indexOf(img)"
+              v-for="img in props.tweetData.media"
+              :key="props.tweetData.media.indexOf(img)"
               :src="img"
             />
           </div>
@@ -166,9 +169,9 @@ const doSomething = () => {
               ><v-icon name="fa-regular-comment" scale="1.0" fill="#ffffff80"
             /></span>
             <span
-              v-if="props.metrics.replyCount > 0"
+              v-if="props.tweetData.metrics.replyCount > 0"
               class="tweet-metric reply-metric"
-              >{{ props.metrics.replyCount }}</span
+              >{{ props.tweetData.metrics.replyCount }}</span
             >
           </span>
           <span class="tweet-metrics">
@@ -176,9 +179,9 @@ const doSomething = () => {
               ><v-icon name="la-retweet-solid" scale="1.15" fill="#ffffff80"
             /></span>
             <span
-              v-if="props.metrics.retweetCount > 0"
+              v-if="props.tweetData.metrics.retweetCount > 0"
               class="tweet-metric retweet-metric"
-              >{{ props.metrics.retweetCount }}</span
+              >{{ props.tweetData.metrics.retweetCount }}</span
             >
           </span>
           <span class="tweet-metrics">
@@ -186,9 +189,9 @@ const doSomething = () => {
               ><v-icon name="fa-regular-heart" scale="1.0" fill="#ffffff80"
             /></span>
             <span
-              v-if="props.metrics.likeCount > 0"
+              v-if="props.tweetData.metrics.likeCount > 0"
               class="tweet-metric like-metric"
-              >{{ props.metrics.likeCount }}</span
+              >{{ props.tweetData.metrics.likeCount }}</span
             >
           </span>
           <span class="tweet-action-icon share-tweet-btn"
