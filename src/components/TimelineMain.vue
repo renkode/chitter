@@ -3,10 +3,10 @@ import { ref } from "vue";
 import TweetSC from "./TweetSC.vue";
 
 const pic = ref([
-  "https://pbs.twimg.com/media/Fe60ymvXgAE0I8N?format=png&name=large",
+  "https://pbs.twimg.com/media/Fe_VPZRXwAcQJ8r?format=jpg&name=large",
 ]);
 const pics2 = ref([
-  "https://pbs.twimg.com/media/Fe6DN2jVIAEE4Xt?format=png&name=large",
+  "https://pbs.twimg.com/media/Fe_7yHVUcAUwGVg?format=jpg&name=large",
   "https://pbs.twimg.com/media/Fe2FJ3vUcAA_6zX?format=jpg&name=large",
 ]);
 const pics3 = ref([
@@ -29,7 +29,7 @@ const pics4 = ref([
       <div class="compose-tweet-container"></div>
       <div class="tweet-list">
         <TweetSC
-          text="I think most people underestimate how little being 5’4 is. I’m literally hopping around on my phone rn to type tjis out #girl"
+          text="I think most people underestimate how #little being 5’4 is. I’m literally hopping around on my phone rn to type tjis out #girl"
           :media="pic"
         />
         <TweetSC

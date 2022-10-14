@@ -13,8 +13,7 @@
     "normalize.css": "^8.0.1",
     "oh-vue-icons": "^1.0.0-rc3",
     "vue": "^3.2.13",
-    "vue-router": "4",
-    "vue-screen-size": "^2.0.4"
+    "vue-router": "4"
   },
   "devDependencies": {
     "@babel/core": "^7.12.16",
@@ -37,7 +36,9 @@
     "parserOptions": {
       "parser": "@babel/eslint-parser"
     },
-    "rules": {}
+    "rules": {
+      "no-unused-vars": "off"
+    }
   },
   "browserslist": [
     "> 1%",

@@ -23,30 +23,45 @@ const pfpUrl = ref(
   "https://pbs.twimg.com/profile_images/1566523505155268608/AEzCad1D_400x400.png"
 );
 
-// embed hashtags and links inside tweets
-const parseHashtagsAndLinks = computed(() => {
+// embed @'s, hashtags and links inside tweets
+const embedLinks = computed(() => {
   if (!props.text || props.text.length === 0) return;
-  const arr = props.text.split(" ");
+
   const urlRegex = new RegExp(
     /[-a-zA-Z0-9@:%._~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_.~#?&//=]*)?/gi
   );
   const hashtagRegex = new RegExp(/(#+[a-zA-Z0-9(_)]{1,})/g);
-  const newArr = arr.map((str) => {
-    if (str.match(urlRegex)) {
-      return `<a class="link" href="${str}">${str}</a>`;
-    } else if (str.match(hashtagRegex)) {
-      return `<a class="hashtag" href="#">${str}</a>`;
-    } else {
-      return str;
+  const atRegex = new RegExp(/(@+[a-zA-Z0-9(_)]{1,})/g);
+
+  const embedArr = props.text.split(" ").map((str) => {
+    switch (true) {
+      case urlRegex.test(str):
+        return `<a class="tweet-link" href="${str}" target="_blank">${str}</a>`;
+      case hashtagRegex.test(str):
+        return `<a class="tweet-link" href="#">${str}</a>`;
+      case atRegex.test(str):
+        return `<a class="tweet-link" href="#">${str}</a>`;
+      default:
+        return str;
     }
   });
-  return newArr.join(" ");
+  return embedArr.join(" ");
 });
 
 const tweetText = ref(null);
 onMounted(() => {
-  tweetText.value.innerHTML = parseHashtagsAndLinks.value;
+  tweetText.value.innerHTML = embedLinks.value;
 });
+
+const isTweetMenuOpen = ref(false);
+const toggleTweetMenu = (e) => {
+  e.preventDefault();
+  isTweetMenuOpen.value = !isTweetMenuOpen.value;
+};
+
+const doSomething = () => {
+  console.log("tweet menu action");
+};
 </script>
 
 <template>
@@ -66,9 +81,36 @@ onMounted(() => {
             <span class="separator">·</span>
             <span class="tweet-time">23m</span>
           </div>
-          <span class="tweet-action-icon extra-btn"
-            ><v-icon name="hi-dots-horizontal" scale="1.0" fill="#ffffff80"
-          /></span>
+          <span class="tweet-action-icon extra-btn" @click="toggleTweetMenu"
+            ><v-icon name="hi-dots-horizontal" scale="1.0" fill="#ffffff80" />
+            <div v-if="isTweetMenuOpen" class="overlay"></div>
+            <div v-if="isTweetMenuOpen" class="tweet-menu-container">
+              <ul class="tweet-menu-list">
+                <li class="tweet-menu-item delete-tweet" @click="doSomething">
+                  <span class="tweet-menu-icon"
+                    ><v-icon name="bi-trash" scale="1.1" fill="red" /></span
+                  >Delete
+                </li>
+                <li class="tweet-menu-item">
+                  <span class="tweet-menu-icon"
+                    ><v-icon
+                      name="co-user-follow"
+                      scale="1.1"
+                      fill="#ffffff80" /></span
+                  >Follow @username
+                </li>
+                <li class="tweet-menu-item">
+                  <span class="tweet-menu-icon"
+                    ><v-icon
+                      name="co-user-unfollow"
+                      scale="1.1"
+                      fill="#ffffff80" /></span
+                  >Unfollow @username
+                </li>
+                <button class="cancel-btn">Cancel</button>
+              </ul>
+            </div></span
+          >
         </div>
         <div class="tweet-content">
           <div class="tweet-text" ref="tweetText"></div>
@@ -200,6 +242,15 @@ onMounted(() => {
   margin-bottom: 0.4rem;
 }
 
+.tweet-link {
+  color: #1d9bf0;
+  text-decoration: none;
+}
+
+.tweet-link:hover {
+  text-decoration: underline;
+}
+
 .tweet-actions-wrapper {
   max-width: 425px;
   width: 100%;
@@ -239,7 +290,7 @@ onMounted(() => {
 
 .reply-btn:hover svg,
 .share-tweet-btn:hover svg,
-.extra-btn:hover svg,
+.extra-btn:hover > svg,
 .reply-btn:hover + .reply-metric {
   color: rgb(20, 181, 245);
   fill: rgb(20, 181, 245);
@@ -345,16 +396,47 @@ svg {
   width: 100%;
 }
 
-.hashtag,
-.link {
-  color: #1d9bf0;
-  text-decoration: none;
+.tweet-menu-container {
+  border-radius: 10px;
+  box-shadow: 0px 0px 6px rgba(255, 255, 255, 0.3);
+  color: white;
+  position: absolute;
+  width: max-content;
+  height: fit-content;
+  z-index: 5;
+  left: -152px;
+  top: 0px;
 }
 
-.hashtag:hover,
-.link:hover {
-  color: #1d9bf0;
-  text-decoration: underline;
+.tweet-menu-container li {
+  cursor: pointer;
+  padding: 0.7em 0.5rem;
+}
+
+.tweet-menu-container li:hover {
+  background-color: rgba(255, 255, 255, 0.137);
+}
+
+.tweet-menu-icon {
+  margin-right: 8px;
+}
+
+.overlay {
+  position: fixed;
+  height: 100%;
+  width: 100%;
+  top: 0;
+  left: 0;
+  z-index: 4;
+  cursor: default;
+}
+
+.delete-tweet {
+  color: red;
+}
+
+.cancel-btn {
+  display: none;
 }
 
 @media screen and (max-width: 700px) {

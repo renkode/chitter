@@ -33,7 +33,9 @@ body,
 html,
 body,
 .nav-sidebar,
-.media-sidebar {
+.media-sidebar,
+.tweet-container,
+.tweet-menu-container {
   background-color: rgb(38, 42, 46);
 }
 #app {
@@ -49,5 +51,13 @@ body,
 body {
   display: flex;
   justify-content: center;
+}
+
+ul {
+  padding: 0;
+}
+
+li {
+  list-style: none;
 }
 </style>
