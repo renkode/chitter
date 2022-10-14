@@ -1,5 +1,8 @@
 import { defineStore } from "pinia";
 
+const date = new Date();
+const iso = date.toISOString();
+
 // main is the name of the store. It is unique across your application
 // and will appear in devtools
 export const useTweetStore = defineStore("tweets", {
@@ -23,7 +26,7 @@ export const useTweetStore = defineStore("tweets", {
             likeCount: 1438,
             quoteCount: 0,
           },
-          createdAt: "2022-10-14T07:25:42.356Z",
+          createdAt: iso,
           replyingTo: null,
           quoting: null,
         },

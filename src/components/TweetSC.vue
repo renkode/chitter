@@ -1,7 +1,12 @@
 <script setup>
 import { ref, defineProps, computed, onMounted } from "vue";
+import dayjs from "dayjs";
 import ProfilePicture from "./ProfilePicture.vue";
 import formatDateMixin from "../mixins/formatDateMixin.js";
+
+var relativeTime = require("dayjs/plugin/relativeTime");
+dayjs.extend(relativeTime);
+
 const props = defineProps({
   text: String,
   media: Array,
@@ -23,10 +28,6 @@ const getMediaClass = computed(() => {
     default:
       return "";
   }
-});
-
-const getTimeSinceCreation = computed(() => {
-  return formatDateMixin.formatDate(props.time);
 });
 
 const pfpUrl = ref(
@@ -58,9 +59,31 @@ const embedLinks = computed(() => {
   return embedArr.join(" ");
 });
 
+const currentTime = ref(dayjs().toISOString());
+const getTimeSinceCreation = ref(
+  formatDateMixin.formatDate(props.time, currentTime.value)
+);
 const tweetText = ref(null);
+
 onMounted(() => {
+  // set tweet text
   tweetText.value.innerHTML = embedLinks.value;
+  // update tweet time every 30s (if tweet isn't a day old);
+  if (dayjs(currentTime.value).diff(dayjs(props.time), "hour") > 23) return;
+  const timer = setInterval(() => {
+    if (
+      getTimeSinceCreation.value !==
+      formatDateMixin.formatDate(props.time, currentTime.value)
+    ) {
+      getTimeSinceCreation.value = formatDateMixin.formatDate(
+        props.time,
+        currentTime.value
+      );
+    }
+  }, 30000);
+  return () => {
+    clearInterval(timer);
+  };
 });
 
 const isTweetMenuOpen = ref(false);
