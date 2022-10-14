@@ -1,9 +1,11 @@
 <script setup>
 import { defineProps } from "vue";
+import { useUserStore } from "@/stores/user.js";
+import { storeToRefs } from "pinia";
 import ProfilePicture from "./ProfilePicture.vue";
-const props = defineProps({
-  user: { profilePicUrl: String, displayName: String, username: String },
-});
+
+const store = useUserStore();
+const { userData } = storeToRefs(store);
 </script>
 
 <template>
@@ -42,13 +44,10 @@ const props = defineProps({
       </button>
       <li class="nav-user">
         <div class="user-info-and-btn">
-          <ProfilePicture
-            :profilePicUrl="props.user.profilePicUrl"
-            :size="40"
-          />
+          <ProfilePicture :profilePicUrl="userData.imgs.avatarUrl" :size="40" />
           <div class="user-info-wrapper">
-            <span class="display-name">{{ props.user.displayName }}</span>
-            <span class="username">@{{ props.user.username }}</span>
+            <span class="display-name">{{ userData.name }}</span>
+            <span class="username">@{{ userData.username }}</span>
           </div>
         </div>
         <span class="tweet-action-icon extra-btn"

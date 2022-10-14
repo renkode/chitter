@@ -5,14 +5,7 @@ import TimelineMain from "./components/TimelineMain.vue";
 </script>
 
 <template>
-  <MenuSidebar
-    :user="{
-      profilePicUrl:
-        'https://pbs.twimg.com/profile_images/1566523505155268608/AEzCad1D_400x400.png',
-      displayName: 'among us forever 🍆',
-      username: 'renkode',
-    }"
-  />
+  <MenuSidebar />
   <TimelineMain />
   <MediaSidebar />
 </template>

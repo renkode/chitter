@@ -1,7 +1,13 @@
 <script setup>
 import { ref, defineProps, computed, onMounted } from "vue";
 import ProfilePicture from "./ProfilePicture.vue";
-const props = defineProps({ text: String, media: Array });
+import formatDateMixin from "../mixins/formatDateMixin.js";
+const props = defineProps({
+  text: String,
+  media: Array,
+  metrics: Object,
+  time: String,
+});
 
 const getMediaClass = computed(() => {
   if (!props.media || props.media.length === 0) return;
@@ -17,6 +23,10 @@ const getMediaClass = computed(() => {
     default:
       return "";
   }
+});
+
+const getTimeSinceCreation = computed(() => {
+  return formatDateMixin.formatDate(props.time);
 });
 
 const pfpUrl = ref(
@@ -79,7 +89,7 @@ const doSomething = () => {
             >
             <span class="username"><a href="#">@renkode</a></span>
             <span class="separator">·</span>
-            <span class="tweet-time">23m</span>
+            <span class="tweet-time">{{ getTimeSinceCreation }}</span>
           </div>
           <span class="tweet-action-icon extra-btn" @click="toggleTweetMenu"
             ><v-icon name="hi-dots-horizontal" scale="1.0" fill="#ffffff80" />
@@ -114,7 +124,11 @@ const doSomething = () => {
         </div>
         <div class="tweet-content">
           <div class="tweet-text" ref="tweetText"></div>
-          <div class="tweet-media" :class="[getMediaClass]">
+          <div
+            class="tweet-media"
+            :class="[getMediaClass]"
+            v-if="props.media.length > 0"
+          >
             <img
               v-for="img in props.media"
               :key="props.media.indexOf(img)"
@@ -128,19 +142,31 @@ const doSomething = () => {
             <span class="tweet-action-icon reply-btn"
               ><v-icon name="fa-regular-comment" scale="1.0" fill="#ffffff80"
             /></span>
-            <span class="tweet-metric reply-metric">4</span>
+            <span
+              v-if="props.metrics.replyCount > 0"
+              class="tweet-metric reply-metric"
+              >{{ props.metrics.replyCount }}</span
+            >
           </span>
           <span class="tweet-metrics">
             <span class="tweet-action-icon retweet-btn"
               ><v-icon name="la-retweet-solid" scale="1.15" fill="#ffffff80"
             /></span>
-            <span class="tweet-metric retweet-metric">320</span>
+            <span
+              v-if="props.metrics.retweetCount > 0"
+              class="tweet-metric retweet-metric"
+              >{{ props.metrics.retweetCount }}</span
+            >
           </span>
           <span class="tweet-metrics">
             <span class="tweet-action-icon like-btn"
               ><v-icon name="fa-regular-heart" scale="1.0" fill="#ffffff80"
             /></span>
-            <span class="tweet-metric like-metric">1,438</span>
+            <span
+              v-if="props.metrics.likeCount > 0"
+              class="tweet-metric like-metric"
+              >{{ props.metrics.likeCount }}</span
+            >
           </span>
           <span class="tweet-action-icon share-tweet-btn"
             ><v-icon name="gi-share" scale="1.0" fill="#ffffff80"
