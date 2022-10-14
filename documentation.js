@@ -121,7 +121,7 @@ const userObj = {
 const userState = {}; // same as above
 const appState = {
   path: STRING,
-  view: STRING, //  timeline (default) | profile | tweet-thread | search
+  view: STRING, //  timeline (default) | profile | tweet-context | search
   profileViewMode: STRING, // tweets (default) | tweets-and-replies | media | likes
   showModal: BOOLEAN,
   modalType: STRING, // status | reply | quote
@@ -145,7 +145,7 @@ const functions = {
   app: {
     //navigation
     goto: (path) => {}, // set path in appState
-    setView: (view) => {}, //  timeline (default) | profile | tweet-thread | search
+    setView: (view) => {}, //  timeline (default) | profile | tweet-context | search
 
     //tweets
     newTweet: (mode) => {}, // mode: status | reply | qrt
@@ -153,7 +153,7 @@ const functions = {
     postTweet: async (tweetId) => {}, // update tweetCount, global tweet collection, localTimelines on success
     deleteTweet: async (tweetId) => {}, // REQUIRE AUTHORIZATION
     fetchTweet: async (tweetId, queryType) => {}, // query: all | userdata | tweetdata | followdata
-    viewTweetThread: (tweetId) => {}, // show replies from either direction
+    viewTweetContext: (tweetId) => {}, // show replies from either direction
     loadReplies: async (tweetId) => {},
     like: (tweetId) => {}, // MUST BE SIGNED IN
     retweet: (tweetId) => {}, // MUST BE SIGNED IN, push retweet to all follower's localTimelines
@@ -216,7 +216,7 @@ const components = {
               media,
               metrics, // regular or fullview mode
               creationDate, // fullview mode
-              onClick: functions.app.viewTweetThread(),
+              onClick: functions.app.viewTweetContext(),
             },
           }),
         ],
@@ -224,7 +224,7 @@ const components = {
       profile: {
         mediaGallery: {},
       },
-      TweetThread: {},
+      TweetContext: {},
       search: {},
     },
 

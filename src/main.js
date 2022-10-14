@@ -1,4 +1,6 @@
 import { createApp } from "vue";
+import { createPinia } from "pinia";
+import withUUID from "vue-uuid";
 import App from "./App.vue";
 import "normalize.css";
 
@@ -37,6 +39,8 @@ addIcons(
   CoUserUnfollow
 );
 
-const app = createApp(App);
+const pinia = createPinia();
+const app = withUUID(createApp(App));
 app.component("v-icon", OhVueIcon);
+app.use(pinia);
 app.mount("#app");
