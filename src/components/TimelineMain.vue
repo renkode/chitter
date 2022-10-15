@@ -1,7 +1,8 @@
 <script setup>
-import { ref } from "vue";
 import { useTweetStore } from "@/stores/tweets.js";
 import { useUsersStore } from "@/stores/users.js";
+import { useAppStore } from "@/stores/app.js";
+import { storeToRefs } from "pinia";
 import HeaderSC from "./HeaderSC.vue";
 import TweetSC from "./TweetSC.vue";
 

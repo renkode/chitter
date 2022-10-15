@@ -20,6 +20,7 @@ import {
   BiTrash,
   CoUserFollow,
   CoUserUnfollow,
+  MdArrowback,
 } from "oh-vue-icons/icons";
 
 addIcons(
@@ -36,7 +37,8 @@ addIcons(
   BiTwitter,
   BiTrash,
   CoUserFollow,
-  CoUserUnfollow
+  CoUserUnfollow,
+  MdArrowback
 );
 
 const pinia = createPinia();

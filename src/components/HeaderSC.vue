@@ -5,7 +5,11 @@ const { view } = storeToRefs(useAppStore());
 </script>
 
 <template>
-  <div class="page-header">{{ view }}</div>
+  <div class="page-header">
+    <span v-if="view === 'tweet' || view === 'profile'" class="back-arrow"
+      ><v-icon name="md-arrowback" scale="1.1" fill="#ffffff80" /></span
+    >{{ view }}
+  </div>
 </template>
 
 <style scoped>
@@ -24,5 +28,10 @@ const { view } = storeToRefs(useAppStore());
   text-transform: capitalize;
   top: 0;
   z-index: 2;
+}
+
+.back-arrow {
+  margin-right: 2rem;
+  cursor: pointer;
 }
 </style>

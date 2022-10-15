@@ -6,8 +6,9 @@ export const useAppStore = defineStore("app", {
   // a function that returns a fresh state
   state: () => ({
     path: "",
-    view: "home", //  timeline (default) | profile | tweet-context | search
-    profileViewMode: "tweets", // tweets (default) | tweets-and-replies | media | likes
+    view: "home", //  timeline (default) | profile | tweet | search
+    viewTweetId: null,
+    profileTab: "tweets", // tweets (default) | tweets-and-replies | media | likes
     showModal: false,
     modalType: "status", // status | reply | quote
     NUM_INITIAL_TWEETS: 5,
@@ -22,11 +23,15 @@ export const useAppStore = defineStore("app", {
       // call router?
     },
     setView(view) {
-      const views = ["home", "timeline", "profile", "tweet-context"];
+      const views = ["home", "timeline", "profile", "tweet"];
       if (!views.includes(view)) {
         throw Error("wrong view");
       }
+      if (view !== "tweet") this.setViewTweetId(null);
       this.view = view;
+    },
+    setViewTweetId(id) {
+      this.viewTweetId = id;
     },
     toggleModal() {
       this.showModal = !this.showModal;

@@ -4,15 +4,22 @@ import dayjs from "dayjs";
 import ProfilePicture from "./ProfilePicture.vue";
 import formatDateMixin from "../mixins/formatDateMixin.js";
 import { useTweetStore } from "@/stores/tweets.js";
-import { useUserStore } from "@/stores/user.js";
+import { useAppStore } from "@/stores/app.js";
 
 const tweetStore = useTweetStore();
-const userStore = useTweetStore();
+const appStore = useAppStore();
 
 var relativeTime = require("dayjs/plugin/relativeTime");
 dayjs.extend(relativeTime);
 
 const props = defineProps({ userData: Object, tweetData: Object });
+
+const setTweetContext = () => {
+  if (appStore.viewTweetId === props.tweetData.id) return;
+  appStore.setPath(`/status/${props.tweetData.id}`);
+  appStore.setView("tweet");
+  appStore.setViewTweetId(props.tweetData.id);
+};
 
 const getMediaClass = computed(() => {
   if (!props.tweetData.media || props.tweetData.media.length === 0) return;
@@ -36,8 +43,9 @@ const toggleTweetMenu = (e) => {
   isTweetMenuOpen.value = !isTweetMenuOpen.value;
 };
 
-const doSomething = () => {
-  console.log("tweet menu action");
+const doSomething = (e) => {
+  e.stopPropagation();
+  console.log("test");
 };
 
 const isLiked = ref(false);
@@ -83,9 +91,9 @@ const embedLinks = computed(() => {
       case urlRegex.test(str):
         return `<a class="tweet-link" href="${str}" target="_blank">${str}</a>`;
       case hashtagRegex.test(str):
-        return `<a class="tweet-link" href="#">${str}</a>`;
+        return `<a class="tweet-link non-url" href="#">${str}</a>`;
       case atRegex.test(str):
-        return `<a class="tweet-link" href="#">${str}</a>`;
+        return `<a class="tweet-link non-url" href="#">${str}</a>`;
       default:
         return str;
     }
@@ -101,6 +109,10 @@ const getTimeSinceCreation = ref(
 onMounted(() => {
   // set tweet text
   tweetText.value.innerHTML = embedLinks.value; // dangerous
+  const anchors = tweetText.value.querySelectorAll(".non-url");
+  Array.from(anchors).forEach((anchor) =>
+    anchor.addEventListener("click", doSomething)
+  );
   // update tweet time every 30s (if tweet isn't a day old);
   if (
     dayjs(currentTime.value).diff(dayjs(props.tweetData.createdAt), "hour") > 23
@@ -118,13 +130,16 @@ onMounted(() => {
     }
   }, 30000);
   return () => {
+    Array.from(anchors).forEach((anchor) =>
+      anchor.removeEventListener("click", doSomething)
+    );
     clearInterval(timer);
   };
 });
 </script>
 
 <template>
-  <div class="tweet-container">
+  <div class="tweet-container" @click="setTweetContext">
     <!-- <div class="user-retweet">lorem ipsum Retweeted</div> -->
     <div class="tweet-body">
       <div class="profile-pic-container">
@@ -145,12 +160,17 @@ onMounted(() => {
             <span class="separator">·</span>
             <span class="tweet-time">{{ getTimeSinceCreation }}</span>
           </div>
-          <span class="tweet-action-icon extra-btn" @click="toggleTweetMenu"
+          <span
+            class="tweet-action-icon extra-btn"
+            @click.stop="toggleTweetMenu"
             ><v-icon name="hi-dots-horizontal" scale="1.0" fill="#ffffff80" />
             <div v-if="isTweetMenuOpen" class="overlay"></div>
             <div v-if="isTweetMenuOpen" class="tweet-menu-container">
               <ul class="tweet-menu-list">
-                <li class="tweet-menu-item delete-tweet" @click="doSomething">
+                <li
+                  class="tweet-menu-item delete-tweet"
+                  @click.stop="doSomething"
+                >
                   <span class="tweet-menu-icon"
                     ><v-icon name="bi-trash" scale="1.1" fill="red" /></span
                   >Delete
@@ -193,7 +213,7 @@ onMounted(() => {
 
         <div class="tweet-actions-wrapper">
           <span class="tweet-metrics">
-            <span class="tweet-action-icon reply-btn"
+            <span class="tweet-action-icon reply-btn" @click.stop="doSomething"
               ><v-icon name="fa-regular-comment" scale="1.0" fill="#ffffff80"
             /></span>
             <span
@@ -206,7 +226,7 @@ onMounted(() => {
             <span
               class="tweet-action-icon retweet-btn"
               :class="{ retweeted: isRetweeted }"
-              @click="toggleRetweet"
+              @click.stop="toggleRetweet"
               ><v-icon name="la-retweet-solid" scale="1.15" fill="#ffffff80"
             /></span>
             <span
@@ -219,7 +239,7 @@ onMounted(() => {
             <span
               class="tweet-action-icon like-btn"
               :class="{ liked: isLiked }"
-              @click="toggleLike"
+              @click.stop="toggleLike"
               ><v-icon name="fa-regular-heart" scale="1.0" fill="#ffffff80"
             /></span>
             <span
@@ -228,7 +248,9 @@ onMounted(() => {
               >{{ props.tweetData.metrics.likeCount }}</span
             >
           </span>
-          <span class="tweet-action-icon share-tweet-btn"
+          <span
+            class="tweet-action-icon share-tweet-btn"
+            @click.stop="doSomething"
             ><v-icon name="gi-share" scale="1.0" fill="#ffffff80"
           /></span>
         </div>
