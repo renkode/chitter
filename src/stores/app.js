@@ -22,12 +22,8 @@ export const useAppStore = defineStore("app", {
       // call router?
     },
     setView(view) {
-      if (
-        view !== "home" ||
-        view !== "timeline" ||
-        view !== "profile" ||
-        view !== "tweet-context"
-      ) {
+      const views = ["home", "timeline", "profile", "tweet-context"];
+      if (!views.includes(view)) {
         throw Error("wrong view");
       }
       this.view = view;

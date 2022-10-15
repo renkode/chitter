@@ -3,6 +3,11 @@ import { ref, defineProps, computed, onMounted } from "vue";
 import dayjs from "dayjs";
 import ProfilePicture from "./ProfilePicture.vue";
 import formatDateMixin from "../mixins/formatDateMixin.js";
+import { useTweetStore } from "@/stores/tweets.js";
+import { useUserStore } from "@/stores/user.js";
+
+const tweetStore = useTweetStore();
+const userStore = useTweetStore();
 
 var relativeTime = require("dayjs/plugin/relativeTime");
 dayjs.extend(relativeTime);
@@ -25,10 +30,44 @@ const getMediaClass = computed(() => {
   }
 });
 
-const pfpUrl = ref(
-  "https://pbs.twimg.com/profile_images/1566523505155268608/AEzCad1D_400x400.png"
-);
+const isTweetMenuOpen = ref(false);
+const toggleTweetMenu = (e) => {
+  e.preventDefault();
+  isTweetMenuOpen.value = !isTweetMenuOpen.value;
+};
 
+const doSomething = () => {
+  console.log("tweet menu action");
+};
+
+const isLiked = ref(false);
+const isRetweeted = ref(false); // default should depend on user's likes/rts
+const toggleLike = () => {
+  // like tweet
+  if (!isLiked.value) {
+    isLiked.value = true;
+    tweetStore.addLike(props.tweetData.id, "1");
+  }
+  // unlike tweet
+  else {
+    isLiked.value = false;
+    tweetStore.removeLike(props.tweetData.id, "1");
+  }
+};
+const toggleRetweet = () => {
+  // like tweet
+  if (!isRetweeted.value) {
+    isRetweeted.value = true;
+    tweetStore.addRetweet(props.tweetData.id, "1");
+  }
+  // unlike tweet
+  else {
+    isRetweeted.value = false;
+    tweetStore.removeRetweet(props.tweetData.id, "1");
+  }
+};
+
+const tweetText = ref(null);
 // embed @'s, hashtags and links inside tweets
 const embedLinks = computed(() => {
   if (!props.tweetData.text || props.tweetData.text.length === 0) return;
@@ -54,25 +93,14 @@ const embedLinks = computed(() => {
   return embedArr.join(" ");
 });
 
-const isTweetMenuOpen = ref(false);
-const toggleTweetMenu = (e) => {
-  e.preventDefault();
-  isTweetMenuOpen.value = !isTweetMenuOpen.value;
-};
-
-const doSomething = () => {
-  console.log("tweet menu action");
-};
-
 const currentTime = ref(dayjs().toISOString());
 const getTimeSinceCreation = ref(
   formatDateMixin.formatDate(props.tweetData.createdAt, currentTime.value)
 );
-const tweetText = ref(null);
 
 onMounted(() => {
   // set tweet text
-  tweetText.value.innerHTML = embedLinks.value;
+  tweetText.value.innerHTML = embedLinks.value; // dangerous
   // update tweet time every 30s (if tweet isn't a day old);
   if (
     dayjs(currentTime.value).diff(dayjs(props.tweetData.createdAt), "hour") > 23
@@ -175,7 +203,10 @@ onMounted(() => {
             >
           </span>
           <span class="tweet-metrics">
-            <span class="tweet-action-icon retweet-btn"
+            <span
+              class="tweet-action-icon retweet-btn"
+              :class="{ retweeted: isRetweeted }"
+              @click="toggleRetweet"
               ><v-icon name="la-retweet-solid" scale="1.15" fill="#ffffff80"
             /></span>
             <span
@@ -185,7 +216,10 @@ onMounted(() => {
             >
           </span>
           <span class="tweet-metrics">
-            <span class="tweet-action-icon like-btn"
+            <span
+              class="tweet-action-icon like-btn"
+              :class="{ liked: isLiked }"
+              @click="toggleLike"
               ><v-icon name="fa-regular-heart" scale="1.0" fill="#ffffff80"
             /></span>
             <span
@@ -353,7 +387,9 @@ onMounted(() => {
 }
 
 .retweet-btn:hover svg,
-.retweet-btn:hover + .retweet-metric {
+.retweet-btn.retweeted svg,
+.retweet-btn:hover + .retweet-metric,
+.retweet-btn.retweeted + .retweet-metric {
   color: rgb(16, 211, 169);
   fill: rgb(16, 211, 169);
 }
@@ -363,7 +399,9 @@ onMounted(() => {
 }
 
 .like-btn:hover svg,
-.like-btn:hover + .like-metric {
+.like-btn.liked svg,
+.like-btn:hover + .like-metric,
+.like-btn.liked + .like-metric {
   color: rgb(226, 28, 104);
   fill: rgb(226, 28, 104);
 }
@@ -373,6 +411,7 @@ svg {
 }
 
 .tweet-metrics {
+  user-select: none;
   position: relative;
   left: -8px;
   display: flex;

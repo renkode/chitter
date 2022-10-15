@@ -14,8 +14,8 @@ export const useTweetStore = defineStore("tweets", {
         data: {
           id: 1,
           type: "status", // status | reply | quote
-          text: "I think most people underestimate how #little being 5’4 is. I’m literally hopping around on my phone rn to type tjis out #girl", // max 250 chars
-          hashtags: ["little", "girl"],
+          text: "@renkode I think most people underestimate how #little being 5’4 is. I’m literally hopping around on my phone rn to type tjis out", // max 250 chars
+          hashtags: ["little"],
           media: [
             "https://pbs.twimg.com/media/Fe_VPZRXwAcQJ8r?format=jpg&name=large",
           ],
@@ -69,7 +69,7 @@ export const useTweetStore = defineStore("tweets", {
         data: {
           id: 3,
           type: "status", // status | reply | quote
-          text: "38 y/o gf who still says “sweet summer child”: they’re debating whether PAWG is a slur and i just can’t with the hellsite today.\nMe [heard “PAWG” and got so hard i got nauseous]: i think i hauve Covid", // max 250 chars
+          text: "38 y/o gf who still says “sweet summer child”: they’re debating whether PAWG is a slur and i just can’t with the hellsite today.\n\nMe [heard “PAWG” and got so hard i got nauseous]: i think i hauve Covid", // max 250 chars
           hashtags: null,
           media: [
             "https://pbs.twimg.com/media/Fe5WTVmXoAITutA?format=jpg&name=large",
@@ -98,7 +98,7 @@ export const useTweetStore = defineStore("tweets", {
         data: {
           id: 4,
           type: "status", // status | reply | quote
-          text: "aheem heem", // max 250 chars
+          text: "uh-oh", // max 250 chars
           hashtags: null,
           media: [
             "https://pbs.twimg.com/media/Fb6m91SWAAMsMeb?format=jpg&name=large",
@@ -131,28 +131,31 @@ export const useTweetStore = defineStore("tweets", {
   // optional actions
   actions: {
     addLike(id, fromUserId) {
-      const isId = (obj) => obj.data.id === id;
-      this.tweets[this.tweets.findIndex(isId)].data.metrics.likeCount++;
-      this.tweets[this.tweets.findIndex(isId)].references.likesFrom.push(
-        fromUserId
-      );
+      const tweet = this.tweets.filter((t) => t.data.id == id)[0];
+      tweet.data.metrics.likeCount++;
+      tweet.references.likesFrom.push(fromUserId);
     },
     removeLike(id, fromUserId) {
-      const isId = (obj) => obj.data.id === id;
-      const isUserId = (obj) => obj.data.authorId === fromUserId;
-      this.tweets[this.tweets.findIndex(isId)].data.metrics.likeCount--;
-      this.tweets[this.tweets.findIndex(isId)].references.likesFrom.splice(
-        this.tweets[this.tweets.findIndex(isUserId)],
+      const tweet = this.tweets.filter((t) => t.data.id == id)[0];
+      tweet.data.metrics.likeCount--;
+      tweet.references.likesFrom.splice(
+        tweet.references.likesFrom.indexOf(fromUserId),
         1
       );
     },
-    // getTimeSinceCreation(id) {
-    //   console.log(this.tweets);
-    //   const time = this.tweets.filter((t) => t.data.id == id)[0].data
-    //     .createdAt;
-    //   console.log(time);
-    //   if (!time) return "Unknown";
-    //   return formatDateMixin.methods.formatDate(time);
-    // },
+    addRetweet(id, fromUserId) {
+      const tweet = this.tweets.filter((t) => t.data.id == id)[0];
+      tweet.data.metrics.retweetCount++;
+      tweet.references.retweetsFrom.push(fromUserId);
+      // push to followers' local timelines
+    },
+    removeRetweet(id, fromUserId) {
+      const tweet = this.tweets.filter((t) => t.data.id == id)[0];
+      tweet.data.metrics.retweetCount--;
+      tweet.references.retweetsFrom.splice(
+        tweet.references.retweetsFrom.indexOf(fromUserId),
+        1
+      );
+    },
   },
 });

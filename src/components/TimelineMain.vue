@@ -2,6 +2,7 @@
 import { ref } from "vue";
 import { useTweetStore } from "@/stores/tweets.js";
 import { useUsersStore } from "@/stores/users.js";
+import HeaderSC from "./HeaderSC.vue";
 import TweetSC from "./TweetSC.vue";
 
 const tweetStore = useTweetStore();
@@ -11,7 +12,7 @@ const usersStore = useUsersStore();
 <template>
   <div class="main-wrapper">
     <div class="timeline-wrapper">
-      <div class="timeline-header">Home</div>
+      <HeaderSC />
       <div class="compose-tweet-container"></div>
       <div class="tweet-list">
         <TweetSC
@@ -43,21 +44,6 @@ const usersStore = useUsersStore();
   border-bottom: 0;
 }
 
-.timeline-header {
-  font-size: 1.2rem;
-  min-height: 53px;
-  height: 53px;
-  width: 100%;
-  padding-left: 16px;
-  background-color: rgba(38, 42, 46, 0.836);
-  backdrop-filter: blur(10px);
-  display: flex;
-  align-items: center;
-  position: sticky;
-  top: 0;
-  z-index: 2;
-}
-
 .compose-tweet-container {
   border-bottom: rgba(255, 255, 255, 0.25) 1px solid;
 }
@@ -81,7 +67,6 @@ const usersStore = useUsersStore();
 @media screen and (max-width: 700px) {
   .main-wrapper,
   .timeline-wrapper,
-  .timeline-header,
   .compose-tweet-container,
   .tweet-list {
     width: 100%;

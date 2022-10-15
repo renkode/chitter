@@ -1,11 +1,13 @@
 <script setup>
 import { defineProps } from "vue";
 import { useUserStore } from "@/stores/user.js";
+import { useAppStore } from "@/stores/app.js";
 import { storeToRefs } from "pinia";
 import ProfilePicture from "./ProfilePicture.vue";
 
-const store = useUserStore();
-const { userData } = storeToRefs(store);
+const userStore = useUserStore();
+const appStore = useAppStore();
+const { userData } = storeToRefs(userStore);
 </script>
 
 <template>
@@ -17,12 +19,12 @@ const { userData } = storeToRefs(store);
             ><v-icon name="bi-twitter" scale="2.0" fill="white"
           /></span>
         </li>
-        <li class="nav-item">
+        <li class="nav-item" @click="appStore.setView('home')">
           <span class="nav-icon"
             ><v-icon name="gi-bird-house" scale="2.0" fill="white" /></span
           ><span class="nav-label">Home</span>
         </li>
-        <li class="nav-item">
+        <li class="nav-item" @click="appStore.setView('timeline')">
           <span class="nav-icon"
             ><v-icon
               name="md-accesstime-round"
@@ -30,7 +32,7 @@ const { userData } = storeToRefs(store);
               fill="white" /></span
           ><span class="nav-label">Timeline</span>
         </li>
-        <li class="nav-item">
+        <li class="nav-item" @click="appStore.setView('profile')">
           <span class="nav-icon"
             ><v-icon name="bi-person" scale="1.8" fill="white" /></span
           ><span class="nav-label">Profile</span>
@@ -67,6 +69,7 @@ const { userData } = storeToRefs(store);
   align-items: center;
   flex-shrink: 2.25;
   z-index: 3;
+  user-select: none;
 }
 
 nav {
