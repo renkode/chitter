@@ -12,7 +12,11 @@ const appStore = useAppStore();
 var relativeTime = require("dayjs/plugin/relativeTime");
 dayjs.extend(relativeTime);
 
-const props = defineProps({ userData: Object, tweetData: Object });
+const props = defineProps({
+  userData: Object,
+  tweetData: Object,
+  viewing: Boolean,
+});
 
 const setTweetContext = () => {
   if (appStore.viewTweetId === props.tweetData.id) return;

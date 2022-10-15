@@ -4,10 +4,9 @@ import { useUsersStore } from "@/stores/users.js";
 import { useAppStore } from "@/stores/app.js";
 import { storeToRefs } from "pinia";
 import HeaderSC from "./HeaderSC.vue";
-import TweetSC from "./TweetSC.vue";
+import TweetListSC from "./TweetListSC.vue";
 
-const tweetStore = useTweetStore();
-const usersStore = useUsersStore();
+const store = useTweetStore();
 </script>
 
 <template>
@@ -15,14 +14,7 @@ const usersStore = useUsersStore();
     <div class="timeline-wrapper">
       <HeaderSC />
       <div class="compose-tweet-container"></div>
-      <div class="tweet-list">
-        <TweetSC
-          v-for="tweet in tweetStore.tweets"
-          :key="tweet.data.id"
-          :userData="usersStore.getUserData(tweet.data.authorId)"
-          :tweetData="tweet.data"
-        />
-      </div>
+      <TweetListSC :tweets="store.tweets" />
     </div>
   </div>
 </template>
@@ -47,14 +39,6 @@ const usersStore = useUsersStore();
 
 .compose-tweet-container {
   border-bottom: rgba(255, 255, 255, 0.25) 1px solid;
-}
-
-.tweet-list {
-  height: fit-content;
-}
-
-.compose-tweet-container,
-.tweet-list {
   width: 598px;
 }
 
@@ -68,8 +52,7 @@ const usersStore = useUsersStore();
 @media screen and (max-width: 700px) {
   .main-wrapper,
   .timeline-wrapper,
-  .compose-tweet-container,
-  .tweet-list {
+  .compose-tweet-container {
     width: 100%;
   }
 }
