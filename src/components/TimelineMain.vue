@@ -1,21 +1,35 @@
 <script setup>
+import { onMounted } from "vue";
 import { useTweetStore } from "@/stores/tweets.js";
-import { useUsersStore } from "@/stores/users.js";
-import { useAppStore } from "@/stores/app.js";
-import { storeToRefs } from "pinia";
-import HeaderSC from "./HeaderSC.vue";
 import TweetListSC from "./TweetListSC.vue";
+import db from "../firebase.js";
+
+import { collection, getDocs } from "firebase/firestore";
+
+const querySnapshot = await getDocs(collection(db, "tweets"));
+// querySnapshot.forEach((doc) => {
+//   // doc.data() is never undefined for query doc snapshots
+//   console.log(doc.id, " => ", doc.data());
+// });
+
+async function delay(time) {
+  await new Promise((res) => {
+    setTimeout(() => {
+      console.log(res);
+    }, time);
+  });
+}
+
+onMounted(() => {
+  delay(9000);
+});
 
 const store = useTweetStore();
 </script>
 
 <template>
-  <div class="main-wrapper">
-    <div class="timeline-wrapper">
-      <HeaderSC />
-      <div class="compose-tweet-container"></div>
-      <TweetListSC :tweets="store.tweets" />
-    </div>
+  <div>
+    <TweetListSC :tweets="store.tweets" />
   </div>
 </template>
 
@@ -28,6 +42,7 @@ const store = useTweetStore();
 
 .timeline-wrapper {
   width: 600px;
+  min-height: 99vh;
   height: fit-content;
   display: flex;
   flex-direction: column;

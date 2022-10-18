@@ -2,11 +2,30 @@
 import MenuSidebar from "./components/MenuSidebar.vue";
 import MediaSidebar from "./components/MediaSidebar.vue";
 import TimelineMain from "./components/TimelineMain.vue";
+import HeaderSC from "./components/HeaderSC.vue";
+import ComposeTweetSC from "./components/ComposeTweetSC.vue";
+import LoadSpinner from "./components/LoadSpinner.vue";
+// import { useTweetStore } from "@/stores/tweets.js";
+
+// const store = useTweetStore();
 </script>
 
 <template>
   <MenuSidebar />
-  <TimelineMain />
+
+  <div class="main-wrapper">
+    <div class="timeline-wrapper">
+      <HeaderSC />
+      <ComposeTweetSC />
+      <Suspense>
+        <template #default>
+          <TimelineMain />
+        </template>
+        <template #fallback> <LoadSpinner /> </template>
+      </Suspense>
+    </div>
+  </div>
+
   <MediaSidebar />
 </template>
 

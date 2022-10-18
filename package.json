@@ -10,13 +10,14 @@
   "dependencies": {
     "core-js": "^3.8.3",
     "dayjs": "^1.11.5",
-    "firebase": "^9.11.0",
+    "firebase": "^9.12.1",
     "normalize.css": "^8.0.1",
     "oh-vue-icons": "^1.0.0-rc3",
     "pinia": "^2.0.23",
     "vue": "^3.2.13",
     "vue-router": "4",
-    "vue-uuid": "^3.0.0"
+    "vue-uuid": "^3.0.0",
+    "vuefire": "^2.2.5"
   },
   "devDependencies": {
     "@babel/core": "^7.12.16",

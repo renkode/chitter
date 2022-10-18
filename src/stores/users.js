@@ -79,7 +79,7 @@ export const useUsersStore = defineStore("users", {
             followingCount: 0,
             followerCount: 0,
           },
-          tweetCount: 3,
+          tweetCount: 1,
           createdAt: "2020-02-03T23:12:08.000Z",
         },
         tweetData: {
