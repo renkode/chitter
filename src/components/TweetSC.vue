@@ -3,6 +3,7 @@ import { ref, defineProps, computed, onMounted } from "vue";
 import dayjs from "dayjs";
 import ProfilePicture from "./ProfilePicture.vue";
 import formatDateMixin from "../mixins/formatDateMixin.js";
+import { getMediaClass } from "../mixins/tools.js";
 import { useTweetStore } from "@/stores/tweets.js";
 import { useAppStore } from "@/stores/app.js";
 
@@ -24,22 +25,6 @@ const setTweetContext = () => {
   appStore.setView("tweet");
   appStore.setViewTweetId(props.tweetData.id);
 };
-
-const getMediaClass = computed(() => {
-  if (!props.tweetData.media || props.tweetData.media.length === 0) return;
-  switch (props.tweetData.media.length) {
-    case 1:
-      return "one-img";
-    case 2:
-      return "two-img";
-    case 3:
-      return "three-img";
-    case 4:
-      return "four-img";
-    default:
-      return "";
-  }
-});
 
 const isTweetMenuOpen = ref(false);
 const toggleTweetMenu = (e) => {
@@ -201,14 +186,16 @@ onMounted(() => {
           <div class="tweet-text" ref="tweetText"></div>
           <div
             class="tweet-media"
-            :class="[getMediaClass]"
+            :class="[getMediaClass(props.tweetData.media)]"
             v-if="props.tweetData.media.length > 0"
           >
-            <img
+            <div
+              class="image-preview-wrapper"
               v-for="img in props.tweetData.media"
               :key="props.tweetData.media.indexOf(img)"
-              :src="img"
-            />
+            >
+              <img :src="img" />
+            </div>
           </div>
         </div>
 
@@ -360,6 +347,8 @@ onMounted(() => {
 }
 
 .tweet-content {
+  display: flex;
+  flex-direction: column;
   margin-bottom: 0.4rem;
 }
 
@@ -462,13 +451,15 @@ svg {
 .tweet-media {
   max-width: 100%;
   width: fit-content;
-  margin-top: 0.5rem;
+  margin-top: 0.9rem;
   border: rgba(255, 255, 255, 0.25) 1px solid;
   border-radius: 20px;
   overflow: hidden;
 }
 
-.tweet-media img {
+.tweet-media img,
+.tweet-media div {
+  position: relative;
   background-size: cover;
   display: flex;
   align-items: center;
@@ -484,40 +475,38 @@ svg {
 .four-img {
   display: grid;
   gap: 2px;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 50% 50%;
   max-height: 285px;
+  height: 100%;
   width: 100%;
 }
 
 .three-img {
-  grid-template-columns: 1fr 1fr;
-  grid-template-rows: 1fr 1fr;
+  grid-template-columns: 50% 50%;
+  grid-template-rows: 50% 50%;
   grid-template-areas:
     "first second"
     "first third";
 }
 
-.three-img img {
-  width: 100%;
-}
-
-.three-img img:first-child {
+.three-img > :first-child {
   grid-area: first;
 }
 
-.three-img img:nth-child(2) {
+.three-img > :nth-child(2) {
   grid-area: second;
 }
 
-.three-img img:last-child {
+.three-img > :last-child {
   grid-area: third;
 }
 
 .four-img {
-  grid-template-rows: 1fr 1fr;
+  grid-template-rows: 50% 50%;
   grid-template-areas: none;
 }
 
+.three-img img,
 .four-img img {
   width: 100%;
 }

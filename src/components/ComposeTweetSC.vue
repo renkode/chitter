@@ -2,10 +2,25 @@
 import { onMounted, ref } from "vue";
 import ProfilePicture from "./ProfilePicture.vue";
 import { useUserStore } from "@/stores/user";
+import { getMediaClass } from "../mixins/tools.js";
 
 const store = useUserStore();
 const textArea = ref(null);
 const circle = ref(null);
+const images = ref([
+  "https://pbs.twimg.com/media/Fe5WTVmXoAITutA?format=jpg&name=large",
+  "https://pbs.twimg.com/media/Fe5WT7-XoBoEEWt?format=jpg&name=large",
+  "https://pbs.twimg.com/media/Fe0r_ZgWAAEN8px?format=jpg&name=large",
+]);
+
+const onFileChange = (e) => {
+  images.value.push(URL.createObjectURL(e.currentTarget.files[0]));
+  console.table(images.value);
+};
+
+const removeFile = (index) => {
+  images.value.splice(index, 1);
+};
 
 const resizeTextArea = () => {
   textArea.value.style.height = "";
@@ -33,15 +48,39 @@ onMounted(() => {
       <ProfilePicture :url="store.userData.imgs.avatarUrl" :size="48" />
     </div>
     <div class="compose-tweet-body">
-      <textarea
-        ref="textArea"
-        placeholder="What's happening?"
-        @input="handleInput"
-      ></textarea>
+      <div class="compose-tweet-content">
+        <textarea
+          ref="textArea"
+          placeholder="What's happening?"
+          @input="handleInput"
+        ></textarea>
+        <div
+          class="tweet-media"
+          :class="[getMediaClass(images)]"
+          v-if="images.length > 0"
+        >
+          <div
+            class="image-preview-wrapper"
+            v-for="img in images"
+            :key="images.indexOf(img)"
+          >
+            <img :src="img" class="image-preview" />
+            <!-- <button
+              class="remove-image-btn"
+              @click="removeFile(images.indexOf(img))"
+            >
+              <v-icon name="bi-x" scale="2.0" fill="white" />
+            </button> -->
+          </div>
+        </div>
+      </div>
       <div class="compose-tweet-bar">
-        <span class="add-image"
-          ><v-icon name="ri-image-add-line" scale="1.1" fill="#1d9bf0"
-        /></span>
+        <span class="add-image">
+          <input type="file" id="upload-image" @change="onFileChange" hidden />
+          <label for="upload-image"
+            ><v-icon name="ri-image-add-line" scale="1.1" fill="#1d9bf0" />
+          </label>
+        </span>
         <div class="limit-and-btn">
           <div ref="circle" class="circle" style="--circle: 0">
             <span class="character-limit"></span>
@@ -64,18 +103,27 @@ onMounted(() => {
 .compose-tweet-body {
   width: 100%;
   padding-left: 1rem;
+  display: flex;
+  flex-direction: column;
+}
+
+.compose-tweet-content {
+  height: fit-content;
+  width: 100%;
+  border-bottom: rgba(255, 255, 255, 0.25) 1px solid;
+  padding-bottom: 1.2rem;
+  display: flex;
+  flex-direction: column;
 }
 
 textarea {
   width: 100%;
   border: 0;
   background-color: rgba(255, 255, 255, 0);
-  border-bottom: rgba(255, 255, 255, 0.25) 1px solid;
   color: white;
   font-size: 1.2rem;
   resize: none;
   overflow: hidden;
-  padding-bottom: 1.2rem;
 }
 
 textarea:focus {
@@ -102,6 +150,34 @@ textarea:focus {
 
 .add-image:hover {
   background-color: rgba(0, 132, 255, 0.233);
+}
+
+label {
+  cursor: pointer;
+}
+
+.image-preview-wrapper {
+  position: relative;
+  display: flex;
+}
+.image-preview-wrapper img {
+  flex: 1;
+}
+
+.remove-image-btn {
+  position: absolute;
+  top: 4px;
+  left: 4px;
+  display: flex;
+  place-content: center;
+  border: 0;
+  border-radius: 100%;
+  background-color: rgba(0, 0, 0, 0.753);
+  color: white;
+  cursor: pointer;
+  width: 30px;
+  height: 30px;
+  z-index: 2;
 }
 
 .limit-and-btn {
