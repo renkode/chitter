@@ -1,7 +1,7 @@
 <script setup>
 import { defineProps } from "vue";
 const props = defineProps({
-  profilePicUrl: String,
+  url: String,
   size: Number,
 });
 </script>
@@ -10,7 +10,7 @@ const props = defineProps({
   <div
     class="profile-pic"
     :style="{
-      backgroundImage: `url(${props.profilePicUrl})`,
+      backgroundImage: `url(${props.url})`,
       width: props.size + 'px',
       height: props.size + 'px',
       borderRadius: props.size / 2 + 'px',

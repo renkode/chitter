@@ -15,13 +15,13 @@ const querySnapshot = await getDocs(collection(db, "tweets"));
 async function delay(time) {
   await new Promise((res) => {
     setTimeout(() => {
-      console.log(res);
+      //console.log(res);
     }, time);
   });
 }
 
 onMounted(() => {
-  delay(9000);
+  delay(0);
 });
 
 const store = useTweetStore();
@@ -50,11 +50,6 @@ const store = useTweetStore();
   border: rgba(255, 255, 255, 0.25) 1px solid;
   border-top: 0;
   border-bottom: 0;
-}
-
-.compose-tweet-container {
-  border-bottom: rgba(255, 255, 255, 0.25) 1px solid;
-  width: 598px;
 }
 
 @media screen and (max-width: 1005px) {

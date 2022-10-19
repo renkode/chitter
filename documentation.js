@@ -240,4 +240,5 @@ const notes = [
   "scaling up concerns: pagination",
   'SANITIZE NEW TWEETS WITH <script type="application/javascript" defer src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/2.4.0/purify.min.js"></script>',
   "take a look at for sanitization example https://codepen.io/openjavascriptadmin/pen/NWvqwqx",
+  "suspense: don't like having to lift a bunch of html to the parent component just to display it properly lol",
 ];

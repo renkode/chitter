@@ -7,6 +7,7 @@ export const useAppStore = defineStore("app", {
   state: () => ({
     path: "",
     view: "home", //  timeline (default) | profile | tweet | search
+    previousView: "home",
     viewTweetId: null,
     profileTab: "tweets", // tweets (default) | tweets-and-replies | media | likes
     showModal: false,
@@ -23,11 +24,15 @@ export const useAppStore = defineStore("app", {
       // call router?
     },
     setView(view) {
+      if (this.view === view) return;
       const views = ["home", "timeline", "profile", "tweet"];
       if (!views.includes(view)) {
         throw Error("wrong view");
       }
-      if (view !== "tweet") this.setViewTweetId(null);
+      if (view !== "tweet") {
+        this.setViewTweetId(null);
+        this.previousView = this.view; // note that this means we can't go back if we go thru tweets like a chain
+      }
       this.view = view;
     },
     setViewTweetId(id) {

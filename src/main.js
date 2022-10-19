@@ -22,6 +22,7 @@ import {
   CoUserFollow,
   CoUserUnfollow,
   MdArrowback,
+  RiImageAddLine,
 } from "oh-vue-icons/icons";
 
 addIcons(
@@ -39,7 +40,8 @@ addIcons(
   BiTrash,
   CoUserFollow,
   CoUserUnfollow,
-  MdArrowback
+  MdArrowback,
+  RiImageAddLine
 );
 
 const pinia = createPinia();

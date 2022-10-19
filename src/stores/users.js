@@ -6,7 +6,7 @@ export const useUsersStore = defineStore("users", {
       {
         userData: {
           id: "1",
-          name: "among us forever 🍆",
+          name: "🍆",
           username: "renkode",
           biography: {
             description: {

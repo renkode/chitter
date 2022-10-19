@@ -46,7 +46,7 @@ const { userData } = storeToRefs(userStore);
       </button>
       <li class="nav-user">
         <div class="user-info-and-btn">
-          <ProfilePicture :profilePicUrl="userData.imgs.avatarUrl" :size="40" />
+          <ProfilePicture :url="userData.imgs.avatarUrl" :size="40" />
           <div class="user-info-wrapper">
             <span class="display-name">{{ userData.name }}</span>
             <span class="username">@{{ userData.username }}</span>

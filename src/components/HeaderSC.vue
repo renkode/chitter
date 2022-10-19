@@ -1,12 +1,16 @@
 <script setup>
 import { useAppStore } from "@/stores/app.js";
 import { storeToRefs } from "pinia";
-const { view } = storeToRefs(useAppStore());
+const { view, previousView } = storeToRefs(useAppStore());
+const store = useAppStore();
 </script>
 
 <template>
   <div class="page-header">
-    <span v-if="view === 'tweet' || view === 'profile'" class="back-arrow"
+    <span
+      v-if="view === 'tweet' || view === 'profile'"
+      class="back-arrow"
+      @click="store.setView(previousView)"
       ><v-icon name="md-arrowback" scale="1.1" fill="#ffffff80" /></span
     >{{ view }}
   </div>

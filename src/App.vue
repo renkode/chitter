@@ -5,9 +5,9 @@ import TimelineMain from "./components/TimelineMain.vue";
 import HeaderSC from "./components/HeaderSC.vue";
 import ComposeTweetSC from "./components/ComposeTweetSC.vue";
 import LoadSpinner from "./components/LoadSpinner.vue";
-// import { useTweetStore } from "@/stores/tweets.js";
+import { useAppStore } from "@/stores/app.js";
 
-// const store = useTweetStore();
+const appStore = useAppStore();
 </script>
 
 <template>
@@ -16,13 +16,15 @@ import LoadSpinner from "./components/LoadSpinner.vue";
   <div class="main-wrapper">
     <div class="timeline-wrapper">
       <HeaderSC />
-      <ComposeTweetSC />
-      <Suspense>
-        <template #default>
-          <TimelineMain />
-        </template>
-        <template #fallback> <LoadSpinner /> </template>
-      </Suspense>
+      <template v-if="appStore.view === 'home'">
+        <ComposeTweetSC />
+        <Transition name="fade">
+          <Suspense>
+            <template #default> <TimelineMain /> </template>
+            <template #fallback> <LoadSpinner /> </template>
+          </Suspense>
+        </Transition>
+      </template>
     </div>
   </div>
 
@@ -71,5 +73,15 @@ ul {
 
 li {
   list-style: none;
+}
+
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.15s ease;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
 }
 </style>

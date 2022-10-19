@@ -147,10 +147,7 @@ onMounted(() => {
     <!-- <div class="user-retweet">lorem ipsum Retweeted</div> -->
     <div class="tweet-body">
       <div class="profile-pic-container">
-        <ProfilePicture
-          :profilePicUrl="props.userData.imgs.avatarUrl"
-          :size="48"
-        />
+        <ProfilePicture :url="props.userData.imgs.avatarUrl" :size="48" />
       </div>
       <div class="tweet-data">
         <div class="user-info-and-btn">
@@ -265,7 +262,7 @@ onMounted(() => {
 
 <style>
 .tweet-container {
-  border-bottom: rgba(255, 255, 255, 0.25) 1px solid;
+  border-top: rgba(255, 255, 255, 0.25) 1px solid;
   padding: 0.75rem 1rem 0.4rem 1rem;
   width: 598px;
   display: flex;
@@ -287,17 +284,70 @@ onMounted(() => {
 }
 
 .tweet-data {
+  width: 100%;
   padding-left: 1rem;
 }
 
 .user-info-and-btn {
   width: 100%;
+  max-width: 100%;
   height: 1rem;
   margin-bottom: 6px;
   display: flex;
   flex-direction: row;
   justify-content: space-between;
   align-items: center;
+}
+
+.user-info-wrapper {
+  height: fit-content;
+  display: flex;
+  max-width: 100%;
+  width: 60vw; /* IDCCCCCCCCCCCCCCCC */
+  max-width: fit-content;
+}
+
+.display-name,
+.username {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0px;
+  width: 100%;
+  max-width: fit-content;
+}
+
+.display-name a {
+  color: white;
+}
+
+.username {
+  margin-left: 4px;
+}
+
+.user-info-wrapper a,
+.display-name:visited,
+.username:visited {
+  text-decoration: none;
+}
+
+.display-name a:hover,
+.username a:hover {
+  text-decoration: underline;
+}
+
+.tweet-time {
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
+.separator {
+  margin: 0px 5px;
+}
+
+.tweet-text {
+  word-wrap: break-word;
+  white-space: pre-wrap;
 }
 
 .username,
@@ -307,47 +357,6 @@ onMounted(() => {
 .tweet-metric {
   vertical-align: center;
   color: rgba(255, 255, 255, 0.5);
-}
-
-.display-name,
-.username {
-  /* display: inline-block;
-  overflow: hidden; */
-  white-space: nowrap;
-  word-wrap: break-word;
-  text-overflow: ellipsis;
-}
-
-.username {
-  margin-left: 4px;
-}
-
-.separator {
-  margin: 0px 5px;
-}
-
-.display-name,
-.tweet-text {
-  word-wrap: break-word;
-}
-
-.tweet-text {
-  white-space: pre-wrap;
-}
-
-.user-info-wrapper a,
-.display-name:visited,
-.username:visited {
-  text-decoration: none;
-}
-
-.display-name a {
-  color: white;
-}
-
-.display-name a:hover,
-.username a:hover {
-  text-decoration: underline;
 }
 
 .tweet-content {

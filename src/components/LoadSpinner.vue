@@ -25,7 +25,8 @@
 .loader {
   margin: 60px auto;
   font-size: 6px;
-  position: relative;
+  position: absolute;
+  top: 10%;
   text-indent: -9999em;
   border-top: 1.1em solid #1d9bf033;
   border-right: 1.1em solid #1d9bf033;
