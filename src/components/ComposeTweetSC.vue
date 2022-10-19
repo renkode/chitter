@@ -1,5 +1,5 @@
 <script setup>
-import { onMounted, ref } from "vue";
+import { onMounted, ref, computed, watch } from "vue";
 import ProfilePicture from "./ProfilePicture.vue";
 import { useUserStore } from "@/stores/user";
 import { getMediaClass } from "../mixins/tools.js";
@@ -12,10 +12,10 @@ const images = ref([
   "https://pbs.twimg.com/media/Fe5WT7-XoBoEEWt?format=jpg&name=large",
   "https://pbs.twimg.com/media/Fe0r_ZgWAAEN8px?format=jpg&name=large",
 ]);
+const str = ref("");
 
 const onFileChange = (e) => {
   images.value.push(URL.createObjectURL(e.currentTarget.files[0]));
-  console.table(images.value);
 };
 
 const removeFile = (index) => {
@@ -27,15 +27,25 @@ const resizeTextArea = () => {
   textArea.value.style.height = textArea.value.scrollHeight + "px";
 };
 
-const adjustCircle = () => {
-  const characterRatio = textArea.value.value.length / 280;
-  circle.value.style = `--circle: ${characterRatio}`;
-};
-
 const handleInput = () => {
   resizeTextArea();
-  adjustCircle();
 };
+
+// adjust circle percentage and color
+watch(str, () => {
+  const characterRatio = (str.value.length / 280).toFixed(2);
+  const charactersLeft = 280 - str.value.length;
+  if (charactersLeft <= 20 && charactersLeft > 0) {
+    // yellow
+    circle.value.style = `--circle: ${characterRatio}; --color: #ffd400; --outerRadius: 28px; --innerRadius: 24px;`;
+  } else if (charactersLeft <= 0) {
+    // red
+    circle.value.style = `--circle: ${characterRatio}; --color: #f4212e;--outerRadius: 28px; --innerRadius: 24px;`;
+  } else {
+    // blue
+    circle.value.style = `--circle: ${characterRatio}; --color: #1d9bf0;--outerRadius: 22px; --innerRadius: 18px;`;
+  }
+});
 
 onMounted(() => {
   resizeTextArea();
@@ -53,6 +63,7 @@ onMounted(() => {
           ref="textArea"
           placeholder="What's happening?"
           @input="handleInput"
+          v-model="str"
         ></textarea>
         <div
           class="tweet-media"
@@ -65,12 +76,12 @@ onMounted(() => {
             :key="images.indexOf(img)"
           >
             <img :src="img" class="image-preview" />
-            <!-- <button
+            <button
               class="remove-image-btn"
               @click="removeFile(images.indexOf(img))"
             >
-              <v-icon name="bi-x" scale="2.0" fill="white" />
-            </button> -->
+              <v-icon name="bi-x" scale="1.6" fill="white" />
+            </button>
           </div>
         </div>
       </div>
@@ -82,9 +93,16 @@ onMounted(() => {
           </label>
         </span>
         <div class="limit-and-btn">
-          <div ref="circle" class="circle" style="--circle: 0">
-            <span class="character-limit"></span>
-          </div>
+          <span class="circle-wrapper">
+            <div ref="circle" class="circle" style="--circle: 0">
+              <span
+                class="character-limit"
+                :class="{ red: 280 - str.length < 0 }"
+                v-if="280 - str.length <= 20"
+                >{{ 280 - str.length }}</span
+              >
+            </div></span
+          >
           <button class="new-tweet-btn">Tweet</button>
         </div>
       </div>
@@ -169,15 +187,20 @@ label {
   top: 4px;
   left: 4px;
   display: flex;
-  place-content: center;
+  justify-content: center;
+  align-items: center;
   border: 0;
   border-radius: 100%;
   background-color: rgba(0, 0, 0, 0.753);
   color: white;
   cursor: pointer;
+  padding: 0;
+}
+
+.remove-image-btn,
+.remove-image-btn svg {
   width: 30px;
   height: 30px;
-  z-index: 2;
 }
 
 .limit-and-btn {
@@ -205,15 +228,36 @@ label {
   background-color: #1687d3;
 }
 
+.circle-wrapper {
+  width: 30px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.character-limit {
+  font-size: 0.8rem;
+}
+
+.red {
+  color: #f4212e;
+}
+
 /* https://stackoverflow.com/questions/70368658/percentage-circle-border-css-react */
 .circle {
   --circle: 0.3;
   --color: #28a7fc;
-  height: 21px;
-  width: 21px;
+  --outerRadius: 22px;
+  --innerRadius: 18px;
+  height: var(--outerRadius);
+  width: var(--outerRadius);
   border-radius: 50%;
   position: relative;
   clip-path: circle(50%);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: width 0.1s ease, height 0.1s ease;
 }
 
 .circle::before {
@@ -233,12 +277,11 @@ label {
 .circle::after {
   content: "";
   position: absolute;
-  width: 80%;
-  height: 80%;
-  top: 10%;
-  left: 10%;
+  width: var(--innerRadius);
+  height: var(--innerRadius);
   background-color: rgb(38, 42, 46);
   border-radius: 50%;
   z-index: -1;
+  transition: width 0.1s ease, height 0.1s ease;
 }
 </style>
