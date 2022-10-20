@@ -9,12 +9,10 @@ export const useUsersStore = defineStore("users", {
           name: "🍆",
           username: "renkode",
           biography: {
-            description: {
-              text: "lorem ipsum #cool",
-              hashtags: ["cool"],
-            },
+            description: "lorem ipsum #cool",
             location: "nowhere",
             website: "https://github.com/renkode/",
+            birthday: "June 9, 2021",
           },
           imgs: {
             avatarUrl:
@@ -62,12 +60,10 @@ export const useUsersStore = defineStore("users", {
           name: "← bearer of the curse",
           username: "mikulover",
           biography: {
-            description: {
-              text: "lorem ipsum #cool",
-              hashtags: ["cool"],
-            },
+            description: "gfdjgdjskg",
             location: "gdshfdh",
-            website: "",
+            website: null,
+            birthday: null,
           },
           imgs: {
             avatarUrl:

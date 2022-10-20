@@ -67,7 +67,7 @@ onMounted(() => {
 <template>
   <div class="compose-tweet-container">
     <div class="profile-pic-container">
-      <ProfilePicture :url="store.userData.imgs.avatarUrl" :size="48" />
+      <ProfilePicture :url="store.userData.avatarUrl" :size="48" />
     </div>
     <div class="compose-tweet-body">
       <div class="compose-tweet-content">
@@ -100,8 +100,9 @@ onMounted(() => {
       <div class="compose-tweet-bar">
         <button class="add-image-btn" :disabled="maxedImages">
           <input
-            type="file"
             id="upload-image"
+            type="file"
+            accept="image/png, image/gif, image/jpeg"
             @change="onFileChange"
             hidden
             :disabled="maxedImages"

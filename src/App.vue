@@ -1,9 +1,10 @@
 <script setup>
 import MenuSidebar from "./components/MenuSidebar.vue";
 import MediaSidebar from "./components/MediaSidebar.vue";
-import TimelineMain from "./components/TimelineMain.vue";
 import HeaderSC from "./components/HeaderSC.vue";
 import ComposeTweetSC from "./components/ComposeTweetSC.vue";
+import TimelineMain from "./components/TimelineMain.vue";
+import ProfileMain from "./components/ProfileMain.vue";
 import LoadSpinner from "./components/LoadSpinner.vue";
 import { useAppStore } from "@/stores/app.js";
 
@@ -16,11 +17,21 @@ const appStore = useAppStore();
   <div class="main-wrapper">
     <div class="timeline-wrapper">
       <HeaderSC />
+
       <template v-if="appStore.view === 'home'">
         <ComposeTweetSC />
         <Transition name="fade">
           <Suspense>
             <template #default> <TimelineMain /> </template>
+            <template #fallback> <LoadSpinner /> </template>
+          </Suspense>
+        </Transition>
+      </template>
+
+      <template v-if="appStore.view === 'profile'">
+        <Transition name="fade">
+          <Suspense>
+            <template #default> <ProfileMain /> </template>
             <template #fallback> <LoadSpinner /> </template>
           </Suspense>
         </Transition>
@@ -83,5 +94,64 @@ li {
 .fade-enter-from,
 .fade-leave-to {
   opacity: 0;
+}
+
+.main-wrapper {
+  width: 600px;
+  height: 100%;
+  flex-grow: 0;
+}
+
+.timeline-wrapper {
+  width: 600px;
+  min-height: 99.5vh;
+  height: fit-content;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  border: rgba(255, 255, 255, 0.25) 1px solid;
+  border-top: 0;
+  border-bottom: 0;
+  position: relative;
+}
+
+.gray-text {
+  color: rgba(255, 255, 255, 0.5);
+}
+
+@media screen and (max-width: 1005px) {
+  .main-wrapper {
+    flex-grow: 0;
+    width: 100%;
+  }
+}
+
+@media screen and (max-width: 700px) {
+  .main-wrapper,
+  .timeline-wrapper,
+  .compose-tweet-container {
+    width: 100%;
+  }
+}
+
+@media screen and (max-height: 500px) {
+  .main-wrapper {
+    display: flex;
+    justify-content: center;
+  }
+}
+
+@media screen and (max-width: 500px) {
+  .timeline-wrapper {
+    border: rgba(255, 255, 255, 0) 1px solid;
+  }
+}
+
+/* prevent nav bar from covering the last tweet */
+@media screen and (max-width: 500px), (max-height: 500px) {
+  .main-wrapper,
+  .timeline-wrapper {
+    padding-bottom: 3.5rem;
+  }
 }
 </style>

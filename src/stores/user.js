@@ -9,24 +9,16 @@ export const useUserStore = defineStore("user", {
       id: "1",
       name: "among us forever 🍆",
       username: "renkode",
-      biography: {
-        description: {
-          text: "lorem ipsum #cool",
-          hashtags: ["cool"],
-        },
-        location: "nowhere",
-        website: "https://github.com/renkode/",
-      },
-      imgs: {
-        avatarUrl:
-          "https://pbs.twimg.com/profile_images/1566523505155268608/AEzCad1D_400x400.png",
-        headerUrl:
-          "https://pbs.twimg.com/media/Fe8wtxmVQAAkipE?format=jpg&name=large",
-      },
-      followData: {
-        followingCount: 0,
-        followerCount: 0,
-      },
+      description: "lorem ipsum #cool",
+      location: "nowhere",
+      website: "https://github.com/renkode/",
+      birthday: "June 9, 2021",
+      avatarUrl:
+        "https://pbs.twimg.com/profile_images/1566523505155268608/AEzCad1D_400x400.png",
+      headerUrl:
+        "https://pbs.twimg.com/media/Fe8wtxmVQAAkipE?format=jpg&name=large",
+      followingCount: 0,
+      followerCount: 0,
       tweetCount: 3,
       createdAt: "2019-06-03T23:12:08.000Z",
     },

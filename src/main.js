@@ -24,6 +24,10 @@ import {
   MdArrowback,
   RiImageAddLine,
   BiX,
+  MdLocationonOutlined,
+  OiLink,
+  LaBirthdayCakeSolid,
+  BiCalendar3,
 } from "oh-vue-icons/icons";
 
 addIcons(
@@ -43,7 +47,11 @@ addIcons(
   CoUserUnfollow,
   MdArrowback,
   RiImageAddLine,
-  BiX
+  BiX,
+  MdLocationonOutlined,
+  OiLink,
+  LaBirthdayCakeSolid,
+  BiCalendar3
 );
 
 const pinia = createPinia();

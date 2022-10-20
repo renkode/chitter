@@ -8,6 +8,11 @@ import ProfilePicture from "./ProfilePicture.vue";
 const userStore = useUserStore();
 const appStore = useAppStore();
 const { userData } = storeToRefs(userStore);
+
+const viewProfile = () => {
+  appStore.setViewProfileId(userData.id);
+  appStore.setView("profile");
+};
 </script>
 
 <template>
@@ -15,7 +20,7 @@ const { userData } = storeToRefs(userStore);
     <nav>
       <ul>
         <li class="nav-item nav-logo">
-          <span class="nav-icon"
+          <span class="nav-icon" @click="appStore.setView('home')"
             ><v-icon name="bi-twitter" scale="2.0" fill="white"
           /></span>
         </li>
@@ -32,7 +37,7 @@ const { userData } = storeToRefs(userStore);
               fill="white" /></span
           ><span class="nav-label">Timeline</span>
         </li>
-        <li class="nav-item" @click="appStore.setView('profile')">
+        <li class="nav-item" @click="viewProfile">
           <span class="nav-icon"
             ><v-icon name="bi-person" scale="1.8" fill="white" /></span
           ><span class="nav-label">Profile</span>
@@ -46,7 +51,7 @@ const { userData } = storeToRefs(userStore);
       </button>
       <li class="nav-user">
         <div class="user-info-and-btn">
-          <ProfilePicture :url="userData.imgs.avatarUrl" :size="40" />
+          <ProfilePicture :url="userData.avatarUrl" :size="40" />
           <div class="user-info-wrapper">
             <span class="display-name">{{ userData.name }}</span>
             <span class="username">@{{ userData.username }}</span>

@@ -98,7 +98,7 @@ const embedLinks = computed(() => {
 
 const currentTime = ref(dayjs().toISOString());
 const getTimeSinceCreation = ref(
-  formatDateMixin.formatDate(props.tweetData.createdAt, currentTime.value)
+  formatDateMixin.formatTweetDate(props.tweetData.createdAt, currentTime.value)
 );
 
 onMounted(() => {
@@ -138,7 +138,7 @@ onMounted(() => {
     <!-- <div class="user-retweet">lorem ipsum Retweeted</div> -->
     <div class="tweet-body">
       <div class="profile-pic-container">
-        <ProfilePicture :url="props.userData.imgs.avatarUrl" :size="48" />
+        <ProfilePicture :url="props.userData.avatarUrl" :size="48" />
       </div>
       <div class="tweet-data">
         <div class="user-info-and-btn">
@@ -146,11 +146,11 @@ onMounted(() => {
             <span class="display-name"
               ><a href="#">{{ props.userData.name }}</a></span
             >
-            <span class="username"
+            <span class="username gray-text"
               ><a href="#">@{{ props.userData.username }}</a></span
             >
-            <span class="separator">·</span>
-            <span class="tweet-time">{{ getTimeSinceCreation }}</span>
+            <span class="separator gray-text">·</span>
+            <span class="tweet-time gray-text">{{ getTimeSinceCreation }}</span>
           </div>
           <span
             class="tweet-action-icon extra-btn"
@@ -210,11 +210,9 @@ onMounted(() => {
             <span class="tweet-action-icon reply-btn" @click.stop="doSomething"
               ><v-icon name="fa-regular-comment" scale="1.0" fill="#ffffff80"
             /></span>
-            <span
-              v-if="props.tweetData.metrics.replyCount > 0"
-              class="tweet-metric reply-metric"
-              >{{ props.tweetData.metrics.replyCount }}</span
-            >
+            <span class="tweet-metric reply-metric gray-text">{{
+              props.tweetData.metrics.replyCount || ""
+            }}</span>
           </span>
           <span class="tweet-metrics">
             <span
@@ -223,11 +221,9 @@ onMounted(() => {
               @click.stop="toggleRetweet"
               ><v-icon name="la-retweet-solid" scale="1.15" fill="#ffffff80"
             /></span>
-            <span
-              v-if="props.tweetData.metrics.retweetCount > 0"
-              class="tweet-metric retweet-metric"
-              >{{ props.tweetData.metrics.retweetCount }}</span
-            >
+            <span class="tweet-metric retweet-metric gray-text">{{
+              props.tweetData.metrics.retweetCount || ""
+            }}</span>
           </span>
           <span class="tweet-metrics">
             <span
@@ -236,11 +232,9 @@ onMounted(() => {
               @click.stop="toggleLike"
               ><v-icon name="fa-regular-heart" scale="1.0" fill="#ffffff80"
             /></span>
-            <span
-              v-if="props.tweetData.metrics.likeCount > 0"
-              class="tweet-metric like-metric"
-              >{{ props.tweetData.metrics.likeCount }}</span
-            >
+            <span class="tweet-metric like-metric gray-text">{{
+              props.tweetData.metrics.likeCount || ""
+            }}</span>
           </span>
           <span
             class="tweet-action-icon share-tweet-btn"
@@ -344,11 +338,7 @@ onMounted(() => {
   white-space: pre-wrap;
 }
 
-.username,
-.username a,
-.tweet-time,
-.separator,
-.tweet-metric {
+.username a {
   vertical-align: center;
   color: rgba(255, 255, 255, 0.5);
 }
@@ -450,6 +440,7 @@ svg {
 }
 
 .tweet-metric {
+  width: 32px;
   position: relative;
   left: 4px;
   font-size: 0.9rem;

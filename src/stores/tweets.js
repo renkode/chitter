@@ -189,12 +189,10 @@ export const useTweetStore = defineStore("tweets", {
         },
       };
       this.tweets.unshift(newTweet); // is this a good idea?
-      console.log(this.tweets);
     },
     removeTweet(id) {
       const index = this.tweets.findIndex((t) => t.data.id === id);
       if (index < 0) return;
-      console.log(id, index);
       this.tweets.splice(index, 1);
     },
   },

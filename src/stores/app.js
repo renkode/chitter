@@ -9,6 +9,7 @@ export const useAppStore = defineStore("app", {
     view: "home", //  timeline (default) | profile | tweet | search
     previousView: "home",
     viewTweetId: null,
+    viewProfileId: null,
     profileTab: "tweets", // tweets (default) | tweets-and-replies | media | likes
     showModal: false,
     modalType: "status", // status | reply | quote
@@ -41,6 +42,9 @@ export const useAppStore = defineStore("app", {
     },
     setViewTweetId(id) {
       this.viewTweetId = id;
+    },
+    setViewProfileId(id) {
+      this.viewProfileId = id;
     },
     toggleModal() {
       this.showModal = !this.showModal;

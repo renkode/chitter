@@ -11,6 +11,8 @@ const props = defineProps({
     class="profile-pic"
     :style="{
       backgroundImage: `url(${props.url})`,
+      maxWidth: props.size + 'px',
+      maxHeight: props.size + 'px',
       width: props.size + 'px',
       height: props.size + 'px',
       borderRadius: props.size / 2 + 'px',

@@ -35,7 +35,7 @@ dayjs.updateLocale("en", {
 });
 
 export default {
-  formatDate(dateString, now) {
+  formatTweetDate(dateString, now) {
     if (!dateString) return "Unknown";
     const date = dayjs(dateString);
     const currentDate = dayjs(now);
@@ -47,5 +47,10 @@ export default {
     } else {
       return date.format("MMM D, YYYY");
     }
+  },
+  formatJoinDate(dateString) {
+    if (!dateString) return null;
+    const date = dayjs(dateString);
+    return date.format("MMMM YYYY");
   },
 };
