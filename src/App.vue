@@ -1,4 +1,5 @@
 <script setup>
+import { onMounted } from "vue";
 import MenuSidebar from "./components/MenuSidebar.vue";
 import MediaSidebar from "./components/MediaSidebar.vue";
 import HeaderSC from "./components/HeaderSC.vue";
@@ -7,8 +8,13 @@ import TimelineMain from "./components/TimelineMain.vue";
 import ProfileMain from "./components/ProfileMain.vue";
 import LoadSpinner from "./components/LoadSpinner.vue";
 import { useAppStore } from "@/stores/app.js";
+import { useUsersStore } from "@/stores/users";
+const app = useAppStore();
+const users = useUsersStore();
 
-const appStore = useAppStore();
+onMounted(() => {
+  app.setCurrentUser(users.getUser("1"));
+});
 </script>
 
 <template>
@@ -18,8 +24,8 @@ const appStore = useAppStore();
     <div class="timeline-wrapper">
       <HeaderSC />
 
-      <template v-if="appStore.view === 'home'">
-        <ComposeTweetSC />
+      <template v-if="app.view === 'home'">
+        <ComposeTweetSC v-if="app.currentUser" />
         <Transition name="fade">
           <Suspense>
             <template #default> <TimelineMain /> </template>
@@ -28,7 +34,7 @@ const appStore = useAppStore();
         </Transition>
       </template>
 
-      <template v-if="appStore.view === 'profile'">
+      <template v-if="app.view === 'profile'">
         <Transition name="fade">
           <Suspense>
             <template #default> <ProfileMain /> </template>
@@ -136,6 +142,14 @@ a:hover {
 
 .gray-text {
   color: #ffffff80;
+}
+
+.error {
+  height: 100px;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 @media screen and (max-width: 1005px) {

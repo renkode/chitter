@@ -5,6 +5,8 @@ import { defineStore } from "pinia";
 export const useAppStore = defineStore("app", {
   // a function that returns a fresh state
   state: () => ({
+    currentId: null,
+    currentUser: null,
     path: "",
     view: "home", //  timeline (default) | profile | tweet | search
     previousView: "home",
@@ -20,6 +22,10 @@ export const useAppStore = defineStore("app", {
   getters: {},
   // optional actions
   actions: {
+    setCurrentUser(user) {
+      this.currentUser = user || null;
+      this.currentId = user.id;
+    },
     setPath(str) {
       this.path = str;
       // call router?

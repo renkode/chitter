@@ -14,7 +14,7 @@
           "likeCount": 1,
           "quoteCount": 0
         },
-        "createdAt": "2019-06-04T23:12:08.000Z",
+        "timestamp": "2019-06-04T23:12:08.000Z",
         "replyingTo": null,
         "quoting": null
       },
@@ -50,7 +50,7 @@
         },
         "tweetCount": 1,
         "pinnedTweetId": "",
-        "createdAt": "2019-06-03T23:12:08.000Z"
+        "timestamp": "2019-06-03T23:12:08.000Z"
       },
       "tweetData": {
         "authoredTweets": [

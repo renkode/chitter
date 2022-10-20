@@ -1,17 +1,19 @@
 <script setup>
 import { onMounted, ref, computed, watch } from "vue";
 import ProfilePicture from "./ProfilePicture.vue";
-import { useUserStore } from "@/stores/user";
+import { useAppStore } from "@/stores/app";
 import { useTweetStore } from "@/stores/tweets";
 import { getMediaClass } from "../mixins/utilities.js";
 import { storeToRefs } from "pinia";
 
-const store = useUserStore();
+const app = useAppStore();
 const tweetStore = useTweetStore();
 const textArea = ref(null);
 const circle = ref(null);
 const images = ref([]);
 const str = ref("");
+
+const user = computed(() => app.currentUser);
 const noContent = computed(
   () => str.value.length === 0 && images.value.length === 0
 );
@@ -39,7 +41,7 @@ const handleInput = () => {
 
 const postTweet = () => {
   if (noContent.value) return;
-  tweetStore.addTweet("status", str.value, images.value, store.userData.id);
+  tweetStore.addTweet("status", str.value, images.value, user.value.id);
   str.value = "";
   images.value = [];
 };
@@ -67,7 +69,7 @@ onMounted(() => {
 <template>
   <div class="compose-tweet-container">
     <div class="profile-pic-container">
-      <ProfilePicture :url="store.userData.avatarUrl" :size="48" />
+      <ProfilePicture :url="user.avatarUrl" :size="48" />
     </div>
     <div class="compose-tweet-body">
       <div class="compose-tweet-content">

@@ -1,19 +1,10 @@
 <script setup>
-import { defineProps } from "vue";
-import { useUserStore } from "@/stores/user.js";
+import { computed } from "vue";
 import { useAppStore } from "@/stores/app.js";
-import { storeToRefs } from "pinia";
 import ProfilePicture from "./ProfilePicture.vue";
 
-const userStore = useUserStore();
-const appStore = useAppStore();
-const { userData } = storeToRefs(userStore);
-
-// const viewProfile = () => {
-//   appStore.setViewProfileId(userData.id);
-//   appStore.setProfileTab("tweets");
-//   appStore.setView("profile");
-// };
+const app = useAppStore();
+const user = computed(() => app.currentUser);
 </script>
 
 <template>
@@ -21,16 +12,16 @@ const { userData } = storeToRefs(userStore);
     <nav>
       <ul>
         <li class="nav-item nav-logo">
-          <span class="nav-icon" @click="appStore.setView('home')"
+          <span class="nav-icon" @click="app.setView('home')"
             ><v-icon name="bi-twitter" scale="2.0" fill="white"
           /></span>
         </li>
-        <li class="nav-item" @click="appStore.setView('home')">
+        <li class="nav-item" @click="app.setView('home')">
           <span class="nav-icon"
             ><v-icon name="gi-bird-house" scale="2.0" fill="white" /></span
           ><span class="nav-label">Home</span>
         </li>
-        <li class="nav-item" @click="appStore.setView('timeline')">
+        <li class="nav-item" @click="app.setView('timeline')">
           <span class="nav-icon"
             ><v-icon
               name="md-accesstime-round"
@@ -38,7 +29,7 @@ const { userData } = storeToRefs(userStore);
               fill="white" /></span
           ><span class="nav-label">Timeline</span>
         </li>
-        <li class="nav-item" @click="appStore.viewUserProfile(userData.id)">
+        <li class="nav-item" @click="app.viewUserProfile(user.id)">
           <span class="nav-icon"
             ><v-icon name="bi-person" scale="1.8" fill="white" /></span
           ><span class="nav-label">Profile</span>
@@ -50,12 +41,12 @@ const { userData } = storeToRefs(userStore);
         /></span>
         <span class="new-tweet-btn-label">Tweet</span>
       </button>
-      <li class="nav-user">
+      <li class="nav-user" v-if="user">
         <div class="user-info-and-btn">
-          <ProfilePicture :url="userData.avatarUrl" :size="40" />
+          <ProfilePicture :url="user.avatarUrl" :size="40" />
           <div class="user-info-wrapper">
-            <span class="display-name">{{ userData.name }}</span>
-            <span class="username">@{{ userData.username }}</span>
+            <span class="display-name">{{ user.name }}</span>
+            <span class="username">@{{ user.username }}</span>
           </div>
         </div>
         <span class="tweet-action-icon extra-btn"

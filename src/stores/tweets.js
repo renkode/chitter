@@ -26,7 +26,7 @@ export const useTweetStore = defineStore("tweets", {
             likeCount: 1438,
             quoteCount: 0,
           },
-          createdAt: iso,
+          timestamp: iso,
           replyingTo: null,
           quoting: null,
         },
@@ -54,7 +54,7 @@ export const useTweetStore = defineStore("tweets", {
             likeCount: 98,
             quoteCount: 0,
           },
-          createdAt: "2022-10-13T07:58:03.484Z",
+          timestamp: "2022-10-13T07:58:03.484Z",
           replyingTo: null,
           quoting: null,
         },
@@ -83,7 +83,7 @@ export const useTweetStore = defineStore("tweets", {
             likeCount: 6,
             quoteCount: 0,
           },
-          createdAt: "2021-03-24T15:54:32-0400",
+          timestamp: "2021-03-24T15:54:32-0400",
           replyingTo: null,
           quoting: null,
         },
@@ -113,7 +113,7 @@ export const useTweetStore = defineStore("tweets", {
             likeCount: 712,
             quoteCount: 0,
           },
-          createdAt: "2021-03-24T15:54:32-0400",
+          timestamp: "2021-03-24T15:54:32-0400",
           replyingTo: null,
           quoting: null,
         },
@@ -157,6 +157,9 @@ export const useTweetStore = defineStore("tweets", {
         1
       );
     },
+    hasRetweeted(userId) {
+      return this.references.retweetsFrom.includes(userId);
+    },
     addTweet(
       type = "status",
       text = "",
@@ -177,7 +180,7 @@ export const useTweetStore = defineStore("tweets", {
             likeCount: 0,
             quoteCount: 0,
           },
-          createdAt: new Date().toISOString(),
+          timestamp: new Date().toISOString(),
           replyingTo: replyingTo || null,
           quoting: null,
         },

@@ -1,8 +1,12 @@
 <script setup>
-import { onMounted } from "vue";
+import { onMounted, computed } from "vue";
 import ProfileBioSC from "./ProfileBioSC.vue";
-import { useUserStore } from "@/stores/user.js";
-const store = useUserStore();
+import { useUsersStore } from "@/stores/users.js";
+import { useAppStore } from "@/stores/app.js";
+
+const app = useAppStore();
+const users = useUsersStore();
+const user = computed(() => users.getUser(app.viewProfileId));
 
 async function delay(time) {
   await new Promise((res) => {
@@ -17,7 +21,8 @@ onMounted(() => {
 
 <template>
   <div class="profile-wrapper">
-    <ProfileBioSC :user="store" />
+    <ProfileBioSC v-if="user" :user="user" />
+    <div class="error gray-text" v-else>User not found.</div>
   </div>
 </template>
 

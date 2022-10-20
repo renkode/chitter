@@ -6,26 +6,28 @@ import formatDateMixin from "../mixins/formatDateMixin.js";
 import { getMediaClass } from "../mixins/utilities.js";
 import { useTweetStore } from "@/stores/tweets.js";
 import { useAppStore } from "@/stores/app.js";
+import { useUsersStore } from "@/stores/users.js";
 
-const tweetStore = useTweetStore();
-const appStore = useAppStore();
+const tweets = useTweetStore();
+const app = useAppStore();
+const users = useUsersStore();
 
 var relativeTime = require("dayjs/plugin/relativeTime");
 dayjs.extend(relativeTime);
 
 const props = defineProps({
   id: Number,
-  userData: Object,
-  tweetData: Object,
+  user: Object,
+  tweet: Object,
   viewing: Boolean,
 });
 
 const setTweetContext = () => {
-  if (appStore.viewTweetId === props.id) return;
+  if (app.viewTweetId === props.id) return;
   if (window.getSelection().toString().length > 0) return; // don't trigger click while highlighting text
-  appStore.setPath(`/status/${props.id}`);
-  appStore.setView("tweet");
-  appStore.setViewTweetId(props.id);
+  app.setPath(`/status/${props.id}`);
+  app.setView("tweet");
+  app.setViewTweetId(props.id);
 };
 
 const isTweetMenuOpen = ref(false);
@@ -35,7 +37,7 @@ const toggleTweetMenu = (e) => {
 };
 
 const deleteTweet = (id) => {
-  tweetStore.removeTweet(id);
+  tweets.removeTweet(id);
 };
 
 const doSomething = (e) => {
@@ -49,31 +51,40 @@ const toggleLike = () => {
   // like tweet
   if (!isLiked.value) {
     isLiked.value = true;
-    tweetStore.addLike(props.id, "1");
+    tweets.addLike(props.id, "1");
   }
   // unlike tweet
   else {
     isLiked.value = false;
-    tweetStore.removeLike(props.id, "1");
+    tweets.removeLike(props.id, "1");
   }
 };
 const toggleRetweet = () => {
   // like tweet
   if (!isRetweeted.value) {
     isRetweeted.value = true;
-    tweetStore.addRetweet(props.id, "1");
+    tweets.addRetweet(props.id, "1");
   }
   // unlike tweet
   else {
     isRetweeted.value = false;
-    tweetStore.removeRetweet(props.id, "1");
+    tweets.removeRetweet(props.id, "1");
   }
 };
+// const handleRetweet = (tweetId) => {
+//   if (!hasRetweeted(userId)) {
+//     isRetweeted.value = true;
+//     users.addRetweet()
+//   } else {
+
+//   }
+
+// }
 
 const tweetText = ref(null);
 // embed @'s, hashtags and links inside tweets
 const embedLinks = computed(() => {
-  if (!props.tweetData.text || props.tweetData.text.length === 0) return;
+  if (!props.tweet.text || props.tweet.text.length === 0) return;
 
   const urlRegex = new RegExp(
     /[-a-zA-Z0-9@:%._~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_.~#?&//=]*)?/gi
@@ -81,7 +92,7 @@ const embedLinks = computed(() => {
   const hashtagRegex = new RegExp(/(#+[a-zA-Z0-9(_)]{1,})/g);
   const atRegex = new RegExp(/(@+[a-zA-Z0-9(_)]{1,})/g);
 
-  const embedArr = props.tweetData.text.split(" ").map((str) => {
+  const embedArr = props.tweet.text.split(" ").map((str) => {
     switch (true) {
       case urlRegex.test(str):
         return `<a class="blue-link" href="${str}" target="_blank">${str}</a>`;
@@ -98,7 +109,7 @@ const embedLinks = computed(() => {
 
 const currentTime = ref(dayjs().toISOString());
 const getTimeSinceCreation = ref(
-  formatDateMixin.formatTweetDate(props.tweetData.createdAt, currentTime.value)
+  formatDateMixin.formatTweetDate(props.tweet.timestamp, currentTime.value)
 );
 
 onMounted(() => {
@@ -109,20 +120,15 @@ onMounted(() => {
     anchor.addEventListener("click", doSomething)
   );
   // update tweet time every 30s (if tweet isn't a day old);
-  if (
-    dayjs(currentTime.value).diff(dayjs(props.tweetData.createdAt), "hour") > 23
-  )
+  if (dayjs(currentTime.value).diff(dayjs(props.tweet.timestamp), "hour") > 23)
     return;
   const timer = setInterval(() => {
     if (
       getTimeSinceCreation.value !==
-      formatDateMixin.formatTweetDate(
-        props.tweetData.createdAt,
-        currentTime.value
-      )
+      formatDateMixin.formatTweetDate(props.tweet.timestamp, currentTime.value)
     ) {
       getTimeSinceCreation.value = formatDateMixin.formatTweetDate(
-        props.tweetData.createdAt,
+        props.tweet.timestamp,
         currentTime.value
       );
     }
@@ -141,16 +147,24 @@ onMounted(() => {
     <!-- <div class="user-retweet">lorem ipsum Retweeted</div> -->
     <div class="tweet-body">
       <div class="profile-pic-container">
-        <ProfilePicture :url="props.userData.avatarUrl" :size="48" />
+        <ProfilePicture
+          :url="props.user.avatarUrl"
+          :size="48"
+          @click.stop="app.viewUserProfile(props.user.id)"
+        />
       </div>
       <div class="tweet-data">
         <div class="user-info-and-btn">
           <div class="user-info-wrapper">
-            <span class="display-name"
-              ><a href="#">{{ props.userData.name }}</a></span
+            <span
+              class="display-name"
+              @click.stop="app.viewUserProfile(props.user.id)"
+              ><a href="#">{{ props.user.name }}</a></span
             >
-            <span class="username gray-text"
-              ><a href="#">@{{ props.userData.username }}</a></span
+            <span
+              class="username gray-text"
+              @click.stop="app.viewUserProfile(props.user.id)"
+              ><a href="#">@{{ props.user.username }}</a></span
             >
             <span class="separator gray-text">·</span>
             <span class="tweet-time gray-text">{{ getTimeSinceCreation }}</span>
@@ -195,13 +209,13 @@ onMounted(() => {
           <div class="tweet-text" ref="tweetText"></div>
           <div
             class="tweet-media"
-            :class="[getMediaClass(props.tweetData.media)]"
-            v-if="props.tweetData.media.length > 0"
+            :class="[getMediaClass(props.tweet.media)]"
+            v-if="props.tweet.media.length > 0"
           >
             <div
               class="image-preview-wrapper"
-              v-for="img in props.tweetData.media"
-              :key="props.tweetData.media.indexOf(img)"
+              v-for="img in props.tweet.media"
+              :key="props.tweet.media.indexOf(img)"
             >
               <img :src="img" />
             </div>
@@ -214,7 +228,7 @@ onMounted(() => {
               ><v-icon name="fa-regular-comment" scale="1.0" fill="#ffffff80"
             /></span>
             <span class="tweet-metric reply-metric gray-text">{{
-              props.tweetData.metrics.replyCount || ""
+              props.tweet.metrics.replyCount || ""
             }}</span>
           </span>
           <span class="tweet-metrics">
@@ -225,7 +239,7 @@ onMounted(() => {
               ><v-icon name="la-retweet-solid" scale="1.15" fill="#ffffff80"
             /></span>
             <span class="tweet-metric retweet-metric gray-text">{{
-              props.tweetData.metrics.retweetCount || ""
+              props.tweet.metrics.retweetCount || ""
             }}</span>
           </span>
           <span class="tweet-metrics">
@@ -236,7 +250,7 @@ onMounted(() => {
               ><v-icon name="fa-regular-heart" scale="1.0" fill="#ffffff80"
             /></span>
             <span class="tweet-metric like-metric gray-text">{{
-              props.tweetData.metrics.likeCount || ""
+              props.tweet.metrics.likeCount || ""
             }}</span>
           </span>
           <span

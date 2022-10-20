@@ -13,16 +13,17 @@ const props = defineProps({ tweets: Array });
 
 <template>
   <div class="tweet-list">
-    <TransitionGroup name="fade-down">
+    <TransitionGroup name="fade-down" v-if="props.tweets.length > 0">
       <TweetSC
         v-for="tweet in props.tweets"
         :key="tweet.data.id"
         :id="tweet.data.id"
-        :userData="usersStore.getUserData(tweet.data.authorId)"
-        :tweetData="tweet.data"
+        :user="usersStore.getUser(tweet.data.authorId)"
+        :tweet="tweet.data"
         :viewing="viewTweetId == tweet.data.id"
       />
     </TransitionGroup>
+    <div class="error gray-text" v-else>No tweets to display</div>
   </div>
 </template>
 

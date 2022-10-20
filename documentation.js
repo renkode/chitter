@@ -27,7 +27,7 @@ const tweetObj = {
       likeCount: NUMBER,
       quoteCount: NUMBER,
     },
-    createdAt: DATE,
+    timestamp: DATE,
     replyingTo:
       {
         userIds: [STRING],
@@ -81,7 +81,7 @@ const userObj = {
     },
     tweetCount: NUMBER,
     pinnedTweetId: STRING,
-    createdAt: DATE,
+    timestamp: DATE,
   },
   tweetData: {
     authoredTweets: [

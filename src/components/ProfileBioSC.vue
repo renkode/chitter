@@ -7,12 +7,10 @@ import { useAppStore } from "@/stores/app.js";
 const store = useAppStore();
 const props = defineProps({ user: Object });
 const shortURL = computed(() =>
-  props.user.userData.website
-    .replace(/https?:\/\/(www\.)?/gi, "")
-    .replace(/\/+$/, "")
+  props.user.website.replace(/https?:\/\/(www\.)?/gi, "").replace(/\/+$/, "")
 );
 const joinDate = computed(() =>
-  formatDateMixin.formatJoinDate(props.user.userData.createdAt)
+  formatDateMixin.formatJoinDate(props.user.timestamp)
 );
 </script>
 
@@ -20,44 +18,42 @@ const joinDate = computed(() =>
   <div class="profile-container">
     <div
       class="header-img"
-      :style="{ backgroundImage: `url(${props.user.userData.headerUrl})` }"
+      :style="{ backgroundImage: `url(${props.user.headerUrl})` }"
     ></div>
 
     <div class="user-info-container">
       <div class="avatar-wrapper">
-        <ProfilePicture :url="props.user.userData.avatarUrl" :size="135" />
+        <ProfilePicture :url="props.user.avatarUrl" :size="135" />
         <button class="edit-profile-btn">Edit Profile</button>
       </div>
       <div class="user-info-wrapper">
-        <span class="display-name">{{ props.user.userData.name }}</span>
-        <span class="username gray-text"
-          >@{{ props.user.userData.username }}</span
-        >
+        <span class="display-name">{{ props.user.name }}</span>
+        <span class="username gray-text">@{{ props.user.username }}</span>
       </div>
-      <span class="description">{{ props.user.userData.description }}</span>
+      <span class="description">{{ props.user.description }}</span>
       <span class="misc-info-wrapper">
-        <span class="misc-info gray-text" v-if="props.user.userData.location"
+        <span class="misc-info gray-text" v-if="props.user.location"
           ><span class="misc-icon"
             ><v-icon
               name="md-locationon-outlined"
               scale="1.0"
               fill="#ffffff80" /></span
-          >{{ props.user.userData.location }}</span
+          >{{ props.user.location }}</span
         >
-        <span class="misc-info gray-text" v-if="props.user.userData.website">
+        <span class="misc-info gray-text" v-if="props.user.website">
           <span class="misc-icon"
             ><v-icon name="oi-link" scale="1.0" fill="#ffffff80" /></span
-          ><a class="blue-link" :href="props.user.userData.website">{{
+          ><a class="blue-link" :href="props.user.website">{{
             shortURL
           }}</a></span
         >
-        <span class="misc-info gray-text" v-if="props.user.userData.birthday">
+        <span class="misc-info gray-text" v-if="props.user.birthday">
           <span class="misc-icon"
             ><v-icon
               name="la-birthday-cake-solid"
               scale="1.0"
               fill="#ffffff80" /></span
-          >{{ props.user.userData.birthday }}</span
+          >{{ props.user.birthday }}</span
         >
         <span class="misc-info gray-text" v-if="joinDate"
           ><span class="misc-icon"
@@ -67,12 +63,12 @@ const joinDate = computed(() =>
       </span>
       <span class="follow-metric-wrapper">
         <span class="follow-metric"
-          ><strong>{{ props.user.userData.followingCount }}</strong
-          ><span class="follow gray-text">Following</span></span
+          ><strong>{{ props.user.followingCount }}</strong
+          ><span class="follow gray-text"> Following</span></span
         >
         <span class="follow-metric"
-          ><strong>{{ props.user.userData.followerCount }}</strong
-          ><span class="follow gray-text">Followers</span></span
+          ><strong>{{ props.user.followerCount }}</strong
+          ><span class="follow gray-text"> Followers</span></span
         >
       </span>
     </div>
@@ -207,6 +203,7 @@ const joinDate = computed(() =>
 }
 
 .misc-info {
+  height: 1.5rem;
   font-size: 1.05rem;
   display: flex;
   flex-direction: row;
@@ -233,10 +230,12 @@ const joinDate = computed(() =>
 
 .follow-metric {
   margin-right: 1.2rem;
+  cursor: pointer;
 }
 
-.follow {
-  margin-left: 0.4rem;
+.follow-metric:hover {
+  text-decoration: underline;
+  text-decoration-color: white;
 }
 
 .profile-tab-container {

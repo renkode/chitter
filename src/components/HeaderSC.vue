@@ -1,31 +1,33 @@
 <script setup>
+import { computed } from "vue";
 import { useAppStore } from "@/stores/app.js";
-import { useUserStore } from "@/stores/user.js";
+import { useUsersStore } from "@/stores/users.js";
 import { storeToRefs } from "pinia";
 
-const store = useAppStore();
-const { view, previousView } = storeToRefs(useAppStore());
-const user = useUserStore(); // TEMPORARY
+const app = useAppStore();
+const users = useUsersStore();
+
+const user = computed(() => users.getUser(app.viewProfileId));
 </script>
 
 <template>
   <div class="page-header">
     <span
-      v-if="view === 'tweet' || view === 'profile'"
+      v-if="app.view === 'tweet' || app.view === 'profile'"
       class="profile-wrapper"
-      @click="store.setView(previousView)"
+      @click="app.setView(app.previousView)"
       ><span class="back-arrow-btn"
         ><v-icon name="md-arrowback" scale="1.1" fill="#ffffff80"
       /></span>
-      <div class="user-info-wrapper" v-if="view === 'profile'">
-        <span class="display-name">{{ user.userData.name }}</span>
+      <div class="user-info-wrapper" v-if="app.view === 'profile'">
+        <span class="display-name">{{ user.name }}</span>
         <span class="total-tweet-count gray-text"
-          >{{ user.userData.tweetCount }} Tweets</span
+          >{{ user.tweetCount }} Tweets</span
         >
       </div>
-      <span v-else style="text-transform: capitalize">{{ view }}</span>
+      <span v-else style="text-transform: capitalize">{{ app.view }}</span>
     </span>
-    <span v-else style="text-transform: capitalize">{{ view }}</span>
+    <span v-else style="text-transform: capitalize">{{ app.view }}</span>
   </div>
 </template>
 
