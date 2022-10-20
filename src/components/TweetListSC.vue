@@ -16,6 +16,7 @@ const props = defineProps({ tweets: Array });
     <TweetSC
       v-for="tweet in props.tweets"
       :key="tweet.data.id"
+      :id="tweet.data.id"
       :userData="usersStore.getUserData(tweet.data.authorId)"
       :tweetData="tweet.data"
       :viewing="viewTweetId == tweet.data.id"

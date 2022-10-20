@@ -14,23 +14,28 @@ var relativeTime = require("dayjs/plugin/relativeTime");
 dayjs.extend(relativeTime);
 
 const props = defineProps({
+  id: Number,
   userData: Object,
   tweetData: Object,
   viewing: Boolean,
 });
 
 const setTweetContext = () => {
-  if (appStore.viewTweetId === props.tweetData.id) return;
-  if (window.getSelection().toString().length > 0) return;
-  appStore.setPath(`/status/${props.tweetData.id}`);
+  if (appStore.viewTweetId === props.id) return;
+  if (window.getSelection().toString().length > 0) return; // don't trigger click while highlighting text
+  appStore.setPath(`/status/${props.id}`);
   appStore.setView("tweet");
-  appStore.setViewTweetId(props.tweetData.id);
+  appStore.setViewTweetId(props.id);
 };
 
 const isTweetMenuOpen = ref(false);
 const toggleTweetMenu = (e) => {
   e.preventDefault();
   isTweetMenuOpen.value = !isTweetMenuOpen.value;
+};
+
+const deleteTweet = (id) => {
+  tweetStore.removeTweet(id);
 };
 
 const doSomething = (e) => {
@@ -44,24 +49,24 @@ const toggleLike = () => {
   // like tweet
   if (!isLiked.value) {
     isLiked.value = true;
-    tweetStore.addLike(props.tweetData.id, "1");
+    tweetStore.addLike(props.id, "1");
   }
   // unlike tweet
   else {
     isLiked.value = false;
-    tweetStore.removeLike(props.tweetData.id, "1");
+    tweetStore.removeLike(props.id, "1");
   }
 };
 const toggleRetweet = () => {
   // like tweet
   if (!isRetweeted.value) {
     isRetweeted.value = true;
-    tweetStore.addRetweet(props.tweetData.id, "1");
+    tweetStore.addRetweet(props.id, "1");
   }
   // unlike tweet
   else {
     isRetweeted.value = false;
-    tweetStore.removeRetweet(props.tweetData.id, "1");
+    tweetStore.removeRetweet(props.id, "1");
   }
 };
 
@@ -156,7 +161,7 @@ onMounted(() => {
               <ul class="tweet-menu-list">
                 <li
                   class="tweet-menu-item delete-tweet"
-                  @click.stop="doSomething"
+                  @click.stop="deleteTweet(props.id)"
                 >
                   <span class="tweet-menu-icon"
                     ><v-icon name="bi-trash" scale="1.1" fill="red" /></span

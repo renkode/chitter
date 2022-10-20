@@ -12,6 +12,9 @@ const textArea = ref(null);
 const circle = ref(null);
 const images = ref([]);
 const str = ref("");
+const noContent = computed(
+  () => str.value.length === 0 && images.value.length === 0
+);
 const maxedImages = computed(() => images.value.length === 4);
 const charactersLeft = computed(() => 280 - str.value.length);
 const isYellowRange = computed(() => charactersLeft.value <= 20);
@@ -35,6 +38,7 @@ const handleInput = () => {
 };
 
 const postTweet = () => {
+  if (noContent.value) return;
   tweetStore.addTweet("status", str.value, images.value, store.userData.id);
   str.value = "";
   images.value = [];
@@ -119,7 +123,7 @@ onMounted(() => {
           >
           <button
             class="new-tweet-btn"
-            :disabled="isRedRange"
+            :disabled="isRedRange || noContent"
             @click="postTweet"
           >
             Tweet
@@ -268,7 +272,7 @@ textarea:focus {
   align-items: center;
 }
 
-.new-tweet-btn:hover {
+.new-tweet-btn:hover:enabled {
   background-color: #1687d3;
 }
 
