@@ -84,11 +84,11 @@ const embedLinks = computed(() => {
   const embedArr = props.tweetData.text.split(" ").map((str) => {
     switch (true) {
       case urlRegex.test(str):
-        return `<a class="tweet-link" href="${str}" target="_blank">${str}</a>`;
+        return `<a class="blue-link" href="${str}" target="_blank">${str}</a>`;
       case hashtagRegex.test(str):
-        return `<a class="tweet-link non-url" href="#">${str}</a>`;
+        return `<a class="blue-link non-url" href="#">${str}</a>`;
       case atRegex.test(str):
-        return `<a class="tweet-link non-url" href="#">${str}</a>`;
+        return `<a class="blue-link non-url" href="#">${str}</a>`;
       default:
         return str;
     }
@@ -116,9 +116,12 @@ onMounted(() => {
   const timer = setInterval(() => {
     if (
       getTimeSinceCreation.value !==
-      formatDateMixin.formatDate(props.tweetData.createdAt, currentTime.value)
+      formatDateMixin.formatTweetDate(
+        props.tweetData.createdAt,
+        currentTime.value
+      )
     ) {
-      getTimeSinceCreation.value = formatDateMixin.formatDate(
+      getTimeSinceCreation.value = formatDateMixin.formatTweetDate(
         props.tweetData.createdAt,
         currentTime.value
       );
@@ -312,17 +315,6 @@ onMounted(() => {
   margin-left: 4px;
 }
 
-.user-info-wrapper a,
-.display-name:visited,
-.username:visited {
-  text-decoration: none;
-}
-
-.display-name a:hover,
-.username a:hover {
-  text-decoration: underline;
-}
-
 .tweet-time {
   flex-shrink: 0;
   white-space: nowrap;
@@ -347,15 +339,6 @@ onMounted(() => {
   display: flex;
   flex-direction: column;
   margin-bottom: 0.4rem;
-}
-
-.tweet-link {
-  color: #1d9bf0;
-  text-decoration: none;
-}
-
-.tweet-link:hover {
-  text-decoration: underline;
 }
 
 .tweet-actions-wrapper {
@@ -442,7 +425,7 @@ svg {
 .tweet-metric {
   width: 32px;
   position: relative;
-  left: 4px;
+  left: 0px;
   font-size: 0.9rem;
 }
 

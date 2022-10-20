@@ -11,20 +11,19 @@ const props = defineProps({
     class="profile-pic"
     :style="{
       backgroundImage: `url(${props.url})`,
-      maxWidth: props.size + 'px',
-      maxHeight: props.size + 'px',
       width: props.size + 'px',
-      height: props.size + 'px',
-      borderRadius: props.size / 2 + 'px',
     }"
   ></div>
 </template>
 
 <style scoped>
 .profile-pic {
+  aspect-ratio: 1 / 1;
   background-size: cover;
   background-color: rgb(175, 175, 175);
+  border-radius: 100%;
   cursor: pointer;
+  min-width: 44px;
   transition: box-shadow 0.15s ease;
 }
 

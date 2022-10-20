@@ -8,22 +8,16 @@ export const useUsersStore = defineStore("users", {
           id: "1",
           name: "🍆",
           username: "renkode",
-          biography: {
-            description: "lorem ipsum #cool",
-            location: "nowhere",
-            website: "https://github.com/renkode/",
-            birthday: "June 9, 2021",
-          },
-          imgs: {
-            avatarUrl:
-              "https://pbs.twimg.com/profile_images/1566523505155268608/AEzCad1D_400x400.png",
-            headerUrl:
-              "https://pbs.twimg.com/media/Fe8wtxmVQAAkipE?format=jpg&name=large",
-          },
-          followData: {
-            followingCount: 0,
-            followerCount: 0,
-          },
+          description: "lorem ipsum #cool",
+          location: "nowhere",
+          website: "https://github.com/renkode/",
+          birthday: "June 9, 2021",
+          avatarUrl:
+            "https://pbs.twimg.com/profile_images/1566523505155268608/AEzCad1D_400x400.png",
+          headerUrl:
+            "https://pbs.twimg.com/media/Fe8wtxmVQAAkipE?format=jpg&name=large",
+          followingCount: 0,
+          followerCount: 0,
           tweetCount: 3,
           createdAt: "2019-06-03T23:12:08.000Z",
         },
@@ -59,22 +53,16 @@ export const useUsersStore = defineStore("users", {
           id: "2",
           name: "← bearer of the curse",
           username: "mikulover",
-          biography: {
-            description: "gfdjgdjskg",
-            location: "gdshfdh",
-            website: null,
-            birthday: null,
-          },
-          imgs: {
-            avatarUrl:
-              "https://pbs.twimg.com/profile_images/1573329090865778690/Nu2FIMbX_400x400.jpg",
-            headerUrl:
-              "https://pbs.twimg.com/profile_banners/840764077681061889/1646410641/1500x500",
-          },
-          followData: {
-            followingCount: 0,
-            followerCount: 0,
-          },
+          description: "gfdjgdjskg",
+          location: "gdshfdh",
+          website: null,
+          birthday: null,
+          avatarUrl:
+            "https://pbs.twimg.com/profile_images/1573329090865778690/Nu2FIMbX_400x400.jpg",
+          headerUrl:
+            "https://pbs.twimg.com/profile_banners/840764077681061889/1646410641/1500x500",
+          followingCount: 0,
+          followerCount: 0,
           tweetCount: 1,
           createdAt: "2020-02-03T23:12:08.000Z",
         },

@@ -9,10 +9,11 @@ const userStore = useUserStore();
 const appStore = useAppStore();
 const { userData } = storeToRefs(userStore);
 
-const viewProfile = () => {
-  appStore.setViewProfileId(userData.id);
-  appStore.setView("profile");
-};
+// const viewProfile = () => {
+//   appStore.setViewProfileId(userData.id);
+//   appStore.setProfileTab("tweets");
+//   appStore.setView("profile");
+// };
 </script>
 
 <template>
@@ -37,7 +38,7 @@ const viewProfile = () => {
               fill="white" /></span
           ><span class="nav-label">Timeline</span>
         </li>
-        <li class="nav-item" @click="viewProfile">
+        <li class="nav-item" @click="appStore.viewUserProfile(userData.id)">
           <span class="nav-icon"
             ><v-icon name="bi-person" scale="1.8" fill="white" /></span
           ><span class="nav-label">Profile</span>
@@ -66,7 +67,7 @@ const viewProfile = () => {
 </template>
 <style scoped>
 .nav-sidebar {
-  width: 100%;
+  width: 110%;
   height: 100%;
   min-height: 100vh;
   display: flex;

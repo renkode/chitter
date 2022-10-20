@@ -86,6 +86,15 @@ li {
   list-style: none;
 }
 
+a,
+a:visited {
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
 .fade-enter-active,
 .fade-leave-active {
   transition: opacity 0.15s ease;
@@ -115,8 +124,18 @@ li {
   position: relative;
 }
 
+.blue-link,
+.blue-link a {
+  color: #1d9bf0;
+}
+
+.blue-link:visited,
+.blue-link a:visited {
+  color: #1d9bf0;
+}
+
 .gray-text {
-  color: rgba(255, 255, 255, 0.5);
+  color: #ffffff80;
 }
 
 @media screen and (max-width: 1005px) {

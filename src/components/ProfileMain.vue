@@ -11,7 +11,7 @@ async function delay(time) {
 }
 
 onMounted(() => {
-  delay(1000);
+  delay(0);
 });
 </script>
 

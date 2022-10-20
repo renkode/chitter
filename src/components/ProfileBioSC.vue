@@ -2,7 +2,15 @@
 import { defineProps, computed } from "vue";
 import ProfilePicture from "./ProfilePicture.vue";
 import formatDateMixin from "../mixins/formatDateMixin.js";
+import { useAppStore } from "@/stores/app.js";
+
+const store = useAppStore();
 const props = defineProps({ user: Object });
+const shortURL = computed(() =>
+  props.user.userData.website
+    .replace(/https?:\/\/(www\.)?/gi, "")
+    .replace(/\/+$/, "")
+);
 const joinDate = computed(() =>
   formatDateMixin.formatJoinDate(props.user.userData.createdAt)
 );
@@ -16,8 +24,9 @@ const joinDate = computed(() =>
     ></div>
 
     <div class="user-info-container">
-      <div class="avatar-and-edit-wrapper">
+      <div class="avatar-wrapper">
         <ProfilePicture :url="props.user.userData.avatarUrl" :size="135" />
+        <button class="edit-profile-btn">Edit Profile</button>
       </div>
       <div class="user-info-wrapper">
         <span class="display-name">{{ props.user.userData.name }}</span>
@@ -38,7 +47,9 @@ const joinDate = computed(() =>
         <span class="misc-info gray-text" v-if="props.user.userData.website">
           <span class="misc-icon"
             ><v-icon name="oi-link" scale="1.0" fill="#ffffff80" /></span
-          >{{ props.user.userData.website }}</span
+          ><a class="blue-link" :href="props.user.userData.website">{{
+            shortURL
+          }}</a></span
         >
         <span class="misc-info gray-text" v-if="props.user.userData.birthday">
           <span class="misc-icon"
@@ -54,6 +65,63 @@ const joinDate = computed(() =>
           >Joined {{ joinDate }}</span
         >
       </span>
+      <span class="follow-metric-wrapper">
+        <span class="follow-metric"
+          ><strong>{{ props.user.userData.followingCount }}</strong
+          ><span class="follow gray-text">Following</span></span
+        >
+        <span class="follow-metric"
+          ><strong>{{ props.user.userData.followerCount }}</strong
+          ><span class="follow gray-text">Followers</span></span
+        >
+      </span>
+    </div>
+
+    <div class="profile-tab-container">
+      <span
+        class="profile-tab"
+        :class="{ 'gray-text': store.profileTab !== 'tweets' }"
+        @click="store.setProfileTab('tweets')"
+        ><span class="tab-wrapper"
+          >Tweets
+          <span
+            class="tab-indicator"
+            v-if="store.profileTab === 'tweets'"
+          ></span> </span
+      ></span>
+      <span
+        class="profile-tab"
+        :class="{ 'gray-text': store.profileTab !== 'tweets-and-replies' }"
+        @click="store.setProfileTab('tweets-and-replies')"
+        ><span class="tab-wrapper"
+          >Tweets & replies
+          <span
+            class="tab-indicator"
+            v-if="store.profileTab === 'tweets-and-replies'"
+          ></span> </span
+      ></span>
+      <span
+        class="profile-tab"
+        :class="{ 'gray-text': store.profileTab !== 'media' }"
+        @click="store.setProfileTab('media')"
+        ><span class="tab-wrapper"
+          >Media
+          <span
+            class="tab-indicator"
+            v-if="store.profileTab === 'media'"
+          ></span> </span
+      ></span>
+      <span
+        class="profile-tab"
+        :class="{ 'gray-text': store.profileTab !== 'likes' }"
+        @click="store.setProfileTab('likes')"
+        ><span class="tab-wrapper"
+          >Likes
+          <span
+            class="tab-indicator"
+            v-if="store.profileTab === 'likes'"
+          ></span> </span
+      ></span>
     </div>
   </div>
 </template>
@@ -71,13 +139,47 @@ const joinDate = computed(() =>
   width: 100%;
   max-height: 200px;
   aspect-ratio: 16 / 6;
+  background-color: rgb(175, 175, 175);
   background-size: cover;
+}
+
+.avatar-wrapper {
+  position: relative;
+  overflow: visible;
+  height: min(60px, 18vw);
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+}
+
+.profile-pic {
+  position: absolute;
+  width: min(135px, 25vw) !important;
+  left: 0;
+  top: max(-85px, -20vw);
+  outline: rgb(38, 42, 46) solid 4px;
+}
+
+.edit-profile-btn {
+  background-color: rgb(38, 42, 46);
+  border: 0;
+  border-radius: 18px;
+  color: white;
+  cursor: pointer;
+  outline: #ffffff80 solid 1px;
+  height: 36px;
+  width: 110px;
+  transition: background-color 0.15s ease;
+}
+
+.edit-profile-btn:hover {
+  background-color: #becae51e;
 }
 
 .user-info-container {
   width: 100%;
   height: 100%;
-  padding: 1.5rem;
+  padding: 1.2rem;
   display: flex;
   flex-direction: column;
 }
@@ -104,10 +206,6 @@ const joinDate = computed(() =>
   flex-wrap: wrap;
 }
 
-.misc-icon {
-  margin-right: 0.4rem;
-}
-
 .misc-info {
   font-size: 1.05rem;
   display: flex;
@@ -118,9 +216,70 @@ const joinDate = computed(() =>
   word-break: keep-all;
 }
 
+.misc-icon {
+  margin-right: 0.4rem;
+}
+
 .user-info-wrapper,
 .description,
 .misc-info-wrapper {
   margin-bottom: 0.7rem;
+}
+
+.follow-metric-wrapper {
+  display: flex;
+  flex-direction: row;
+}
+
+.follow-metric {
+  margin-right: 1.2rem;
+}
+
+.follow {
+  margin-left: 0.4rem;
+}
+
+.profile-tab-container {
+  width: 100%;
+  height: 53px;
+  display: flex;
+}
+
+.profile-tab {
+  flex-grow: 1;
+  cursor: pointer;
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  transition: background-color 0.15s ease;
+  flex-wrap: nowrap;
+  width: fit-content;
+}
+
+.profile-tab:hover {
+  background-color: #becae51e;
+}
+
+.tab-wrapper {
+  height: 100%;
+  min-width: fit-content;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  flex-wrap: nowrap;
+  word-wrap: normal;
+  word-break: keep-all;
+  white-space: nowrap;
+}
+
+.tab-indicator {
+  content: "";
+  width: 100%;
+  height: 4px;
+  background-color: #1d9bf0;
+  border-radius: 2px;
+  position: absolute;
+  bottom: 0;
 }
 </style>

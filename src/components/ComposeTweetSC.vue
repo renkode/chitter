@@ -4,7 +4,7 @@ import ProfilePicture from "./ProfilePicture.vue";
 import { useUserStore } from "@/stores/user";
 import { useTweetStore } from "@/stores/tweets";
 import { getMediaClass } from "../mixins/utilities.js";
-import { storesToRef } from "pinia";
+import { storeToRefs } from "pinia";
 
 const store = useUserStore();
 const tweetStore = useTweetStore();
@@ -235,7 +235,7 @@ textarea:focus {
   align-items: center;
   border: 0;
   border-radius: 100%;
-  background-color: rgba(0, 0, 0, 0.753);
+  background-color: rgba(0, 0, 0, 0.75);
   color: white;
   cursor: pointer;
   padding: 0;

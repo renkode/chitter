@@ -40,11 +40,25 @@ export const useAppStore = defineStore("app", {
         `previous view: ${this.previousView}`
       );
     },
+    setProfileTab(tab) {
+      if (this.profileTab === tab) return;
+      const tabs = ["tweets", "tweets-and-replies", "media", "likes"];
+      if (!tabs.includes(tab)) {
+        throw Error("wrong tab");
+      }
+      this.profileTab = tab;
+      console.log(`current tab: ${this.profileTab}`);
+    },
     setViewTweetId(id) {
       this.viewTweetId = id;
     },
     setViewProfileId(id) {
       this.viewProfileId = id;
+    },
+    viewUserProfile(id) {
+      this.setProfileTab("tweets");
+      this.setViewProfileId(id);
+      this.setView("profile");
     },
     toggleModal() {
       this.showModal = !this.showModal;
