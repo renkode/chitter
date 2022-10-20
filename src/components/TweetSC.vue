@@ -228,7 +228,7 @@ onMounted(() => {
               ><v-icon name="fa-regular-comment" scale="1.0" fill="#ffffff80"
             /></span>
             <span class="tweet-metric reply-metric gray-text">{{
-              props.tweet.metrics.replyCount || ""
+              props.tweet.replyCount || ""
             }}</span>
           </span>
           <span class="tweet-metrics">
@@ -239,7 +239,7 @@ onMounted(() => {
               ><v-icon name="la-retweet-solid" scale="1.15" fill="#ffffff80"
             /></span>
             <span class="tweet-metric retweet-metric gray-text">{{
-              props.tweet.metrics.retweetCount || ""
+              props.tweet.retweetCount || ""
             }}</span>
           </span>
           <span class="tweet-metrics">
@@ -250,7 +250,7 @@ onMounted(() => {
               ><v-icon name="fa-regular-heart" scale="1.0" fill="#ffffff80"
             /></span>
             <span class="tweet-metric like-metric gray-text">{{
-              props.tweet.metrics.likeCount || ""
+              props.tweet.likeCount || ""
             }}</span>
           </span>
           <span
