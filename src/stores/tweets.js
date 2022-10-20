@@ -157,5 +157,43 @@ export const useTweetStore = defineStore("tweets", {
         1
       );
     },
+    addTweet(
+      type = "status",
+      text = "",
+      media = [],
+      authorId,
+      replyingTo = null
+    ) {
+      const newTweet = {
+        data: {
+          id: this.tweets.length + 1,
+          type: type,
+          text: text,
+          media: [...media],
+          authorId: authorId,
+          metrics: {
+            replyCount: 0,
+            retweetCount: 0,
+            likeCount: 0,
+            quoteCount: 0,
+          },
+          createdAt: new Date().toISOString(),
+          replyingTo: replyingTo || null,
+          quoting: null,
+        },
+        references: {
+          repliesFrom: [],
+          retweetsFrom: [],
+          quotesFrom: [],
+          likesFrom: [],
+        },
+      };
+      this.tweets.unshift(newTweet); // is this a good idea?
+      console.log(this.tweets);
+    },
+    removeTweet(id) {
+      const index = this.tweets.indexOf(id);
+      this.tweets.splice(index, 1);
+    },
   },
 });

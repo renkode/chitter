@@ -3,7 +3,7 @@ import { ref, defineProps, computed, onMounted } from "vue";
 import dayjs from "dayjs";
 import ProfilePicture from "./ProfilePicture.vue";
 import formatDateMixin from "../mixins/formatDateMixin.js";
-import { getMediaClass } from "../mixins/tools.js";
+import { getMediaClass } from "../mixins/utilities.js";
 import { useTweetStore } from "@/stores/tweets.js";
 import { useAppStore } from "@/stores/app.js";
 
@@ -21,6 +21,7 @@ const props = defineProps({
 
 const setTweetContext = () => {
   if (appStore.viewTweetId === props.tweetData.id) return;
+  if (window.getSelection().toString().length > 0) return;
   appStore.setPath(`/status/${props.tweetData.id}`);
   appStore.setView("tweet");
   appStore.setViewTweetId(props.tweetData.id);
@@ -97,7 +98,7 @@ const getTimeSinceCreation = ref(
 
 onMounted(() => {
   // set tweet text
-  tweetText.value.innerHTML = embedLinks.value; // dangerous
+  tweetText.value.innerHTML = embedLinks.value || ""; // dangerous
   const anchors = tweetText.value.querySelectorAll(".non-url");
   Array.from(anchors).forEach((anchor) =>
     anchor.addEventListener("click", doSomething)
@@ -333,6 +334,7 @@ onMounted(() => {
 }
 
 .tweet-text {
+  word-break: break-word;
   word-wrap: break-word;
   white-space: pre-wrap;
 }

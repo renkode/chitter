@@ -2,17 +2,20 @@
 import { onMounted, ref, computed, watch } from "vue";
 import ProfilePicture from "./ProfilePicture.vue";
 import { useUserStore } from "@/stores/user";
-import { getMediaClass } from "../mixins/tools.js";
+import { useTweetStore } from "@/stores/tweets";
+import { getMediaClass } from "../mixins/utilities.js";
+import { storesToRef } from "pinia";
 
 const store = useUserStore();
+const tweetStore = useTweetStore();
 const textArea = ref(null);
 const circle = ref(null);
-const images = ref([
-  "https://pbs.twimg.com/media/Fe5WTVmXoAITutA?format=jpg&name=large",
-  "https://pbs.twimg.com/media/Fe5WT7-XoBoEEWt?format=jpg&name=large",
-  "https://pbs.twimg.com/media/Fe0r_ZgWAAEN8px?format=jpg&name=large",
-]);
+const images = ref([]);
 const str = ref("");
+const maxedImages = computed(() => images.value.length === 4);
+const charactersLeft = computed(() => 280 - str.value.length);
+const isYellowRange = computed(() => charactersLeft.value <= 20);
+const isRedRange = computed(() => charactersLeft.value <= 0);
 
 const onFileChange = (e) => {
   images.value.push(URL.createObjectURL(e.currentTarget.files[0]));
@@ -31,14 +34,19 @@ const handleInput = () => {
   resizeTextArea();
 };
 
+const postTweet = () => {
+  tweetStore.addTweet("status", str.value, images.value, store.userData.id);
+  str.value = "";
+  images.value = [];
+};
+
 // adjust circle percentage and color
 watch(str, () => {
   const characterRatio = (str.value.length / 280).toFixed(2);
-  const charactersLeft = 280 - str.value.length;
-  if (charactersLeft <= 20 && charactersLeft > 0) {
+  if (isYellowRange.value && charactersLeft.value > 0) {
     // yellow
     circle.value.style = `--circle: ${characterRatio}; --color: #ffd400; --outerRadius: 28px; --innerRadius: 24px;`;
-  } else if (charactersLeft <= 0) {
+  } else if (isRedRange.value) {
     // red
     circle.value.style = `--circle: ${characterRatio}; --color: #f4212e;--outerRadius: 28px; --innerRadius: 24px;`;
   } else {
@@ -86,24 +94,36 @@ onMounted(() => {
         </div>
       </div>
       <div class="compose-tweet-bar">
-        <span class="add-image">
-          <input type="file" id="upload-image" @change="onFileChange" hidden />
+        <button class="add-image-btn" :disabled="maxedImages">
+          <input
+            type="file"
+            id="upload-image"
+            @change="onFileChange"
+            hidden
+            :disabled="maxedImages"
+          />
           <label for="upload-image"
             ><v-icon name="ri-image-add-line" scale="1.1" fill="#1d9bf0" />
           </label>
-        </span>
+        </button>
         <div class="limit-and-btn">
           <span class="circle-wrapper">
             <div ref="circle" class="circle" style="--circle: 0">
               <span
                 class="character-limit"
-                :class="{ red: 280 - str.length < 0 }"
-                v-if="280 - str.length <= 20"
-                >{{ 280 - str.length }}</span
+                :class="{ red: isRedRange }"
+                v-if="isYellowRange"
+                >{{ charactersLeft }}</span
               >
             </div></span
           >
-          <button class="new-tweet-btn">Tweet</button>
+          <button
+            class="new-tweet-btn"
+            :disabled="isRedRange"
+            @click="postTweet"
+          >
+            Tweet
+          </button>
         </div>
       </div>
     </div>
@@ -155,23 +175,42 @@ textarea:focus {
   margin-top: 0.9rem;
 }
 
-.add-image {
+.add-image-btn {
   height: 35px;
   width: 35px;
+  border: 0;
   border-radius: 100%;
+  background-color: rgba(255, 255, 255, 0);
   cursor: pointer;
   display: flex;
   justify-content: center;
   align-items: center;
+  outline: 0;
+  padding: 0;
   transition: background-color 0.15s ease;
 }
 
-.add-image:hover {
+.add-image-btn:hover:enabled {
   background-color: rgba(0, 132, 255, 0.233);
 }
 
-label {
+.add-image-btn svg {
+  pointer-events: none;
+}
+
+.add-image-btn:disabled,
+.add-image-btn:disabled label {
+  cursor: default;
+  opacity: 0.6;
+}
+
+.add-image-btn label {
+  height: 100%;
+  width: 100%;
   cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .image-preview-wrapper {
@@ -195,6 +234,11 @@ label {
   color: white;
   cursor: pointer;
   padding: 0;
+}
+
+.remove-image-btn:focus {
+  outline: 0;
+  border: 0;
 }
 
 .remove-image-btn,
@@ -228,6 +272,11 @@ label {
   background-color: #1687d3;
 }
 
+.new-tweet-btn:disabled {
+  cursor: default;
+  opacity: 0.4;
+}
+
 .circle-wrapper {
   width: 30px;
   display: flex;
@@ -243,7 +292,7 @@ label {
   color: #f4212e;
 }
 
-/* https://stackoverflow.com/questions/70368658/percentage-circle-border-css-react */
+/* modified https://stackoverflow.com/questions/70368658/percentage-circle-border-css-react */
 .circle {
   --circle: 0.3;
   --color: #28a7fc;
