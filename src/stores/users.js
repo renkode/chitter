@@ -113,7 +113,12 @@ export const useUsersStore = defineStore("users", {
     },
     addToLocalTimeline(userId, tweetId, type, timestamp) {
       const user = this.getUser(userId);
-      user.localTimeline.unshift({ id: tweetId, type, timestamp });
+      user.localTimeline.unshift({
+        id: tweetId,
+        type,
+        timestamp,
+        fromUserId: userId,
+      });
     },
     addToAllFollowerTimelines(currentUserId, tweetId, type, timestamp) {
       const user = this.getUser(currentUserId);
@@ -131,6 +136,24 @@ export const useUsersStore = defineStore("users", {
       user.followers.forEach((follower) => {
         this.removeFromLocalTimeline(follower, tweetId);
       });
+    },
+    followUser(currentUserId, targetId) {
+      const currentUser = this.getUser(currentUserId);
+      const otherUser = this.getUser(targetId);
+      if (!otherUser) throw new Error("user not found");
+      currentUser.followingCount++;
+      currentUser.following.unshift(targetId);
+      otherUser.followerCount++;
+      otherUser.followers.unshift(currentUserId);
+    },
+    unfollowUser(currentUserId, targetId) {
+      const currentUser = this.getUser(currentUserId);
+      const otherUser = this.getUser(targetId);
+      if (!otherUser) throw new Error("user not found");
+      currentUser.followingCount--;
+      currentUser.following.splice(currentUser.following.indexOf(targetId, 1));
+      otherUser.followerCount--;
+      otherUser.followers.splice(otherUser.followers.indexOf(currentUserId, 1));
     },
   },
 });

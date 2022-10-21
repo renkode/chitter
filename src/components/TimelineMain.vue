@@ -1,5 +1,5 @@
 <script setup>
-import { onMounted } from "vue";
+import { onMounted, computed } from "vue";
 import { useAppStore } from "@/stores/app.js";
 import { useTweetStore } from "@/stores/tweets.js";
 import { useUsersStore } from "@/stores/users.js";
@@ -9,7 +9,10 @@ import db from "../firebase.js";
 import { collection, getDocs } from "firebase/firestore";
 
 const app = useAppStore();
-const tweets = useTweetStore();
+const store = useTweetStore();
+const tweets = computed(() =>
+  store.tweets.map((tweet) => ({ data: tweet, type: tweet.type }))
+);
 
 const querySnapshot = await getDocs(collection(db, "tweets"));
 // querySnapshot.forEach((doc) => {
@@ -32,7 +35,7 @@ onMounted(() => {
 
 <template>
   <div class="tweet-list-container">
-    <TweetListSC :tweets="tweets.tweets" />
+    <TweetListSC :tweets="tweets" />
   </div>
 </template>
 

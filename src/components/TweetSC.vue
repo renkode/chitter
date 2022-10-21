@@ -19,6 +19,8 @@ const props = defineProps({
   id: Number,
   user: Object,
   tweet: Object,
+  type: String, // status, retweet, reply, reply-origin
+  retweetedBy: String,
   viewing: Boolean,
 });
 
@@ -128,7 +130,15 @@ onMounted(() => {
 
 <template>
   <div class="tweet-container" @click="setTweetContext">
-    <!-- <div class="user-retweet">lorem ipsum Retweeted</div> -->
+    <div
+      class="user-retweet gray-text"
+      v-if="props.type === 'retweet' && props.retweetedBy"
+    >
+      <v-icon name="la-retweet-solid" scale="0.89" fill="#ffffff80" />{{
+        props.retweetedBy
+      }}
+      Retweeted
+    </div>
     <div class="tweet-body">
       <div class="profile-pic-container">
         <ProfilePicture
@@ -260,6 +270,15 @@ onMounted(() => {
 }
 .tweet-container:hover {
   background-color: rgba(255, 255, 255, 0.065);
+}
+
+.user-retweet {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  width: 100%;
+  padding-left: 10%;
+  margin-bottom: 3px;
 }
 
 .tweet-body {

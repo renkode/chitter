@@ -12,11 +12,16 @@ const tweets = useTweetStore();
 const users = useUsersStore();
 const currentUser = computed(() => users.getUser(app.currentId));
 const localTweets = computed(() =>
-  currentUser.value.localTimeline
-    .map((localTweet) => tweets.getTweet(localTweet.id))
-    .filter((t) => {
-      if (t) return t;
-    })
+  currentUser.value.localTimeline.map((localTweet) => {
+    if (tweets.getTweet(localTweet.id)) {
+      const tweet = tweets.getTweet(localTweet.id);
+      return {
+        data: tweet,
+        type: localTweet.type,
+        retweetedBy: users.getUser(localTweet.fromUserId).name || null,
+      };
+    }
+  })
 );
 
 async function delay(time) {

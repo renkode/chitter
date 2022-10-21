@@ -1,29 +1,29 @@
 <script setup>
-import { defineProps } from "vue";
+import { defineProps, computed } from "vue";
 import { useUsersStore } from "@/stores/users.js";
 import { useAppStore } from "@/stores/app.js";
 import { storeToRefs } from "pinia";
 import TweetSC from "./TweetSC.vue";
 
-const usersStore = useUsersStore();
-const { viewTweetId } = storeToRefs(useAppStore());
+const users = useUsersStore();
+const app = useAppStore();
+const viewTweetId = computed(() => app.viewTweetId);
 
-const props = defineProps({ tweets: Array });
+const tweets = defineProps({ tweets: Array });
 </script>
 
 <template>
   <div class="tweet-list">
-    <TransitionGroup
-      name="fade-down"
-      v-if="props.tweets && props.tweets.length > 0"
-    >
+    <TransitionGroup name="fade-down" v-if="tweets && tweets.tweets.length > 0">
       <TweetSC
-        v-for="tweet in props.tweets"
-        :key="tweet.id"
-        :id="tweet.id"
-        :user="usersStore.getUser(tweet.authorId)"
-        :tweet="tweet"
-        :viewing="viewTweetId == tweet.id"
+        v-for="tweet in tweets.tweets"
+        :key="tweet.data.id"
+        :id="tweet.data.id"
+        :user="users.getUser(tweet.data.authorId)"
+        :tweet="tweet.data"
+        :type="tweet.type"
+        :retweetedBy="tweet.retweetedBy"
+        :viewing="viewTweetId == tweet.data.id"
       />
     </TransitionGroup>
     <div class="error gray-text" v-else>No tweets to display</div>
