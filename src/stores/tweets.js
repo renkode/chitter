@@ -108,6 +108,7 @@ export const useTweetStore = defineStore("tweets", {
     },
     addLike(id, userId) {
       const tweet = this.tweets.filter((t) => t.id == id)[0];
+      if (!tweet) throw new Error("no such tweet");
       tweet.likeCount++;
       tweet.likesFrom.push(userId);
 
@@ -116,6 +117,7 @@ export const useTweetStore = defineStore("tweets", {
     },
     removeLike(id, userId) {
       const tweet = this.tweets.filter((t) => t.id == id)[0];
+      if (!tweet) throw new Error("no such tweet");
       tweet.likeCount--;
       tweet.likesFrom.splice(tweet.likesFrom.indexOf(userId), 1);
 
@@ -124,10 +126,12 @@ export const useTweetStore = defineStore("tweets", {
     },
     hasLiked(id, userId) {
       const tweet = this.tweets.filter((t) => t.id == id)[0];
+      if (!tweet) return false;
       return tweet.likesFrom.includes(userId);
     },
     addRetweet(id, userId) {
       const tweet = this.tweets.filter((t) => t.id == id)[0];
+      if (!tweet) throw new Error("no such tweet");
       tweet.retweetCount++;
       tweet.retweetsFrom.push(userId);
 
@@ -143,6 +147,7 @@ export const useTweetStore = defineStore("tweets", {
     },
     removeRetweet(id, userId) {
       const tweet = this.tweets.filter((t) => t.id == id)[0];
+      if (!tweet) throw new Error("no such tweet");
       tweet.retweetCount--;
       tweet.retweetsFrom.splice(tweet.retweetsFrom.indexOf(userId), 1);
 
@@ -153,6 +158,7 @@ export const useTweetStore = defineStore("tweets", {
     },
     hasRetweeted(id, userId) {
       const tweet = this.tweets.filter((t) => t.id == id)[0];
+      if (!tweet) return false;
       return tweet.retweetsFrom.includes(userId);
     },
     addTweet(
@@ -191,11 +197,13 @@ export const useTweetStore = defineStore("tweets", {
     },
     removeTweet(id, userId) {
       const index = this.tweets.findIndex((t) => t.id === id);
-      if (index < 0) return;
+      if (index < 0) throw new Error("no such tweet");
       this.tweets.splice(index, 1);
 
       const users = useUsersStore();
       users.removeTweet(userId, id);
+      users.removeLike(userId, id);
+      users.removeRetweet(userId, id);
       users.removeFromLocalTimeline(userId, id); // self
       users.removeFromAllFollowerTimelines(userId, id); // followers
     },

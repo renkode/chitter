@@ -5,6 +5,7 @@ import MediaSidebar from "./components/MediaSidebar.vue";
 import HeaderSC from "./components/HeaderSC.vue";
 import ComposeTweetSC from "./components/ComposeTweetSC.vue";
 import TimelineMain from "./components/TimelineMain.vue";
+import LocalTimeline from "./components/LocalTimeline.vue";
 import ProfileMain from "./components/ProfileMain.vue";
 import LoadSpinner from "./components/LoadSpinner.vue";
 import { useAppStore } from "@/stores/app.js";
@@ -24,11 +25,21 @@ onMounted(() => {
     <div class="timeline-wrapper">
       <HeaderSC />
 
-      <template v-if="app.view === 'home' || app.view === 'timeline'">
+      <template v-if="app.view === 'home'">
         <ComposeTweetSC v-if="app.currentUser" />
         <Transition name="fade">
           <Suspense>
             <template #default> <TimelineMain /> </template>
+            <template #fallback> <LoadSpinner /> </template>
+          </Suspense>
+        </Transition>
+      </template>
+
+      <template v-if="app.view === 'timeline'">
+        <ComposeTweetSC v-if="app.currentUser" />
+        <Transition name="fade">
+          <Suspense>
+            <template #default> <LocalTimeline /> </template>
             <template #fallback> <LoadSpinner /> </template>
           </Suspense>
         </Transition>

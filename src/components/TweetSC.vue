@@ -36,8 +36,8 @@ const toggleTweetMenu = (e) => {
   isTweetMenuOpen.value = !isTweetMenuOpen.value;
 };
 
-const deleteTweet = (id, userId) => {
-  tweets.removeTweet(id, props.user.id);
+const deleteTweet = () => {
+  tweets.removeTweet(props.id, props.user.id);
 };
 
 const doSomething = (e) => {
@@ -162,7 +162,7 @@ onMounted(() => {
               <ul class="tweet-menu-list">
                 <li
                   class="tweet-menu-item delete-tweet"
-                  @click.stop="deleteTweet(props.id)"
+                  @click.stop="deleteTweet"
                 >
                   <span class="tweet-menu-icon"
                     ><v-icon name="bi-trash" scale="1.1" fill="red" /></span

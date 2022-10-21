@@ -90,7 +90,7 @@ export const useUsersStore = defineStore("users", {
     },
     removeTweet(userId, tweetId) {
       const user = this.getUser(userId);
-      const tweetIndex = user.authoredTweets.findIndex((t) => t.id === tweetId);
+      const tweetIndex = user.authoredTweets.findIndex((t) => t.id == tweetId);
       user.authoredTweets.splice(tweetIndex, 1);
     },
     addRetweet(userId, tweetId) {
@@ -99,7 +99,7 @@ export const useUsersStore = defineStore("users", {
     },
     removeRetweet(userId, tweetId) {
       const user = this.getUser(userId);
-      const tweetIndex = user.retweets.findIndex((t) => t.id === tweetId);
+      const tweetIndex = user.retweets.findIndex((t) => t.id == tweetId);
       user.retweets.splice(tweetIndex, 1);
     },
     addLike(userId, tweetId) {
@@ -123,7 +123,7 @@ export const useUsersStore = defineStore("users", {
     },
     removeFromLocalTimeline(userId, tweetId) {
       const user = this.getUser(userId);
-      const tweetIndex = user.localTimeline.findIndex((t) => t.id === tweetId);
+      const tweetIndex = user.localTimeline.findIndex((t) => t.id == tweetId);
       user.localTimeline.splice(tweetIndex, 1);
     },
     removeFromAllFollowerTimelines(currentUserId, tweetId) {

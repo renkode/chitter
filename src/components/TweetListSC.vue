@@ -42,6 +42,10 @@ const props = defineProps({ tweets: Array });
   opacity: 0;
 }
 
+.fade-down-leave-from {
+  opacity: 1;
+}
+
 .tweet-list {
   height: fit-content;
   width: 598px;

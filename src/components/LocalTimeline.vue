@@ -1,21 +1,23 @@
 <script setup>
-import { onMounted } from "vue";
+import { ref, watch, onMounted, computed } from "vue";
 import { useAppStore } from "@/stores/app.js";
 import { useTweetStore } from "@/stores/tweets.js";
 import { useUsersStore } from "@/stores/users.js";
 import TweetListSC from "./TweetListSC.vue";
 import db from "../firebase.js";
-
 import { collection, getDocs } from "firebase/firestore";
 
 const app = useAppStore();
 const tweets = useTweetStore();
-
-const querySnapshot = await getDocs(collection(db, "tweets"));
-// querySnapshot.forEach((doc) => {
-//   // doc.data() is never undefined for query doc snapshots
-//   console.log(doc.id, " => ", doc.data());
-// });
+const users = useUsersStore();
+const currentUser = computed(() => users.getUser(app.currentId));
+const localTweets = computed(() =>
+  currentUser.value.localTimeline
+    .map((localTweet) => tweets.getTweet(localTweet.id))
+    .filter((t) => {
+      if (t) return t;
+    })
+);
 
 async function delay(time) {
   await new Promise((res) => {
@@ -32,7 +34,7 @@ onMounted(() => {
 
 <template>
   <div class="tweet-list-container">
-    <TweetListSC :tweets="tweets.tweets" />
+    <TweetListSC v-if="currentUser" :tweets="localTweets" />
   </div>
 </template>
 
