@@ -13,7 +13,10 @@ const props = defineProps({ tweets: Array });
 
 <template>
   <div class="tweet-list">
-    <TransitionGroup name="fade-down" v-if="props.tweets.length > 0">
+    <TransitionGroup
+      name="fade-down"
+      v-if="props.tweets && props.tweets.length > 0"
+    >
       <TweetSC
         v-for="tweet in props.tweets"
         :key="tweet.id"

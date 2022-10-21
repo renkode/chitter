@@ -24,7 +24,7 @@ onMounted(() => {
     <div class="timeline-wrapper">
       <HeaderSC />
 
-      <template v-if="app.view === 'home'">
+      <template v-if="app.view === 'home' || app.view === 'timeline'">
         <ComposeTweetSC v-if="app.currentUser" />
         <Transition name="fade">
           <Suspense>

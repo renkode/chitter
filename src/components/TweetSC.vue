@@ -36,8 +36,8 @@ const toggleTweetMenu = (e) => {
   isTweetMenuOpen.value = !isTweetMenuOpen.value;
 };
 
-const deleteTweet = (id) => {
-  tweets.removeTweet(id);
+const deleteTweet = (id, userId) => {
+  tweets.removeTweet(id, props.user.id);
 };
 
 const doSomething = (e) => {
@@ -45,41 +45,25 @@ const doSomething = (e) => {
   console.log("test");
 };
 
-const isLiked = ref(false);
-const isRetweeted = ref(false); // default should depend on user's likes/rts
+const isLiked = computed(() => tweets.hasLiked(props.tweet.id, app.currentId));
+const isRetweeted = computed(() =>
+  tweets.hasRetweeted(props.tweet.id, app.currentId)
+);
+
 const toggleLike = () => {
-  // like tweet
   if (!isLiked.value) {
-    isLiked.value = true;
-    tweets.addLike(props.id, "1");
-  }
-  // unlike tweet
-  else {
-    isLiked.value = false;
-    tweets.removeLike(props.id, "1");
+    tweets.addLike(props.id, app.currentId);
+  } else {
+    tweets.removeLike(props.id, app.currentId);
   }
 };
 const toggleRetweet = () => {
-  // like tweet
   if (!isRetweeted.value) {
-    isRetweeted.value = true;
-    tweets.addRetweet(props.id, "1");
-  }
-  // unlike tweet
-  else {
-    isRetweeted.value = false;
-    tweets.removeRetweet(props.id, "1");
+    tweets.addRetweet(props.id, app.currentId);
+  } else {
+    tweets.removeRetweet(props.id, app.currentId);
   }
 };
-// const handleRetweet = (tweetId) => {
-//   if (!hasRetweeted(userId)) {
-//     isRetweeted.value = true;
-//     users.addRetweet()
-//   } else {
-
-//   }
-
-// }
 
 const tweetText = ref(null);
 // embed @'s, hashtags and links inside tweets

@@ -5,8 +5,8 @@ import { defineStore } from "pinia";
 export const useAppStore = defineStore("app", {
   // a function that returns a fresh state
   state: () => ({
-    currentId: null,
-    currentUser: null,
+    currentId: null, // initialized on mount
+    currentUser: null, // initialized on mount
     path: "",
     view: "home", //  timeline (default) | profile | tweet | search
     previousView: "home",
@@ -14,7 +14,7 @@ export const useAppStore = defineStore("app", {
     viewProfileId: null,
     profileTab: "tweets", // tweets (default) | tweets-and-replies | media | likes
     showModal: false,
-    modalType: "status", // status | reply | quote
+    modalType: "status", // status | reply | ed-tprofile
     NUM_INITIAL_TWEETS: 5,
     NUM_LOAD_OLDER_TWEETS: 3,
   }),
@@ -70,7 +70,8 @@ export const useAppStore = defineStore("app", {
       this.showModal = !this.showModal;
     },
     setModalType(type) {
-      if (type !== "status" || type !== "reply" || type !== "quote") {
+      const types = ["status", "reply", "edit-profile"];
+      if (!types.includes(type)) {
         throw Error("wrong modal type");
       }
       this.modalType = type;

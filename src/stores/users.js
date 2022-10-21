@@ -16,7 +16,7 @@ export const useUsersStore = defineStore("users", {
         headerUrl:
           "https://pbs.twimg.com/media/Fe8wtxmVQAAkipE?format=jpg&name=large",
         followingCount: 0,
-        followerCount: 0,
+        followerCount: 1,
         tweetCount: 3,
         timestamp: "2019-06-03T23:12:08.000Z",
         authoredTweets: [
@@ -37,9 +37,9 @@ export const useUsersStore = defineStore("users", {
           },
         ],
         retweets: [],
-        likedTweets: [],
+        likes: [],
         following: [],
-        followers: [],
+        followers: ["2"],
         localTimeline: [],
       },
       {
@@ -54,7 +54,7 @@ export const useUsersStore = defineStore("users", {
           "https://pbs.twimg.com/profile_images/1573329090865778690/Nu2FIMbX_400x400.jpg",
         headerUrl:
           "https://pbs.twimg.com/profile_banners/840764077681061889/1646410641/1500x500",
-        followingCount: 0,
+        followingCount: 1,
         followerCount: 0,
         tweetCount: 1,
         timestamp: "2020-02-03T23:12:08.000Z",
@@ -66,8 +66,8 @@ export const useUsersStore = defineStore("users", {
           },
         ],
         retweets: [],
-        likedTweets: [],
-        following: [],
+        likes: [],
+        following: ["1"],
         followers: [],
         localTimeline: [],
       },
@@ -82,7 +82,7 @@ export const useUsersStore = defineStore("users", {
     },
     addTweet(userId, tweetId, type = "status", containsMedia = false) {
       const user = this.getUser(userId);
-      user.tweetData.authoredTweets.unshift({
+      user.authoredTweets.unshift({
         id: tweetId,
         type,
         containsMedia,
@@ -90,10 +90,47 @@ export const useUsersStore = defineStore("users", {
     },
     removeTweet(userId, tweetId) {
       const user = this.getUser(userId);
-      const tweetIndex = user.tweetData.authoredTweets.findIndex(
-        (t) => t.id === tweetId
-      );
-      user.tweetData.authoredTweets.splice(tweetIndex, 1);
+      const tweetIndex = user.authoredTweets.findIndex((t) => t.id === tweetId);
+      user.authoredTweets.splice(tweetIndex, 1);
+    },
+    addRetweet(userId, tweetId) {
+      const user = this.getUser(userId);
+      user.retweets.push({ id: tweetId, timestamp: new Date().toISOString() });
+    },
+    removeRetweet(userId, tweetId) {
+      const user = this.getUser(userId);
+      const tweetIndex = user.retweets.findIndex((t) => t.id === tweetId);
+      user.retweets.splice(tweetIndex, 1);
+    },
+    addLike(userId, tweetId) {
+      const user = this.getUser(userId);
+      user.likes.push(tweetId);
+    },
+    removeLike(userId, tweetId) {
+      const user = this.getUser(userId);
+      const tweetIndex = user.likes.indexOf(tweetId);
+      user.likes.splice(tweetIndex, 1);
+    },
+    addToLocalTimeline(userId, tweetId, type, timestamp) {
+      const user = this.getUser(userId);
+      user.localTimeline.unshift({ id: tweetId, type, timestamp });
+    },
+    addToAllFollowerTimelines(currentUserId, tweetId, type, timestamp) {
+      const user = this.getUser(currentUserId);
+      user.followers.forEach((follower) => {
+        this.addToLocalTimeline(follower, tweetId, type, timestamp);
+      });
+    },
+    removeFromLocalTimeline(userId, tweetId) {
+      const user = this.getUser(userId);
+      const tweetIndex = user.localTimeline.findIndex((t) => t.id === tweetId);
+      user.localTimeline.splice(tweetIndex, 1);
+    },
+    removeFromAllFollowerTimelines(currentUserId, tweetId) {
+      const user = this.getUser(currentUserId);
+      user.followers.forEach((follower) => {
+        this.removeFromLocalTimeline(follower, tweetId);
+      });
     },
   },
 });

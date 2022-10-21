@@ -1,4 +1,5 @@
 import { defineStore } from "pinia";
+import { useUsersStore } from "@/stores/users";
 
 const date = new Date();
 const iso = date.toISOString();
@@ -102,29 +103,57 @@ export const useTweetStore = defineStore("tweets", {
   getters: {},
   // optional actions
   actions: {
-    addLike(id, fromUserId) {
+    getTweet(id) {
+      return this.tweets.filter((t) => t.id == id)[0];
+    },
+    addLike(id, userId) {
       const tweet = this.tweets.filter((t) => t.id == id)[0];
       tweet.likeCount++;
-      tweet.likesFrom.push(fromUserId);
+      tweet.likesFrom.push(userId);
+
+      const users = useUsersStore();
+      users.addLike(userId, id);
     },
-    removeLike(id, fromUserId) {
+    removeLike(id, userId) {
       const tweet = this.tweets.filter((t) => t.id == id)[0];
       tweet.likeCount--;
-      tweet.likesFrom.splice(tweet.likesFrom.indexOf(fromUserId), 1);
+      tweet.likesFrom.splice(tweet.likesFrom.indexOf(userId), 1);
+
+      const users = useUsersStore();
+      users.removeLike(userId, id);
     },
-    addRetweet(id, fromUserId) {
+    hasLiked(id, userId) {
+      const tweet = this.tweets.filter((t) => t.id == id)[0];
+      return tweet.likesFrom.includes(userId);
+    },
+    addRetweet(id, userId) {
       const tweet = this.tweets.filter((t) => t.id == id)[0];
       tweet.retweetCount++;
-      tweet.retweetsFrom.push(fromUserId);
-      // push to followers' local timelines
+      tweet.retweetsFrom.push(userId);
+
+      const users = useUsersStore();
+      users.addRetweet(userId, id);
+      users.addToLocalTimeline(userId, id, "retweet", new Date().toISOString()); // self
+      users.addToAllFollowerTimelines(
+        userId,
+        id,
+        "retweet",
+        new Date().toISOString()
+      ); // followers
     },
-    removeRetweet(id, fromUserId) {
+    removeRetweet(id, userId) {
       const tweet = this.tweets.filter((t) => t.id == id)[0];
       tweet.retweetCount--;
-      tweet.retweetsFrom.splice(tweet.retweetsFrom.indexOf(fromUserId), 1);
+      tweet.retweetsFrom.splice(tweet.retweetsFrom.indexOf(userId), 1);
+
+      const users = useUsersStore();
+      users.removeRetweet(userId, id);
+      users.removeFromLocalTimeline(userId, id); // self
+      users.removeFromAllFollowerTimelines(userId, id); // followers
     },
-    hasRetweeted(userId) {
-      return this.retweetsFrom.includes(userId);
+    hasRetweeted(id, userId) {
+      const tweet = this.tweets.filter((t) => t.id == id)[0];
+      return tweet.retweetsFrom.includes(userId);
     },
     addTweet(
       type = "status",
@@ -133,6 +162,7 @@ export const useTweetStore = defineStore("tweets", {
       authorId,
       replyingTo = null
     ) {
+      const timestamp = new Date().toISOString();
       const newTweet = {
         id: this.tweets.length + 1,
         type: type,
@@ -152,11 +182,22 @@ export const useTweetStore = defineStore("tweets", {
         likesFrom: [],
       };
       this.tweets.unshift(newTweet); // is this a good idea?
+
+      const users = useUsersStore();
+      const containsMedia = media.length > 0 ? true : false;
+      users.addTweet(authorId, newTweet.id, type, containsMedia);
+      users.addToLocalTimeline(authorId, newTweet.id, type, timestamp); // self
+      users.addToAllFollowerTimelines(authorId, newTweet.id, type, timestamp); // followers
     },
-    removeTweet(id) {
+    removeTweet(id, userId) {
       const index = this.tweets.findIndex((t) => t.id === id);
       if (index < 0) return;
       this.tweets.splice(index, 1);
+
+      const users = useUsersStore();
+      users.removeTweet(userId, id);
+      users.removeFromLocalTimeline(userId, id); // self
+      users.removeFromAllFollowerTimelines(userId, id); // followers
     },
   },
 });
