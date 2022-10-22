@@ -80,6 +80,9 @@ export const useUsersStore = defineStore("users", {
     getUser(id) {
       return this.users.filter((user) => user.id == id)[0];
     },
+    getUserByUsername(username) {
+      return this.users.filter((user) => user.username == username)[0];
+    },
     addTweet(userId, tweetId, type = "status", containsMedia = false) {
       const user = this.getUser(userId);
       user.authoredTweets.unshift({

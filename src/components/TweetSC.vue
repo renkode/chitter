@@ -83,9 +83,12 @@ const embedLinks = computed(() => {
       case urlRegex.test(str):
         return `<a class="blue-link" href="${str}" target="_blank">${str}</a>`;
       case hashtagRegex.test(str):
-        return `<a class="blue-link non-url" href="#">${str}</a>`;
+        return `<a class="blue-link" href="#">${str}</a>`;
       case atRegex.test(str):
-        return `<a class="blue-link non-url" href="#">${str}</a>`;
+        return `<a class="blue-link user-link" href="#" data-username=${str.replace(
+          "@",
+          ""
+        )}>${str}</a>`;
       default:
         return str;
     }
@@ -101,9 +104,13 @@ const getTimeSinceCreation = ref(
 onMounted(() => {
   // set tweet text
   tweetText.value.innerHTML = embedLinks.value || ""; // dangerous
-  const anchors = tweetText.value.querySelectorAll(".non-url");
+  const anchors = tweetText.value.querySelectorAll(".user-link");
   Array.from(anchors).forEach((anchor) =>
-    anchor.addEventListener("click", doSomething)
+    anchor.addEventListener("click", (e) => {
+      e.stopPropagation();
+      if (!users.getUserByUsername(anchor.dataset.username)) return;
+      app.viewUserProfile(users.getUserByUsername(anchor.dataset.username).id);
+    })
   );
   // update tweet time every 30s (if tweet isn't a day old);
   if (dayjs(currentTime.value).diff(dayjs(props.tweet.timestamp), "hour") > 23)

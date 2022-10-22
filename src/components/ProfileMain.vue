@@ -12,6 +12,10 @@ const users = useUsersStore();
 const user = computed(() => users.getUser(app.viewProfileId));
 const tab = ref("tweets"); // tweets-and-replies | media | likes
 
+const setTab = (newTab) => {
+  tab.value = newTab;
+};
+
 const mapFromUserTweets = () => {
   return user.value.authoredTweets.map((t) => ({
     data: tweetStore.getTweet(t.id),
@@ -25,7 +29,7 @@ const mapFromUserTweets = () => {
 const mapFromRetweets = () => {
   return user.value.retweets.map((t) => ({
     data: tweetStore.getTweet(t.id),
-    type: t.type,
+    type: "retweet",
     retweetedBy: user.value.name,
     timestamp: t.timestamp,
   }));
@@ -58,10 +62,6 @@ const tweets = computed(() => {
         );
   }
 });
-
-const setTab = (newTab) => {
-  tab.value = newTab;
-};
 </script>
 
 <template>
