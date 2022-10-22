@@ -89,7 +89,7 @@ export const useTweetStore = defineStore("tweets", {
         retweetCount: 84,
         likeCount: 712,
         quoteCount: 0,
-        timestamp: "2021-03-24T15:54:32-0400",
+        timestamp: "2021-03-24T15:54:30-0400",
         replyingTo: null,
         quoting: null,
         repliesFrom: [], // user and tweet ids

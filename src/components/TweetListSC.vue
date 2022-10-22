@@ -10,6 +10,11 @@ const app = useAppStore();
 const viewTweetId = computed(() => app.viewTweetId);
 
 const tweets = defineProps({ tweets: Array });
+/* example ( i don't like how it's structured either but whatever )
+{ data: tweetObj,
+  type: "retweet",
+  retweetedBy: "user's name"
+}*/
 </script>
 
 <template>

@@ -5,7 +5,7 @@ import formatDateMixin from "../mixins/formatDateMixin.js";
 import { useAppStore } from "@/stores/app.js";
 
 const store = useAppStore();
-const props = defineProps({ user: Object });
+const props = defineProps({ user: Object, tab: String, setTab: Function });
 const shortURL = computed(() =>
   props.user.website.replace(/https?:\/\/(www\.)?/gi, "").replace(/\/+$/, "")
 );
@@ -24,7 +24,12 @@ const joinDate = computed(() =>
     <div class="user-info-container">
       <div class="avatar-wrapper">
         <ProfilePicture :url="props.user.avatarUrl" :size="135" />
-        <button class="edit-profile-btn">Edit Profile</button>
+        <button
+          class="edit-profile-btn"
+          v-if="store.currentId == props.user.id"
+        >
+          Edit Profile
+        </button>
       </div>
       <div class="user-info-wrapper">
         <span class="display-name">{{ props.user.name }}</span>
@@ -76,46 +81,46 @@ const joinDate = computed(() =>
     <div class="profile-tab-container">
       <span
         class="profile-tab"
-        :class="{ 'gray-text': store.profileTab !== 'tweets' }"
-        @click="store.setProfileTab('tweets')"
+        :class="{ 'gray-text': props.tab !== 'tweets' }"
+        @click="setTab('tweets')"
         ><span class="tab-wrapper"
           >Tweets
           <span
             class="tab-indicator"
-            v-if="store.profileTab === 'tweets'"
+            v-if="props.tab === 'tweets'"
           ></span> </span
       ></span>
       <span
         class="profile-tab"
-        :class="{ 'gray-text': store.profileTab !== 'tweets-and-replies' }"
-        @click="store.setProfileTab('tweets-and-replies')"
+        :class="{ 'gray-text': props.tab !== 'tweets-and-replies' }"
+        @click="setTab('tweets-and-replies')"
         ><span class="tab-wrapper"
           >Tweets & replies
           <span
             class="tab-indicator"
-            v-if="store.profileTab === 'tweets-and-replies'"
+            v-if="props.tab === 'tweets-and-replies'"
           ></span> </span
       ></span>
       <span
         class="profile-tab"
-        :class="{ 'gray-text': store.profileTab !== 'media' }"
-        @click="store.setProfileTab('media')"
+        :class="{ 'gray-text': props.tab !== 'media' }"
+        @click="setTab('media')"
         ><span class="tab-wrapper"
           >Media
           <span
             class="tab-indicator"
-            v-if="store.profileTab === 'media'"
+            v-if="props.tab === 'media'"
           ></span> </span
       ></span>
       <span
         class="profile-tab"
-        :class="{ 'gray-text': store.profileTab !== 'likes' }"
-        @click="store.setProfileTab('likes')"
+        :class="{ 'gray-text': props.tab !== 'likes' }"
+        @click="setTab('likes')"
         ><span class="tab-wrapper"
           >Likes
           <span
             class="tab-indicator"
-            v-if="store.profileTab === 'likes'"
+            v-if="props.tab === 'likes'"
           ></span> </span
       ></span>
     </div>
