@@ -3,7 +3,12 @@ import { ref, defineProps, computed, onMounted } from "vue";
 import dayjs from "dayjs";
 import ProfilePicture from "./ProfilePicture.vue";
 import formatDateMixin from "../mixins/formatDateMixin.js";
-import { getMediaClass } from "../mixins/utilities.js";
+import {
+  getMediaClass,
+  urlRegex,
+  hashtagRegex,
+  atRegex,
+} from "../mixins/utilities.js";
 import { useTweetStore } from "@/stores/tweets.js";
 import { useAppStore } from "@/stores/app.js";
 import { useUsersStore } from "@/stores/users.js";
@@ -71,12 +76,6 @@ const tweetText = ref(null);
 // embed @'s, hashtags and links inside tweets
 const embedLinks = computed(() => {
   if (!props.tweet.text || props.tweet.text.length === 0) return;
-
-  const urlRegex = new RegExp(
-    /[-a-zA-Z0-9@:%._~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_.~#?&//=]*)?/gi
-  );
-  const hashtagRegex = new RegExp(/(#+[a-zA-Z0-9(_)]{1,})/g);
-  const atRegex = new RegExp(/(@+[a-zA-Z0-9(_)]{1,})/g);
 
   const embedArr = props.tweet.text.split(" ").map((str) => {
     switch (true) {
@@ -207,7 +206,7 @@ onMounted(() => {
           >
         </div>
         <div class="tweet-content">
-          <div class="tweet-text" ref="tweetText"></div>
+          <div class="tweet-text" ref="tweetText">{{ embedLinks }}</div>
           <div
             class="tweet-media"
             :class="[getMediaClass(props.tweet.media)]"
@@ -266,6 +265,10 @@ onMounted(() => {
 </template>
 
 <style>
+.blue-link:focus {
+  outline: 0;
+}
+
 .tweet-container {
   border-top: rgba(255, 255, 255, 0.25) 1px solid;
   padding: 0.75rem 1rem 0.4rem 1rem;

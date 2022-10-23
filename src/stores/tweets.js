@@ -13,7 +13,7 @@ export const useTweetStore = defineStore("tweets", {
     tweets: [
       {
         id: 1,
-        type: "status", // status | reply | quote
+        type: "reply", // status | reply | quote
         text: "@renkode I think most people underestimate how #little being 5’4 is. I’m literally hopping around on my phone rn to type tjis out", // max 250 chars
         media: [
           "https://pbs.twimg.com/media/Fe_VPZRXwAcQJ8r?format=jpg&name=large",
@@ -24,7 +24,7 @@ export const useTweetStore = defineStore("tweets", {
         likeCount: 1438,
         quoteCount: 0,
         timestamp: iso,
-        replyingTo: null,
+        replyingTo: "1",
         quoting: null,
         repliesFrom: [], // user and tweet ids
         retweetsFrom: [], // user ids
@@ -171,8 +171,8 @@ export const useTweetStore = defineStore("tweets", {
       const timestamp = new Date().toISOString();
       const newTweet = {
         id: this.tweets.length + 1,
-        type: type,
-        text: text,
+        type,
+        text,
         media: [...media],
         authorId: authorId,
         replyCount: 0,
@@ -180,7 +180,7 @@ export const useTweetStore = defineStore("tweets", {
         likeCount: 0,
         quoteCount: 0,
         timestamp: new Date().toISOString(),
-        replyingTo: replyingTo || null,
+        replyingTo: replyingTo,
         quoting: null,
         repliesFrom: [],
         retweetsFrom: [],

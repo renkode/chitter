@@ -3,11 +3,12 @@ import { onMounted, ref, computed, watch } from "vue";
 import ProfilePicture from "./ProfilePicture.vue";
 import { useAppStore } from "@/stores/app";
 import { useTweetStore } from "@/stores/tweets";
-import { getMediaClass } from "../mixins/utilities.js";
-import { storeToRefs } from "pinia";
+import { useUsersStore } from "@/stores/users";
+import { getMediaClass, atRegex } from "../mixins/utilities.js";
 
 const app = useAppStore();
 const tweetStore = useTweetStore();
+const users = useUsersStore();
 const textArea = ref(null);
 const circle = ref(null);
 const images = ref([]);
@@ -41,7 +42,15 @@ const handleInput = () => {
 
 const postTweet = () => {
   if (noContent.value) return;
-  tweetStore.addTweet("status", str.value, images.value, user.value.id);
+  let type = "status";
+  let firstStr = str.value.split(" ")[0];
+  let replyingTo = null;
+  if (atRegex.test(firstStr)) {
+    type = "reply";
+    if (users.getUserByUsername(firstStr.replace("@", "")))
+      replyingTo = users.getUserByUsername(firstStr.replace("@", ""));
+  }
+  tweetStore.addTweet(type, str.value, images.value, user.value.id, replyingTo);
   str.value = "";
   images.value = [];
 };

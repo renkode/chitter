@@ -61,7 +61,7 @@ export const useUsersStore = defineStore("users", {
         authoredTweets: [
           {
             id: "1",
-            type: "status",
+            type: "reply",
             containsMedia: true,
           },
         ],

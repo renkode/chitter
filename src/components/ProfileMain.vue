@@ -42,7 +42,7 @@ const mapFromLikes = () => {
 };
 
 // filter suitable tweets then map to an object usable by TweetListSC
-// idk how i managed to implement this within an hour with very little bugs but i will not question it
+// idk how i managed to implement this within an hour with minimal bugs but i will not question it
 const tweets = computed(() => {
   switch (tab.value) {
     case "tweets-and-replies":
@@ -55,7 +55,12 @@ const tweets = computed(() => {
       return mapFromLikes();
     default:
       return mapFromUserTweets()
-        .filter((tweet) => tweet.type === "status" || tweet.type === "reply")
+        .filter(
+          (tweet) =>
+            tweet.type === "status" ||
+            (tweet.type === "reply" &&
+              tweet.data.replyingTo == tweet.data.authorId) // self reply
+        )
         .concat(mapFromRetweets())
         .sort((a, b) =>
           a.timestamp > b.timestamp ? -1 : a.timestamp < b.timestamp ? 1 : 0
