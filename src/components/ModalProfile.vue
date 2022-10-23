@@ -16,17 +16,28 @@ const websiteInput = ref(app.currentUser.website);
 const birthdayInput = ref(app.currentUser.birthday);
 
 const nameError = computed(() => nameInput.value.length === 0);
-const MAX_USERNAME_LENGTH = 3;
 const ALPHANUMERIC_UNDERSCORE = new RegExp("^[a-zA-Z0-9_]*$");
 const validUsername = computed(() =>
   ALPHANUMERIC_UNDERSCORE.test(usernameInput.value)
 );
+
+const MAX_USERNAME_LENGTH = 3;
+const isUsernameTaken = computed(
+  () =>
+    users.users.filter(
+      (user) =>
+        app.currentId !== user.id && user.username == usernameInput.value
+    ).length > 0
+);
+
 const usernameError = computed(
   () =>
     (usernameInput.value.length >= 0 &&
       usernameInput.value.length < MAX_USERNAME_LENGTH) ||
-    !validUsername.value
+    !validUsername.value ||
+    isUsernameTaken.value
 );
+
 const URL_REGEX = new RegExp(
   /^((https?|ftp|smtp):\/\/)?(www.)?[a-z0-9]+\.[a-z]+(\/[a-zA-Z0-9#]+\/?)*$/i
 );
@@ -58,6 +69,8 @@ const setFocus = (e) => {
     .classList.toggle("show");
   e.currentTarget.closest(".input-wrapper").classList.toggle("blue-border");
 };
+
+const updateProfile = () => {};
 
 watch(nameInput, () => {
   if (nameError.value) {
@@ -101,7 +114,13 @@ watch(websiteInput, () => {
           /></span>
           <span class="header-text"><strong>Edit profile</strong></span></span
         >
-        <button class="save-btn" :disabled="containsError">Save</button>
+        <button
+          class="save-btn"
+          :disabled="containsError"
+          @click.prevent="updateProfile"
+        >
+          Save
+        </button>
       </div>
       <HeaderPicture :url="headerUrl" />
 
@@ -163,6 +182,9 @@ watch(websiteInput, () => {
               >
               <span class="error-input red-text" v-if="!validUsername"
                 >Username can't contain special characters.</span
+              >
+              <span class="error-input red-text" v-if="isUsernameTaken"
+                >Username is taken.</span
               >
             </div>
           </div>
