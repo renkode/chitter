@@ -8,6 +8,7 @@ import TimelineMain from "./components/TimelineMain.vue";
 import LocalTimeline from "./components/LocalTimeline.vue";
 import ProfileMain from "./components/ProfileMain.vue";
 import LoadSpinner from "./components/LoadSpinner.vue";
+import ModalProfile from "./components/ModalProfile.vue";
 import { useAppStore } from "@/stores/app.js";
 import { useUsersStore } from "@/stores/users";
 const app = useAppStore();
@@ -57,6 +58,10 @@ onMounted(() => {
   </div>
 
   <MediaSidebar />
+
+  <Teleport to="body">
+    <ModalProfile v-if="app.showModal" />
+  </Teleport>
 </template>
 
 <style>
@@ -67,6 +72,11 @@ onMounted(() => {
 html,
 body,
 #app {
+  font-family: Avenir, Helvetica, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  box-sizing: border-box;
+  color: white;
   width: 100%;
   height: 100%;
   font-size: 15px;
@@ -78,14 +88,9 @@ body,
 .media-sidebar,
 .tweet-container,
 .tweet-menu-container {
-  background-color: rgb(38, 42, 46);
+  background-color: #262a2e;
 }
 #app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  box-sizing: border-box;
-  color: white;
   display: flex;
   flex-direction: row;
 }
@@ -141,6 +146,15 @@ a:hover {
   position: relative;
 }
 
+.red-text {
+  color: #f4212e;
+}
+
+.red-border {
+  border: 1px solid #f4212e;
+}
+
+.blue-text,
 .blue-link,
 .blue-link a {
   color: #1d9bf0;

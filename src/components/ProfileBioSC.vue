@@ -1,6 +1,7 @@
 <script setup>
 import { defineProps, computed } from "vue";
 import ProfilePicture from "./ProfilePicture.vue";
+import HeaderPicture from "./HeaderPicture.vue";
 import formatDateMixin from "../mixins/formatDateMixin.js";
 import { useAppStore } from "@/stores/app.js";
 
@@ -12,14 +13,16 @@ const shortURL = computed(() =>
 const joinDate = computed(() =>
   formatDateMixin.formatJoinDate(props.user.timestamp)
 );
+
+const openModal = () => {
+  store.setModalType("edit-profile");
+  store.toggleModal();
+};
 </script>
 
 <template>
   <div class="profile-container">
-    <div
-      class="header-img"
-      :style="{ backgroundImage: `url(${props.user.headerUrl})` }"
-    ></div>
+    <HeaderPicture :url="props.user.headerUrl" />
 
     <div class="user-info-container">
       <div class="avatar-wrapper">
@@ -27,6 +30,7 @@ const joinDate = computed(() =>
         <button
           class="edit-profile-btn"
           v-if="store.currentId == props.user.id"
+          @click="openModal"
         >
           Edit Profile
         </button>
@@ -136,14 +140,6 @@ const joinDate = computed(() =>
   flex-direction: column;
 }
 
-.header-img {
-  width: 100%;
-  max-height: 200px;
-  aspect-ratio: 16 / 6;
-  background-color: rgb(175, 175, 175);
-  background-size: cover;
-}
-
 .avatar-wrapper {
   position: relative;
   overflow: visible;
@@ -158,11 +154,11 @@ const joinDate = computed(() =>
   width: min(135px, 25vw) !important;
   left: 0;
   top: max(-85px, -20vw);
-  outline: rgb(38, 42, 46) solid 4px;
+  outline: #262a2e solid 4px;
 }
 
 .edit-profile-btn {
-  background-color: rgb(38, 42, 46);
+  background-color: #262a2e;
   border: 0;
   border-radius: 18px;
   color: white;

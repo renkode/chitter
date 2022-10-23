@@ -270,6 +270,7 @@ li.nav-item.nav-logo .nav-icon {
     flex-direction: row;
     justify-content: center;
     align-items: center;
+    z-index: 15;
   }
   nav {
     max-height: 3.5rem;

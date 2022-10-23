@@ -127,7 +127,7 @@ onMounted(() => {
             <div ref="circle" class="circle" style="--circle: 0">
               <span
                 class="character-limit"
-                :class="{ red: isRedRange }"
+                :class="{ 'red-text': isRedRange }"
                 v-if="isYellowRange"
                 >{{ charactersLeft }}</span
               >
@@ -304,10 +304,6 @@ textarea:focus {
   font-size: 0.8rem;
 }
 
-.red {
-  color: #f4212e;
-}
-
 /* modified https://stackoverflow.com/questions/70368658/percentage-circle-border-css-react */
 .circle {
   --circle: 0.3;
@@ -344,7 +340,7 @@ textarea:focus {
   position: absolute;
   width: var(--innerRadius);
   height: var(--innerRadius);
-  background-color: rgb(38, 42, 46);
+  background-color: #262a2e;
   border-radius: 50%;
   z-index: -1;
   transition: width 0.1s ease, height 0.1s ease;

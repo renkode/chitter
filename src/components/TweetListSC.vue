@@ -38,12 +38,12 @@ const tweets = defineProps({ tweets: Array });
 <style>
 .fade-down-enter-active,
 .fade-down-leave-active {
-  transition: all 0.15s ease;
+  transition: all 0.12s ease;
 }
 
 .fade-down-enter-from,
 .fade-down-leave-to {
-  transform: translateY(-20px);
+  transform: translateY(-15px);
   opacity: 0;
 }
 
