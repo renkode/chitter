@@ -178,27 +178,36 @@ onMounted(() => {
               <ul class="tweet-menu-list">
                 <li
                   class="tweet-menu-item delete-tweet"
-                  @click.stop="deleteTweet"
+                  v-if="app.currentId == props.user.id"
+                  @click="deleteTweet"
                 >
                   <span class="tweet-menu-icon"
                     ><v-icon name="bi-trash" scale="1.1" fill="red" /></span
                   >Delete
                 </li>
-                <li class="tweet-menu-item">
+                <li
+                  class="tweet-menu-item"
+                  v-if="users.canFollow(app.currentId, props.user.id)"
+                  @click="users.followUser(app.currentId, props.user.id)"
+                >
                   <span class="tweet-menu-icon"
                     ><v-icon
                       name="co-user-follow"
                       scale="1.1"
                       fill="#ffffff80" /></span
-                  >Follow @username
+                  >Follow @{{ props.user.username }}
                 </li>
-                <li class="tweet-menu-item">
+                <li
+                  class="tweet-menu-item"
+                  v-if="users.canUnfollow(app.currentId, props.user.id)"
+                  @click="users.unfollowUser(app.currentId, props.user.id)"
+                >
                   <span class="tweet-menu-icon"
                     ><v-icon
                       name="co-user-unfollow"
                       scale="1.1"
                       fill="#ffffff80" /></span
-                  >Unfollow @username
+                  >Unfollow @{{ props.user.username }}
                 </li>
                 <button class="cancel-btn">Cancel</button>
               </ul>
@@ -526,20 +535,31 @@ svg {
   box-shadow: 0px 0px 6px rgba(255, 255, 255, 0.3);
   color: white;
   position: absolute;
+  min-width: 150px;
   width: max-content;
   height: fit-content;
   z-index: 5;
-  left: -152px;
-  top: 0px;
+  right: 8px;
+  top: 8px;
+  cursor: default;
+  overflow: hidden;
 }
 
 .tweet-menu-container li {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
   cursor: pointer;
-  padding: 0.7em 0.5rem;
+  padding: 0.7em;
+  text-align: center;
 }
 
 .tweet-menu-container li:hover {
   background-color: rgba(255, 255, 255, 0.137);
+}
+
+.tweet-menu-list {
+  margin: 0;
 }
 
 .tweet-menu-icon {

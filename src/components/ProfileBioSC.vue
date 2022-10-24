@@ -4,8 +4,10 @@ import ProfilePicture from "./ProfilePicture.vue";
 import HeaderPicture from "./HeaderPicture.vue";
 import formatDateMixin from "../mixins/formatDateMixin.js";
 import { useAppStore } from "@/stores/app.js";
+import { useUsersStore } from "@/stores/users.js";
 
 const store = useAppStore();
+const users = useUsersStore();
 const props = defineProps({ user: Object, tab: String, setTab: Function });
 const shortURL = computed(() =>
   props.user.website.replace(/https?:\/\/(www\.)?/gi, "").replace(/\/+$/, "")
@@ -33,6 +35,18 @@ const openModal = () => {
           @click="openModal"
         >
           Edit Profile
+        </button>
+        <button
+          class="following-btn"
+          v-else-if="users.canUnfollow(store.currentId, props.user.id)"
+          @click="users.unfollowUser(store.currentId, props.user.id)"
+        ></button>
+        <button
+          class="follow-btn"
+          v-else-if="users.canFollow(store.currentId, props.user.id)"
+          @click="users.followUser(store.currentId, props.user.id)"
+        >
+          Follow
         </button>
       </div>
       <div class="user-info-wrapper">
@@ -157,20 +171,60 @@ const openModal = () => {
   outline: #262a2e solid 4px;
 }
 
+.follow-btn,
+.following-btn,
 .edit-profile-btn {
-  background-color: #262a2e;
-  border: 0;
   border-radius: 18px;
-  color: white;
   cursor: pointer;
-  outline: #ffffff80 solid 1px;
+  transition: all 0.15s ease;
   height: 36px;
-  width: 110px;
-  transition: background-color 0.15s ease;
+  width: fit-content;
+  padding: 0 1rem;
+}
+
+.follow-btn {
+  background-color: white;
+  color: black;
+  border: white solid 1px;
+}
+
+.follow-btn:hover {
+  background-color: rgb(228, 228, 228);
+}
+
+.edit-profile-btn,
+.following-btn {
+  background-color: #262a2e;
+  color: white;
+  border: #ffffff80 solid 1px;
 }
 
 .edit-profile-btn:hover {
   background-color: #becae51e;
+}
+
+.following-btn {
+  width: 95px;
+  transition-duration: 0.1s;
+}
+
+.following-btn::before {
+  content: "Following";
+}
+
+.following-btn:hover {
+  border-color: #f4212e;
+  color: #f4212e;
+  background-color: #f4212f1c;
+}
+
+.following-btn:hover::before {
+  content: "";
+}
+
+.following-btn:hover::after {
+  content: "Unfollow";
+  color: #f4212e;
 }
 
 .user-info-container {
