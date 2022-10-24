@@ -13,7 +13,9 @@ const props = defineProps({
       backgroundImage: `url(${props.url})`,
       width: props.size + 'px',
     }"
-  ></div>
+  >
+    <slot></slot>
+  </div>
 </template>
 
 <style scoped>
@@ -24,6 +26,7 @@ const props = defineProps({
   border-radius: 100%;
   cursor: pointer;
   min-width: 44px;
+  position: relative;
   transition: box-shadow 0.15s ease;
 }
 

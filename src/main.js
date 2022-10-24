@@ -28,6 +28,7 @@ import {
   OiLink,
   LaBirthdayCakeSolid,
   BiCalendar3,
+  MdAddaphotoOutlined,
 } from "oh-vue-icons/icons";
 
 addIcons(
@@ -51,7 +52,8 @@ addIcons(
   MdLocationonOutlined,
   OiLink,
   LaBirthdayCakeSolid,
-  BiCalendar3
+  BiCalendar3,
+  MdAddaphotoOutlined
 );
 
 const pinia = createPinia();

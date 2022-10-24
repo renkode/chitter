@@ -53,8 +53,16 @@ const nameInputWrapper = ref(null);
 const usernameInputWrapper = ref(null);
 const websiteInputWrapper = ref(null);
 
+const setAvatar = (e) => {
+  avatarUrl.value = URL.createObjectURL(e.currentTarget.files[0]);
+};
+
 const setHeader = (e) => {
   headerUrl.value = URL.createObjectURL(e.currentTarget.files[0]);
+};
+
+const clearHeader = () => {
+  headerUrl.value = "";
 };
 
 const setFocus = (e) => {
@@ -122,11 +130,42 @@ watch(websiteInput, () => {
           Save
         </button>
       </div>
-      <HeaderPicture :url="headerUrl" />
+
+      <div class="header-wrapper">
+        <HeaderPicture :url="headerUrl" />
+        <span class="image-actions">
+          <span class="set-image-btn">
+            <input
+              id="upload-header"
+              type="file"
+              accept="image/png, image/gif, image/jpeg"
+              @change="setHeader"
+              hidden
+            /><label for="upload-header">
+              <v-icon name="md-addaphoto-outlined" scale="1.0" fill="white"
+            /></label>
+          </span>
+          <span class="clear-header-btn" @click="clearHeader"
+            ><v-icon name="bi-x" scale="1.6" fill="white" /></span
+        ></span>
+      </div>
 
       <div class="modal-content">
         <div class="avatar-wrapper">
-          <ProfilePicture :url="avatarUrl" :size="112" />
+          <ProfilePicture :url="avatarUrl" :size="112">
+            <span class="image-actions">
+              <span class="set-image-btn">
+                <input
+                  id="upload-avatar"
+                  type="file"
+                  accept="image/png, image/gif, image/jpeg"
+                  @change="setAvatar"
+                  hidden
+                />
+                <label for="upload-avatar">
+                  <v-icon name="md-addaphoto-outlined" scale="1.0" fill="white"
+                /></label> </span></span
+          ></ProfilePicture>
         </div>
         <div class="modal-form">
           <div class="name-and-username">
@@ -342,6 +381,47 @@ watch(websiteInput, () => {
 .save-btn:disabled {
   cursor: default;
   opacity: 0.7;
+}
+
+.header-wrapper {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.profile-pic {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.image-actions {
+  position: absolute;
+  margin: auto;
+  width: fit-content;
+  height: fit-content;
+  display: flex;
+  flex-direction: row;
+  gap: 1rem;
+}
+
+.set-image-btn,
+.clear-header-btn {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 42px;
+  height: 42px;
+  border-radius: 100%;
+  cursor: pointer;
+  background-color: rgba(0, 0, 0, 0.5);
+  transition: background-color 0.15s ease;
+}
+
+.set-image-btn:hover,
+.clear-header-btn:hover {
+  background-color: rgba(0, 0, 0, 0.4);
 }
 
 .modal-content {
