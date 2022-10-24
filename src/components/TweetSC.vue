@@ -307,7 +307,7 @@ onMounted(() => {
 
 .user-info-and-btn {
   width: 100%;
-  max-width: 100%;
+  max-width: 510px;
   height: 1rem;
   margin-bottom: 6px;
   display: flex;
@@ -319,9 +319,10 @@ onMounted(() => {
 .user-info-wrapper {
   height: fit-content;
   display: flex;
-  max-width: 100%;
-  width: 60vw; /* IDCCCCCCCCCCCCCCCC */
-  max-width: fit-content;
+  max-width: 93%;
+  width: 60vw;
+  flex-grow: 1;
+  /* max-width: fit-content; */
 }
 
 .display-name,
@@ -332,6 +333,7 @@ onMounted(() => {
   min-width: 0px;
   width: 100%;
   max-width: fit-content;
+  display: inline-block;
 }
 
 .display-name a {

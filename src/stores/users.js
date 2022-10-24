@@ -40,7 +40,26 @@ export const useUsersStore = defineStore("users", {
         likes: [],
         following: [],
         followers: ["2"],
-        localTimeline: [],
+        localTimeline: [
+          {
+            id: 2,
+            type: "status",
+            timestamp: "2022-10-24T21:21:54.735Z",
+            fromUserId: "1",
+          },
+          {
+            id: 3,
+            type: "status",
+            timestamp: "2022-10-24T21:21:53.427Z",
+            fromUserId: "1",
+          },
+          {
+            id: 4,
+            type: "status",
+            timestamp: "2022-10-24T21:21:51.181Z",
+            fromUserId: "1",
+          },
+        ],
       },
       {
         id: "2",
@@ -180,6 +199,16 @@ export const useUsersStore = defineStore("users", {
       currentUser.following.splice(currentUser.following.indexOf(targetId, 1));
       otherUser.followerCount--;
       otherUser.followers.splice(otherUser.followers.indexOf(currentUserId, 1));
+    },
+    canFollow(currentUserId, targetId) {
+      if (currentUserId == targetId) return false;
+      const currentUser = this.getUser(currentUserId);
+      return !currentUser.following.includes(targetId);
+    },
+    canUnfollow(currentUserId, targetId) {
+      if (currentUserId == targetId) return false;
+      const currentUser = this.getUser(currentUserId);
+      return currentUser.following.includes(targetId);
     },
   },
 });

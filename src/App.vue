@@ -30,17 +30,17 @@ onMounted(() => {
         <ComposeTweetSC v-if="app.currentUser" />
         <Transition name="fade">
           <Suspense>
-            <template #default> <TimelineMain /> </template>
+            <template #default> <LocalTimeline /> </template>
             <template #fallback> <LoadSpinner /> </template>
           </Suspense>
         </Transition>
       </template>
 
-      <template v-if="app.view === 'timeline'">
+      <template v-if="app.view === 'explore'">
         <ComposeTweetSC v-if="app.currentUser" />
         <Transition name="fade">
           <Suspense>
-            <template #default> <LocalTimeline /> </template>
+            <template #default> <TimelineMain /> </template>
             <template #fallback> <LoadSpinner /> </template>
           </Suspense>
         </Transition>

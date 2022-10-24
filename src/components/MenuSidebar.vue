@@ -5,6 +5,7 @@ import ProfilePicture from "./ProfilePicture.vue";
 
 const app = useAppStore();
 const user = computed(() => app.currentUser);
+const isCurrentView = computed((view) => view === app.view);
 </script>
 
 <template>
@@ -16,23 +17,42 @@ const user = computed(() => app.currentUser);
             ><v-icon name="bi-twitter" scale="2.0" fill="white"
           /></span>
         </li>
+
         <li class="nav-item" @click="app.setView('home')">
           <span class="nav-icon"
-            ><v-icon name="gi-bird-house" scale="2.0" fill="white" /></span
-          ><span class="nav-label">Home</span>
+            ><v-icon
+              name="gi-bird-house"
+              scale="2.0"
+              :fill="app.view === 'home' ? 'white' : '#ffffff80'" /></span
+          ><span class="nav-label" :class="{ 'gray-text': app.view !== 'home' }"
+            >Home</span
+          >
         </li>
-        <li class="nav-item" @click="app.setView('timeline')">
+
+        <li class="nav-item" @click="app.setView('explore')">
           <span class="nav-icon"
             ><v-icon
-              name="md-accesstime-round"
-              scale="1.5"
-              fill="white" /></span
-          ><span class="nav-label">Timeline</span>
+              name="hi-hashtag"
+              scale="1.6"
+              :fill="app.view === 'explore' ? 'white' : '#ffffff80'" /></span
+          ><span
+            class="nav-label"
+            :class="{ 'gray-text': app.view !== 'explore' }"
+            >Explore</span
+          >
         </li>
+
         <li class="nav-item" @click="app.viewUserProfile(user.id)">
           <span class="nav-icon"
-            ><v-icon name="bi-person" scale="1.8" fill="white" /></span
-          ><span class="nav-label">Profile</span>
+            ><v-icon
+              name="bi-person"
+              scale="1.8"
+              :fill="app.view === 'profile' ? 'white' : '#ffffff80'" /></span
+          ><span
+            class="nav-label"
+            :class="{ 'gray-text': app.view !== 'profile' }"
+            >Profile</span
+          >
         </li>
       </ul>
       <button class="new-tweet-btn">
@@ -142,7 +162,8 @@ li.nav-item.nav-logo .nav-icon {
 }
 
 .user-info-and-btn {
-  width: auto;
+  /* width: auto; */
+  max-width: 90%;
   height: 100%;
   margin-bottom: 0;
 }
@@ -155,6 +176,10 @@ li.nav-item.nav-logo .nav-icon {
 
 .profile-pic {
   margin-right: 0.5rem;
+}
+
+.display-name {
+  max-width: 80%;
 }
 
 .username {

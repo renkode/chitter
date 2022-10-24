@@ -31,7 +31,7 @@ const calendar = [
   },
   {
     month: "February",
-    days: 28,
+    days: 29,
   },
   {
     month: "March",

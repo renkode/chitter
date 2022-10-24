@@ -32,7 +32,7 @@ export const useAppStore = defineStore("app", {
     },
     setView(view) {
       if (this.view === view) return;
-      const views = ["home", "timeline", "profile", "tweet"];
+      const views = ["home", "explore", "profile", "tweet"];
       if (!views.includes(view)) {
         throw Error("wrong view");
       }
