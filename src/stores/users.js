@@ -10,7 +10,7 @@ export const useUsersStore = defineStore("users", {
         description: "lorem ipsum #cool",
         location: "nowhere",
         website: "https://github.com/renkode/",
-        birthday: "June 9, 2021",
+        birthday: "June 9",
         avatarUrl:
           "https://pbs.twimg.com/profile_images/1566523505155268608/AEzCad1D_400x400.png",
         headerUrl:
@@ -49,7 +49,7 @@ export const useUsersStore = defineStore("users", {
         description: "Randomly just made some toast pyon★. I am a freak pyon★",
         location: "h",
         website: null,
-        birthday: null,
+        birthday: "",
         avatarUrl:
           "https://pbs.twimg.com/profile_images/1573329090865778690/Nu2FIMbX_400x400.jpg",
         headerUrl:

@@ -22,7 +22,8 @@ const props = defineProps({
 .profile-pic {
   aspect-ratio: 1 / 1;
   background-size: cover;
-  background-color: rgb(175, 175, 175);
+  background-position: center;
+  background-color: rgb(88, 95, 102);
   border-radius: 100%;
   cursor: pointer;
   min-width: 44px;

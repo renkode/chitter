@@ -1,9 +1,10 @@
 <script setup>
-import { ref, watch, computed } from "vue";
+import { ref, watch, computed, onMounted } from "vue";
 import HeaderPicture from "./HeaderPicture.vue";
 import ProfilePicture from "./ProfilePicture.vue";
 import { useAppStore } from "@/stores/app.js";
 import { useUsersStore } from "@/stores/users";
+import { calendar } from "@/mixins/utilities.js";
 const app = useAppStore();
 const users = useUsersStore();
 const headerUrl = ref(app.currentUser.headerUrl);
@@ -15,13 +16,21 @@ const locationInput = ref(app.currentUser.location);
 const websiteInput = ref(app.currentUser.website);
 const birthdayInput = ref(app.currentUser.birthday);
 
+const nameInputWrapper = ref(null);
+const usernameInputWrapper = ref(null);
+const websiteInputWrapper = ref(null);
+const monthInput = ref(null);
+const dayInput = ref(null);
+
+// name validation
 const nameError = computed(() => nameInput.value.length === 0);
+
+// username validation
+const MAX_USERNAME_LENGTH = 3;
 const ALPHANUMERIC_UNDERSCORE = new RegExp("^[a-zA-Z0-9_]*$");
 const validUsername = computed(() =>
   ALPHANUMERIC_UNDERSCORE.test(usernameInput.value)
 );
-
-const MAX_USERNAME_LENGTH = 3;
 const isUsernameTaken = computed(
   () =>
     users.users.filter(
@@ -29,7 +38,6 @@ const isUsernameTaken = computed(
         app.currentId !== user.id && user.username == usernameInput.value
     ).length > 0
 );
-
 const usernameError = computed(
   () =>
     (usernameInput.value.length >= 0 &&
@@ -38,6 +46,7 @@ const usernameError = computed(
     isUsernameTaken.value
 );
 
+// website url validation
 const URL_REGEX = new RegExp(
   /^((https?|ftp|smtp):\/\/)?(www.)?[a-z0-9]+\.[a-z]+(\/[a-zA-Z0-9#]+\/?)*$/i
 );
@@ -49,22 +58,18 @@ const containsError = computed(
   () => nameError.value || usernameError.value || URLError.value
 );
 
-const nameInputWrapper = ref(null);
-const usernameInputWrapper = ref(null);
-const websiteInputWrapper = ref(null);
-
+// edit avatar and header
 const setAvatar = (e) => {
   avatarUrl.value = URL.createObjectURL(e.currentTarget.files[0]);
 };
-
 const setHeader = (e) => {
   headerUrl.value = URL.createObjectURL(e.currentTarget.files[0]);
 };
-
 const clearHeader = () => {
   headerUrl.value = "";
 };
 
+// add blue border and blue label on input focus
 const setFocus = (e) => {
   e.currentTarget.nextElementSibling
     .querySelector("label")
@@ -76,6 +81,34 @@ const setFocus = (e) => {
     .querySelector(".text-limit")
     .classList.toggle("show");
   e.currentTarget.closest(".input-wrapper").classList.toggle("blue-border");
+};
+
+// programmatically add month and day options to select
+const populateMonths = () => {
+  calendar.forEach((month) => {
+    var opt = document.createElement("option");
+    if (app.currentUser.birthday.split(" ")[0] === month.month)
+      opt.selected = true;
+    opt.value = month.month;
+    opt.textContent = month.month;
+    monthInput.value.appendChild(opt);
+  });
+};
+
+const populateDays = () => {
+  dayInput.value.innerHTML = "";
+  if (monthInput.value.value === "") return;
+  const days = calendar.filter((c) => c.month === monthInput.value.value)[0]
+    .days;
+  const [birthMonth, birthDate] = app.currentUser.birthday.split(" "); //destructure
+  for (let i = 1; i <= days; i++) {
+    var opt = document.createElement("option");
+    if (birthMonth === monthInput.value.value && birthDate == i)
+      opt.selected = true;
+    opt.value = i;
+    opt.textContent = i;
+    dayInput.value.appendChild(opt);
+  }
 };
 
 const updateProfile = () => {};
@@ -108,6 +141,11 @@ watch(websiteInput, () => {
     websiteInputWrapper.value.className = "input-wrapper blue-border";
     websiteInputWrapper.value.querySelector("label").className = "blue-text";
   }
+});
+
+onMounted(() => {
+  populateMonths();
+  populateDays();
 });
 </script>
 
@@ -282,10 +320,16 @@ watch(websiteInput, () => {
             >
           </div>
           <div class="birthday-wrapper">
-            <span class="birthday-label gray-text"
-              >Birth date<span class="separator">·</span
-              ><a class="blue-link" href=""> Edit</a></span
-            ><span class="birthday-text">{{ birthdayInput }}</span>
+            <span class="birthday-label gray-text">Birth date</span>
+            <span class="birthday-input-wrapper"
+              ><select
+                id="month"
+                name="month"
+                ref="monthInput"
+                @change="populateDays"
+              ></select>
+              <select id="day" name="day" ref="dayInput"></select
+            ></span>
           </div>
         </div>
       </div>
@@ -336,6 +380,9 @@ watch(websiteInput, () => {
   align-items: center;
   padding: 0 1rem;
   z-index: 21;
+  background-color: rgba(38, 42, 46, 0.836);
+  backdrop-filter: blur(10px);
+  user-select: none;
 }
 
 .header-item-wrapper {
@@ -406,7 +453,7 @@ watch(websiteInput, () => {
   gap: 1rem;
 }
 
-.set-image-btn,
+.set-image-btn label,
 .clear-header-btn {
   display: flex;
   justify-content: center;
@@ -419,7 +466,7 @@ watch(websiteInput, () => {
   transition: background-color 0.15s ease;
 }
 
-.set-image-btn:hover,
+.set-image-btn label:hover,
 .clear-header-btn:hover {
   background-color: rgba(0, 0, 0, 0.4);
 }
@@ -450,7 +497,7 @@ watch(websiteInput, () => {
 .modal-form {
   display: flex;
   flex-direction: column;
-  gap: 1rem;
+  gap: 1.5rem;
 }
 
 .validation-wrapper {
@@ -562,6 +609,28 @@ textarea:focus {
   flex-direction: column;
   justify-content: center;
   align-items: flex-start;
+  gap: 0.8rem;
+}
+
+.birthday-input-wrapper {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  gap: 6px;
+}
+
+.birthday-input-wrapper select {
+  background-color: #262a2e;
+  border: rgba(255, 255, 255, 0.25) 1px solid;
+  border-radius: 6px;
+  color: white;
+  padding: 8px;
+  display: flex;
+  height: 3rem;
+}
+
+.birthday-input-wrapper select:focus {
+  outline: 0;
 }
 
 .birthday-label {
