@@ -83,6 +83,29 @@ export const useUsersStore = defineStore("users", {
     getUserByUsername(username) {
       return this.users.filter((user) => user.username == username)[0];
     },
+    updateProfile(
+      id,
+      name,
+      username,
+      description,
+      location,
+      website,
+      birthday,
+      avatarUrl,
+      headerUrl
+    ) {
+      const user = this.users.filter((user) => user.id == id)[0];
+      const index = this.users.findIndex((user) => user.id == id);
+      user.name = name;
+      user.username = username;
+      user.description = description;
+      user.location = location;
+      user.website = website;
+      user.birthday = birthday;
+      user.avatarUrl = avatarUrl;
+      user.headerUrl = headerUrl;
+      Object.assign(this.users[index], user);
+    },
     addTweet(userId, tweetId, type = "status", containsMedia = false) {
       const user = this.getUser(userId);
       user.authoredTweets.unshift({

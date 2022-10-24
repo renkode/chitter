@@ -14,6 +14,7 @@ const usernameInput = ref(app.currentUser.username);
 const bioInput = ref(app.currentUser.description);
 const locationInput = ref(app.currentUser.location);
 const websiteInput = ref(app.currentUser.website);
+const birthdayInput = ref(app.currentUser.birthday);
 
 const nameInputWrapper = ref(null);
 const usernameInputWrapper = ref(null);
@@ -110,7 +111,21 @@ const populateDays = () => {
 };
 
 // click save to update profile
-const updateProfile = () => {};
+const updateProfile = () => {
+  const newBirthDate = `${monthInput.value.value} ${dayInput.value.value}`;
+  users.updateProfile(
+    app.currentId,
+    nameInput.value,
+    usernameInput.value,
+    bioInput.value,
+    locationInput.value,
+    websiteInput.value,
+    newBirthDate,
+    avatarUrl.value,
+    headerUrl.value
+  );
+  app.toggleModal();
+};
 
 // watchers
 watch(nameInput, () => {

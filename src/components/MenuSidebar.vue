@@ -46,7 +46,7 @@ const user = computed(() => app.currentUser);
           <ProfilePicture :url="user.avatarUrl" :size="40" />
           <div class="user-info-wrapper">
             <span class="display-name">{{ user.name }}</span>
-            <span class="username">@{{ user.username }}</span>
+            <span class="username gray-text">@{{ user.username }}</span>
           </div>
         </div>
         <span class="tweet-action-icon extra-btn"
