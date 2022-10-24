@@ -8,7 +8,7 @@ import TimelineMain from "./components/TimelineMain.vue";
 import LocalTimeline from "./components/LocalTimeline.vue";
 import ProfileMain from "./components/ProfileMain.vue";
 import LoadSpinner from "./components/LoadSpinner.vue";
-import ModalProfile from "./components/ModalProfile.vue";
+import ModalComponent from "./components/ModalComponent.vue";
 import { useAppStore } from "@/stores/app.js";
 import { useUsersStore } from "@/stores/users";
 const app = useAppStore();
@@ -60,7 +60,7 @@ onMounted(() => {
   <MediaSidebar />
 
   <Teleport to="body">
-    <ModalProfile v-if="app.showModal" />
+    <ModalComponent v-if="app.showModal" />
   </Teleport>
 </template>
 
