@@ -5,6 +5,7 @@ export const useUsersStore = defineStore("users", {
     users: [
       {
         id: "1",
+        isAdmin: true,
         name: "🍆",
         username: "renkode",
         description: "lorem ipsum #cool",

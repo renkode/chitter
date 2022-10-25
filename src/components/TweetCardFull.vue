@@ -27,6 +27,8 @@ const props = defineProps({
   type: String, // status, retweet, reply, reply-origin
 });
 
+const tweetContainer = ref(null);
+
 const replyingTo = computed(
   () => users.getUser(props.tweet.replyingToUser).username
 );
@@ -47,6 +49,7 @@ const toggleTweetMenu = (e) => {
 
 const deleteTweet = () => {
   tweets.removeTweet(props.id, props.user.id);
+  if (app.viewTweetId == props.id) app.setViewTweetId(null);
 };
 
 const doSomething = (e) => {
@@ -108,6 +111,7 @@ onMounted(() => {
       app.viewUserProfile(users.getUserByUsername(anchor.dataset.username).id);
     })
   );
+  tweetContainer.value.scrollIntoView({ behavior: "smooth", block: "start" });
   return () => {
     Array.from(anchors).forEach((anchor) =>
       anchor.removeEventListener("click", doSomething)
@@ -117,7 +121,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="tweet-container" @click="setTweetContext">
+  <div class="tweet-container" @click="setTweetContext" ref="tweetContainer">
     <div class="tweet-body">
       <div class="profile-pic-and-user">
         <div class="profile-pic-container">
@@ -150,7 +154,9 @@ onMounted(() => {
                 <ul class="tweet-menu-list">
                   <li
                     class="tweet-menu-item delete-tweet"
-                    v-if="app.currentId == props.user.id"
+                    v-if="
+                      app.currentId == props.user.id || app.currentUser.isAdmin
+                    "
                     @click="deleteTweet"
                   >
                     <span class="tweet-menu-icon"
@@ -476,6 +482,11 @@ svg {
   position: relative;
   left: 0px;
   font-size: 0.9rem;
+  cursor: pointer;
+}
+
+.tweet-metric:hover {
+  text-decoration: underline;
 }
 
 .tweet-media {

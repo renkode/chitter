@@ -11,33 +11,42 @@ const users = useUsersStore();
 const store = useTweetStore();
 // const props = defineProps(["tweet"]);
 const tweet = computed(() => store.getTweet(app.viewTweetId));
-const previousTweets = ref([]);
-const replies = computed(
-  () => tweet.value.repliesFrom.map((id) => store.getTweet(id)) || []
+const previousTweet = computed(() =>
+  store.getTweet(tweet.value.replyingToTweet)
 );
+const previousTweets = ref([]);
+const replies = computed(() => {
+  if (tweet.value) {
+    return tweet.value.repliesFrom.map((id) => store.getTweet(id)) || [];
+  } else {
+    return null;
+  }
+});
 
+// kinda like a linked list. don't ask me.
 const fetchPreviousTweets = () => {
   previousTweets.value = [];
+  if (!tweet.value) return;
   let currentTweet = tweet.value;
   while (currentTweet.replyingToTweet) {
-    console.log("huh");
     try {
       let lastTweet = store.getTweet(currentTweet.replyingToTweet);
+      if (!lastTweet) {
+        previousTweets.value = [null];
+        break;
+      }
       previousTweets.value.unshift(lastTweet);
       currentTweet = lastTweet;
-      console.log(currentTweet, previousTweets.value);
     } catch {
       throw new Error("loop gone wild");
     }
   }
 };
 
-watch(
-  () => app.viewTweetId,
-  () => {
-    fetchPreviousTweets();
-  }
-);
+// refresh whenever current tweet or previous tweet change/get deleted
+watch([() => app.viewTweetId, previousTweet], () => {
+  fetchPreviousTweets();
+});
 
 onMounted(() => {
   fetchPreviousTweets();
@@ -46,7 +55,7 @@ onMounted(() => {
 
 <template>
   <div class="tweet-list-container">
-    <template v-if="previousTweets.length > 0">
+    <template v-if="previousTweets.length > 0 && previousTweets[0]">
       <TweetCard
         v-for="tweet in previousTweets"
         :key="tweet.id"
@@ -56,6 +65,15 @@ onMounted(() => {
         :type="tweet.type"
         :retweetedBy="tweet.retweetedBy"
       />
+    </template>
+    <template
+      v-else-if="previousTweets.length > 0 && previousTweets[0] == null"
+    >
+      <div class="tweet-container">
+        <div class="deleted-tweet">
+          <span class="gray-text">Tweet has been deleted.</span>
+        </div>
+      </div>
     </template>
     <template v-if="tweet">
       <TweetCardFull
@@ -80,6 +98,14 @@ onMounted(() => {
 </template>
 
 <style scoped>
+.deleted-tweet {
+  width: 90%;
+  height: 3rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
 @media screen and (max-width: 700px) {
   .tweet-list-container {
     max-width: 600px;

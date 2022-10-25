@@ -164,7 +164,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="modal-container">
+  <div>
     <div class="modal-header">
       <span class="header-item-wrapper">
         <span class="exit-modal-btn" @click="app.toggleModal"
@@ -350,20 +350,6 @@ onMounted(() => {
 
 <style scoped>
 .modal-container {
-  background-color: #262a2e;
-  border-radius: 16px;
-  position: fixed;
-  pointer-events: auto;
-  margin: auto;
-  top: 0;
-  left: 0;
-  bottom: 0;
-  right: 0;
-  max-width: 600px;
-  height: fit-content;
-  z-index: 20;
-  overflow-y: scroll;
-  height: 75%;
   padding-bottom: 3rem;
 }
 

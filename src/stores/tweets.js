@@ -223,6 +223,11 @@ export const useTweetStore = defineStore("tweets", {
     removeTweet(id, userId) {
       const index = this.tweets.findIndex((t) => t.id === id);
       if (index < 0) throw new Error("no such tweet");
+      const replyingToTweet = this.getTweet(this.tweets[index].replyingToTweet);
+      if (replyingToTweet)
+        replyingToTweet.repliesFrom = replyingToTweet.repliesFrom.filter(
+          (replyId) => replyId !== id
+        );
       this.tweets.splice(index, 1);
 
       const users = useUsersStore();

@@ -181,7 +181,9 @@ onMounted(() => {
               <ul class="tweet-menu-list">
                 <li
                   class="tweet-menu-item delete-tweet"
-                  v-if="app.currentId == props.user.id"
+                  v-if="
+                    app.currentId == props.user.id || app.currentUser.isAdmin
+                  "
                   @click="deleteTweet"
                 >
                   <span class="tweet-menu-icon"
