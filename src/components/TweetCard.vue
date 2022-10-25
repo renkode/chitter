@@ -220,7 +220,10 @@ onMounted(() => {
           >
         </div>
         <div class="tweet-content">
-          <div class="replying-to" v-if="props.tweet.type === 'reply'">
+          <div
+            class="replying-to"
+            v-if="props.tweet.type === 'reply' && props.tweet.replyingToTweet"
+          >
             <span class="gray-text">Replying to </span>
             <a
               class="blue-link"

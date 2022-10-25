@@ -1,5 +1,5 @@
 <script setup>
-import { ref, defineProps, computed, onMounted } from "vue";
+import { ref, defineProps, computed, onMounted, watch } from "vue";
 import dayjs from "dayjs";
 import ProfilePicture from "./ProfilePicture.vue";
 import formatDateMixin from "../mixins/formatDateMixin.js";
@@ -100,9 +100,8 @@ const embedLinks = computed(() => {
   return embedArr.join(" ");
 });
 
-onMounted(() => {
-  // set tweet text
-  tweetText.value.innerHTML = embedLinks.value || ""; // dangerous
+watch(embedLinks, () => {
+  tweetText.value.innerHTML = embedLinks.value;
   const anchors = tweetText.value.querySelectorAll(".user-link");
   Array.from(anchors).forEach((anchor) =>
     anchor.addEventListener("click", (e) => {
@@ -111,10 +110,13 @@ onMounted(() => {
       app.viewUserProfile(users.getUserByUsername(anchor.dataset.username).id);
     })
   );
+});
+
+onMounted(() => {
   tweetContainer.value.scrollIntoView({ behavior: "smooth", block: "start" });
   return () => {
-    Array.from(anchors).forEach((anchor) =>
-      anchor.removeEventListener("click", doSomething)
+    Array.from(tweetText.value.querySelectorAll(".user-link")).forEach(
+      (anchor) => anchor.removeEventListener("click", doSomething)
     );
   };
 });
@@ -195,7 +197,10 @@ onMounted(() => {
         </div>
       </div>
       <div class="tweet-content">
-        <div class="replying-to" v-if="props.tweet.type === 'reply'">
+        <div
+          class="replying-to"
+          v-if="props.tweet.type === 'reply' && props.tweet.replyingToTweet"
+        >
           <span class="gray-text">Replying to </span>
           <a
             class="blue-link"
@@ -203,7 +208,7 @@ onMounted(() => {
             >@{{ replyingTo }}</a
           >
         </div>
-        <div class="tweet-text" ref="tweetText">{{ embedLinks }}</div>
+        <div class="tweet-text" ref="tweetText"></div>
         <div
           class="tweet-media"
           :class="[getMediaClass(props.tweet.media)]"
