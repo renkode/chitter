@@ -7,6 +7,7 @@ import ComposeTweet from "./components/ComposeTweet.vue";
 import TimelineMain from "./components/TimelineMain.vue";
 import LocalTimeline from "./components/LocalTimeline.vue";
 import ProfileMain from "./components/ProfileMain.vue";
+import TweetContext from "./components/TweetContext.vue";
 import FollowLists from "./components/FollowLists.vue";
 import LoadSpinner from "./components/LoadSpinner.vue";
 import ModalComponent from "./components/ModalComponent.vue";
@@ -63,6 +64,10 @@ onMounted(() => {
             <template #fallback> <LoadSpinner /> </template>
           </Suspense>
         </Transition>
+      </template>
+
+      <template v-if="app.view === 'tweet' && app.viewTweetId">
+        <TweetContext />
       </template>
     </div>
   </div>

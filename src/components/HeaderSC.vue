@@ -23,7 +23,7 @@ const user = computed(() => users.getUser(app.viewProfileId));
       ><span
         v-if="app.view === 'tweet' || app.view === 'profile'"
         class="back-arrow-btn"
-        @click="app.setView(app.previousView)"
+        @click="app.setView('home')"
         ><v-icon name="md-arrowback" scale="1.1" fill="#ffffff80"
       /></span>
       <span v-else class="back-arrow-btn" @click="app.setView('profile')"

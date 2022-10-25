@@ -35,12 +35,24 @@ export const useUsersStore = defineStore("users", {
             type: "status",
             containsMedia: true,
           },
+          {
+            id: 5,
+            type: "reply",
+            timestamp: "2022-10-24T21:21:51.181Z",
+            fromUserId: "1",
+          },
         ],
         retweets: [],
         likes: [],
         following: [],
         followers: ["2"],
         localTimeline: [
+          {
+            id: 5,
+            type: "reply",
+            timestamp: "2022-10-24T21:21:51.181Z",
+            fromUserId: "1",
+          },
           {
             id: 2,
             type: "status",

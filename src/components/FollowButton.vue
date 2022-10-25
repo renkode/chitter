@@ -11,12 +11,12 @@ const props = defineProps(["userId"]);
   <button
     class="following-btn"
     v-if="users.canUnfollow(app.currentId, props.userId)"
-    @click="users.unfollowUser(app.currentId, props.userId)"
+    @click.stop="users.unfollowUser(app.currentId, props.userId)"
   ></button>
   <button
     class="follow-btn"
     v-else-if="users.canFollow(app.currentId, props.userId)"
-    @click="users.followUser(app.currentId, props.userId)"
+    @click.stop="users.followUser(app.currentId, props.userId)"
   >
     Follow
   </button>
@@ -47,6 +47,7 @@ const props = defineProps(["userId"]);
   background-color: #262a2e00;
   color: white;
   border: #ffffff80 solid 1px;
+  min-width: 95px;
   width: 95px;
   transition-duration: 0.1s;
 }

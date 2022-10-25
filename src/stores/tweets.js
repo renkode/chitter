@@ -12,6 +12,25 @@ export const useTweetStore = defineStore("tweets", {
     // STATE MUST BE AN OBJECT JFC
     tweets: [
       {
+        id: 5,
+        type: "reply", // status | reply | quote
+        text: "nice", // max 250 chars
+        media: [],
+        authorId: 1,
+        replyCount: 0,
+        retweetCount: 0,
+        likeCount: 1,
+        quoteCount: 0,
+        timestamp: iso,
+        replyingToTweet: 1,
+        replyingToUser: 2,
+        quoting: null,
+        repliesFrom: [], // user and tweet ids
+        retweetsFrom: [], // user ids
+        quotesFrom: [], // user and tweet ids
+        likesFrom: [2], // user ids
+      },
+      {
         id: 1,
         type: "reply", // status | reply | quote
         text: "@renkode I think most people underestimate how #little being 5’4 is. I’m literally hopping around on my phone rn to type tjis out", // max 250 chars
@@ -24,9 +43,10 @@ export const useTweetStore = defineStore("tweets", {
         likeCount: 1438,
         quoteCount: 0,
         timestamp: iso,
-        replyingTo: "1",
+        replyingToTweet: null,
+        replyingToUser: 1,
         quoting: null,
-        repliesFrom: [], // user and tweet ids
+        repliesFrom: [5], // user and tweet ids
         retweetsFrom: [], // user ids
         quotesFrom: [], // user and tweet ids
         likesFrom: [], // user ids
@@ -45,7 +65,8 @@ export const useTweetStore = defineStore("tweets", {
         likeCount: 98,
         quoteCount: 0,
         timestamp: "2022-10-13T07:58:03.484Z",
-        replyingTo: null,
+        replyingToTweet: null,
+        replyingToUser: null,
         quoting: null,
         repliesFrom: [], // user and tweet ids
         retweetsFrom: [], // user ids
@@ -67,7 +88,8 @@ export const useTweetStore = defineStore("tweets", {
         likeCount: 6,
         quoteCount: 0,
         timestamp: "2021-03-24T15:54:32-0400",
-        replyingTo: null,
+        replyingToTweet: null,
+        replyingToUser: null,
         quoting: null,
         repliesFrom: [], // user and tweet ids
         retweetsFrom: [], // user ids
@@ -90,7 +112,8 @@ export const useTweetStore = defineStore("tweets", {
         likeCount: 712,
         quoteCount: 0,
         timestamp: "2021-03-24T15:54:30-0400",
-        replyingTo: null,
+        replyingToTweet: null,
+        replyingToUser: null,
         quoting: null,
         repliesFrom: [], // user and tweet ids
         retweetsFrom: [], // user ids
@@ -166,7 +189,8 @@ export const useTweetStore = defineStore("tweets", {
       text = "",
       media = [],
       authorId,
-      replyingTo = null
+      replyingToTweet = null,
+      replyingToUser = null
     ) {
       const timestamp = new Date().toISOString();
       const newTweet = {
@@ -180,7 +204,8 @@ export const useTweetStore = defineStore("tweets", {
         likeCount: 0,
         quoteCount: 0,
         timestamp: new Date().toISOString(),
-        replyingTo: replyingTo,
+        replyingToTweet: replyingToTweet,
+        replyingToUser: replyingToUser,
         quoting: null,
         repliesFrom: [],
         retweetsFrom: [],

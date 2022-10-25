@@ -25,7 +25,6 @@ const props = defineProps({
   user: Object,
   tweet: Object,
   type: String, // status, retweet, reply, reply-origin
-  retweetedBy: String,
 });
 
 const replyingTo = computed(
@@ -98,11 +97,6 @@ const embedLinks = computed(() => {
   return embedArr.join(" ");
 });
 
-const currentTime = ref(dayjs().toISOString());
-const getTimeSinceCreation = ref(
-  formatDateMixin.formatTweetDate(props.tweet.timestamp, currentTime.value)
-);
-
 onMounted(() => {
   // set tweet text
   tweetText.value.innerHTML = embedLinks.value || ""; // dangerous
@@ -114,169 +108,162 @@ onMounted(() => {
       app.viewUserProfile(users.getUserByUsername(anchor.dataset.username).id);
     })
   );
-  // update tweet time every 30s (if tweet isn't a day old);
-  if (dayjs(currentTime.value).diff(dayjs(props.tweet.timestamp), "hour") > 23)
-    return;
-  const timer = setInterval(() => {
-    if (
-      getTimeSinceCreation.value !==
-      formatDateMixin.formatTweetDate(props.tweet.timestamp, currentTime.value)
-    ) {
-      getTimeSinceCreation.value = formatDateMixin.formatTweetDate(
-        props.tweet.timestamp,
-        currentTime.value
-      );
-    }
-  }, 30000);
   return () => {
     Array.from(anchors).forEach((anchor) =>
       anchor.removeEventListener("click", doSomething)
     );
-    clearInterval(timer);
   };
 });
 </script>
 
 <template>
   <div class="tweet-container" @click="setTweetContext">
-    <div
-      class="user-retweet gray-text"
-      v-if="props.type === 'retweet' && props.retweetedBy"
-    >
-      <v-icon name="la-retweet-solid" scale="0.89" fill="#ffffff80" />{{
-        props.retweetedBy
-      }}
-      Retweeted
-    </div>
     <div class="tweet-body">
-      <div class="profile-pic-container">
-        <ProfilePicture
-          :url="props.user.avatarUrl"
-          :size="48"
-          @click.stop="app.viewUserProfile(props.user.id)"
-        />
-      </div>
-      <div class="tweet-data">
-        <div class="user-info-and-btn">
-          <div class="user-info-wrapper">
-            <span
-              class="display-name"
-              @click.stop="app.viewUserProfile(props.user.id)"
-              ><a href="#">{{ props.user.name }}</a></span
-            >
-            <span
-              class="username gray-text"
-              @click.stop="app.viewUserProfile(props.user.id)"
-              ><a href="#">@{{ props.user.username }}</a></span
-            >
-            <span class="separator gray-text">·</span>
-            <span class="tweet-time gray-text">{{ getTimeSinceCreation }}</span>
-          </div>
-          <span
-            class="tweet-action-icon extra-btn"
-            @click.stop="toggleTweetMenu"
-            ><v-icon name="hi-dots-horizontal" scale="1.0" fill="#ffffff80" />
-            <div v-if="isTweetMenuOpen" class="overlay"></div>
-            <div v-if="isTweetMenuOpen" class="tweet-menu-container">
-              <ul class="tweet-menu-list">
-                <li
-                  class="tweet-menu-item delete-tweet"
-                  v-if="app.currentId == props.user.id"
-                  @click="deleteTweet"
-                >
-                  <span class="tweet-menu-icon"
-                    ><v-icon name="bi-trash" scale="1.1" fill="red" /></span
-                  >Delete
-                </li>
-                <li
-                  class="tweet-menu-item"
-                  v-if="users.canFollow(app.currentId, props.user.id)"
-                  @click="users.followUser(app.currentId, props.user.id)"
-                >
-                  <span class="tweet-menu-icon"
-                    ><v-icon
-                      name="co-user-follow"
-                      scale="1.1"
-                      fill="#ffffff80" /></span
-                  >Follow @{{ props.user.username }}
-                </li>
-                <li
-                  class="tweet-menu-item"
-                  v-if="users.canUnfollow(app.currentId, props.user.id)"
-                  @click="users.unfollowUser(app.currentId, props.user.id)"
-                >
-                  <span class="tweet-menu-icon"
-                    ><v-icon
-                      name="co-user-unfollow"
-                      scale="1.1"
-                      fill="#ffffff80" /></span
-                  >Unfollow @{{ props.user.username }}
-                </li>
-                <button class="cancel-btn">Cancel</button>
-              </ul>
-            </div></span
-          >
+      <div class="profile-pic-and-user">
+        <div class="profile-pic-container">
+          <ProfilePicture
+            :url="props.user.avatarUrl"
+            :size="48"
+            @click.stop="app.viewUserProfile(props.user.id)"
+          />
         </div>
-        <div class="tweet-content">
-          <div class="replying-to" v-if="props.tweet.type === 'reply'">
-            <span class="gray-text">Replying to </span>
-            <a
-              class="blue-link"
-              @click.stop="app.viewUserProfile(props.tweet.replyingToUser)"
-              >@{{ replyingTo }}</a
-            >
-          </div>
-          <div class="tweet-text" ref="tweetText">{{ embedLinks }}</div>
-          <div
-            class="tweet-media"
-            :class="[getMediaClass(props.tweet.media)]"
-            v-if="props.tweet.media.length > 0"
-          >
-            <div
-              class="image-preview-wrapper"
-              v-for="img in props.tweet.media"
-              :key="props.tweet.media.indexOf(img)"
-            >
-              <img :src="img" />
+        <div class="tweet-data">
+          <div class="user-info-and-btn">
+            <div class="user-info-wrapper">
+              <span
+                class="display-name"
+                @click.stop="app.viewUserProfile(props.user.id)"
+                ><a href="#">{{ props.user.name }}</a></span
+              >
+              <span
+                class="username gray-text"
+                @click.stop="app.viewUserProfile(props.user.id)"
+                ><a href="#">@{{ props.user.username }}</a></span
+              >
             </div>
+            <span
+              class="tweet-action-icon extra-btn"
+              @click.stop="toggleTweetMenu"
+              ><v-icon name="hi-dots-horizontal" scale="1.0" fill="#ffffff80" />
+              <div v-if="isTweetMenuOpen" class="overlay"></div>
+              <div v-if="isTweetMenuOpen" class="tweet-menu-container">
+                <ul class="tweet-menu-list">
+                  <li
+                    class="tweet-menu-item delete-tweet"
+                    v-if="app.currentId == props.user.id"
+                    @click="deleteTweet"
+                  >
+                    <span class="tweet-menu-icon"
+                      ><v-icon name="bi-trash" scale="1.1" fill="red" /></span
+                    >Delete
+                  </li>
+                  <li
+                    class="tweet-menu-item"
+                    v-if="users.canFollow(app.currentId, props.user.id)"
+                    @click="users.followUser(app.currentId, props.user.id)"
+                  >
+                    <span class="tweet-menu-icon"
+                      ><v-icon
+                        name="co-user-follow"
+                        scale="1.1"
+                        fill="#ffffff80" /></span
+                    >Follow @{{ props.user.username }}
+                  </li>
+                  <li
+                    class="tweet-menu-item"
+                    v-if="users.canUnfollow(app.currentId, props.user.id)"
+                    @click="users.unfollowUser(app.currentId, props.user.id)"
+                  >
+                    <span class="tweet-menu-icon"
+                      ><v-icon
+                        name="co-user-unfollow"
+                        scale="1.1"
+                        fill="#ffffff80" /></span
+                    >Unfollow @{{ props.user.username }}
+                  </li>
+                  <button class="cancel-btn">Cancel</button>
+                </ul>
+              </div></span
+            >
           </div>
         </div>
+      </div>
+      <div class="tweet-content">
+        <div class="replying-to" v-if="props.tweet.type === 'reply'">
+          <span class="gray-text">Replying to </span>
+          <a
+            class="blue-link"
+            @click.stop="app.viewUserProfile(props.tweet.replyingToUser)"
+            >@{{ replyingTo }}</a
+          >
+        </div>
+        <div class="tweet-text" ref="tweetText">{{ embedLinks }}</div>
+        <div
+          class="tweet-media"
+          :class="[getMediaClass(props.tweet.media)]"
+          v-if="props.tweet.media.length > 0"
+        >
+          <div
+            class="image-preview-wrapper"
+            v-for="img in props.tweet.media"
+            :key="props.tweet.media.indexOf(img)"
+          >
+            <img :src="img" />
+          </div>
+        </div>
+      </div>
 
-        <div class="tweet-actions-wrapper">
-          <span class="tweet-metrics">
-            <span class="tweet-action-icon reply-btn" @click.stop="doSomething"
-              ><v-icon name="fa-regular-comment" scale="1.0" fill="#ffffff80"
-            /></span>
-            <span class="tweet-metric reply-metric gray-text">{{
-              props.tweet.replyCount || ""
-            }}</span>
-          </span>
-          <span class="tweet-metrics">
-            <span
-              class="tweet-action-icon retweet-btn"
-              :class="{ retweeted: isRetweeted }"
-              @click.stop="toggleRetweet"
-              ><v-icon name="la-retweet-solid" scale="1.15" fill="#ffffff80"
-            /></span>
-            <span class="tweet-metric retweet-metric gray-text">{{
-              props.tweet.retweetCount || ""
-            }}</span>
-          </span>
-          <span class="tweet-metrics">
-            <span
-              class="tweet-action-icon like-btn"
-              :class="{ liked: isLiked }"
-              @click.stop="toggleLike"
-              ><v-icon name="fa-regular-heart" scale="1.0" fill="#ffffff80"
-            /></span>
-            <span class="tweet-metric like-metric gray-text">{{
-              props.tweet.likeCount || ""
-            }}</span>
-          </span>
+      <div class="date-and-time">
+        <span class="tweet-time gray-text">{{
+          formatDateMixin.formatTime(props.tweet.timestamp)
+        }}</span>
+        <span class="separator gray-text">·</span>
+        <span class="tweet-time gray-text">{{
+          formatDateMixin.formatFullDate(props.tweet.timestamp)
+        }}</span>
+      </div>
+
+      <div
+        class="tweet-metrics-wrapper"
+        v-if="props.tweet.retweetCount > 0 || props.tweet.likeCount > 0"
+      >
+        <span class="tweet-metric" v-if="props.tweet.retweetCount > 0"
+          ><strong>{{ props.tweet.retweetCount }}</strong>
+          <span class="gray-text"> Retweets</span></span
+        >
+        <span class="tweet-metric" v-if="props.tweet.likeCount > 0"
+          ><strong>{{ props.tweet.likeCount }}</strong>
+          <span class="gray-text"> Likes</span></span
+        >
+      </div>
+
+      <div class="tweet-actions-wrapper">
+        <div class="tweet-action-container">
+          <span class="tweet-action-icon reply-btn" @click.stop="doSomething"
+            ><v-icon name="fa-regular-comment" scale="1.3" fill="#ffffff80"
+          /></span>
+        </div>
+        <div class="tweet-action-container">
+          <span
+            class="tweet-action-icon retweet-btn"
+            :class="{ retweeted: isRetweeted }"
+            @click.stop="toggleRetweet"
+            ><v-icon name="la-retweet-solid" scale="1.45" fill="#ffffff80"
+          /></span>
+        </div>
+        <div class="tweet-action-container">
+          <span
+            class="tweet-action-icon like-btn"
+            :class="{ liked: isLiked }"
+            @click.stop="toggleLike"
+            ><v-icon name="fa-regular-heart" scale="1.3" fill="#ffffff80"
+          /></span>
+        </div>
+        <div class="tweet-action-container">
           <span
             class="tweet-action-icon share-tweet-btn"
             @click.stop="doSomething"
-            ><v-icon name="gi-share" scale="1.0" fill="#ffffff80"
+            ><v-icon name="gi-share" scale="1.3" fill="#ffffff80"
           /></span>
         </div>
       </div>
@@ -284,7 +271,7 @@ onMounted(() => {
   </div>
 </template>
 
-<style>
+<style scoped>
 .blue-link:focus {
   outline: 0;
 }
@@ -302,23 +289,21 @@ onMounted(() => {
   background-color: rgba(255, 255, 255, 0.065);
 }
 
-.user-retweet {
-  display: flex;
-  justify-content: flex-start;
-  align-items: center;
-  width: 100%;
-  padding-left: 10%;
-  margin-bottom: 3px;
-}
-
 .tweet-body {
   display: flex;
-  flex-direction: row;
-  gap: 1rem;
+  flex-direction: column;
+  gap: 0;
+}
+
+.profile-pic-and-user {
+  width: 100%;
+  display: flex;
+  gap: 0.5rem;
 }
 
 .profile-pic-container {
   height: 100%;
+  width: fit-content;
 }
 
 .tweet-data {
@@ -328,7 +313,7 @@ onMounted(() => {
 .user-info-and-btn {
   width: 100%;
   max-width: 505px;
-  height: 1rem;
+  height: 100%;
   margin-bottom: 6px;
   display: flex;
   flex-direction: row;
@@ -337,12 +322,9 @@ onMounted(() => {
 }
 
 .user-info-wrapper {
-  height: fit-content;
-  display: flex;
-  max-width: 93%;
-  width: 60vw;
-  flex-grow: 1;
-  column-gap: 5px;
+  flex-direction: column;
+  height: 100%;
+  justify-content: center;
 }
 
 .display-name,
@@ -379,26 +361,49 @@ onMounted(() => {
 .tweet-content {
   display: flex;
   flex-direction: column;
-  margin-bottom: 0.4rem;
+  margin-bottom: 0;
+  margin-top: 0.7rem;
 }
 
-.replying-to {
-  margin-bottom: 0.4rem;
+.date-and-time {
+  margin: 0.8rem 0;
+  display: flex;
+  gap: 0.5rem;
+}
+
+.tweet-metrics-wrapper {
+  width: 100%;
+  height: 54px;
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  align-items: center;
+  border-top: rgba(255, 255, 255, 0.2) 1px solid;
 }
 
 .tweet-actions-wrapper {
-  max-width: 425px;
   width: 100%;
+  max-width: 100%;
+  padding: 0.6rem 0 0.5rem 0;
   display: flex;
   flex-direction: row;
-  justify-content: space-between;
+  justify-content: center;
   align-items: center;
+  border-top: rgba(255, 255, 255, 0.2) 1px solid;
+}
+
+.tweet-action-container {
+  flex: 1;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .tweet-action-icon {
   width: 34px;
   height: 34px;
-  border-radius: 999px;
+  border-radius: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -459,16 +464,15 @@ svg {
   z-index: 0;
 }
 
-.tweet-metrics {
-  user-select: none;
+.tweet-metrics-wrapper {
   position: relative;
-  left: -8px;
   display: flex;
   align-items: center;
+  gap: 1rem;
 }
 
 .tweet-metric {
-  width: 32px;
+  width: fit-content;
   position: relative;
   left: 0px;
   font-size: 0.9rem;

@@ -40,17 +40,21 @@ const handleInput = () => {
   resizeTextArea();
 };
 
-const postTweet = () => {
+const postTweet = (tweetId) => {
   if (noContent.value) return;
   let type = "status";
   let firstStr = str.value.split(" ")[0];
-  let replyingTo = null;
-  if (atRegex.test(firstStr)) {
-    type = "reply";
-    if (users.getUserByUsername(firstStr.replace("@", "")))
-      replyingTo = users.getUserByUsername(firstStr.replace("@", ""));
-  }
-  tweetStore.addTweet(type, str.value, images.value, user.value.id, replyingTo);
+  let replyingToUser = null;
+  if (firstStr[0] === "@" && users.getUserByUsername(firstStr.replace("@", "")))
+    replyingToUser = users.getUserByUsername(firstStr.replace("@", "")).id;
+  tweetStore.addTweet(
+    type,
+    str.value,
+    images.value,
+    user.value.id,
+    tweetId,
+    replyingToUser
+  );
   str.value = "";
   images.value = [];
 };
@@ -136,7 +140,7 @@ onMounted(() => {
           <button
             class="new-tweet-btn"
             :disabled="isRedRange || noContent"
-            @click="postTweet"
+            @click="postTweet(null)"
           >
             Tweet
           </button>

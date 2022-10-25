@@ -59,7 +59,7 @@ const tweets = computed(() => {
           (tweet) =>
             tweet.type === "status" ||
             (tweet.type === "reply" &&
-              tweet.data.replyingTo == tweet.data.authorId) // self reply
+              tweet.data.replyingToUser == tweet.data.authorId) // self reply
         )
         .concat(mapFromRetweets())
         .sort((a, b) =>

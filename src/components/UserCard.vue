@@ -16,7 +16,7 @@ const props = defineProps([
 </script>
 
 <template>
-  <div class="user-container">
+  <div class="user-container" @click="app.viewUserProfile(props.id)">
     <div class="profile-pic-container">
       <ProfilePicture
         :url="props.avatarUrl"
@@ -51,7 +51,7 @@ const props = defineProps([
 .user-container {
   border-top: rgba(255, 255, 255, 0.25) 1px solid;
   padding: 1rem 1.25rem;
-  width: 598px;
+  max-width: 598px;
   display: flex;
   flex-direction: row;
   cursor: pointer;
@@ -61,6 +61,13 @@ const props = defineProps([
 .user-container:hover {
   background-color: rgba(255, 255, 255, 0.065);
 }
+
+.user-body {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
 .user-info-and-btn {
   display: flex;
   flex-direction: row;
@@ -71,6 +78,7 @@ const props = defineProps([
 
 .user-info-wrapper {
   flex-direction: column;
+  width: 30vw;
 }
 
 .username-wrapper {
@@ -89,7 +97,6 @@ const props = defineProps([
   padding: 0 4px;
   display: flex;
   align-items: center;
-  flex-wrap: nowrap;
   word-wrap: normal;
   word-break: normal;
   white-space: nowrap;

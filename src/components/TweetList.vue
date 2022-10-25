@@ -2,12 +2,10 @@
 import { defineProps, computed } from "vue";
 import { useUsersStore } from "@/stores/users.js";
 import { useAppStore } from "@/stores/app.js";
-import { storeToRefs } from "pinia";
 import TweetCard from "./TweetCard.vue";
 
 const users = useUsersStore();
 const app = useAppStore();
-const viewTweetId = computed(() => app.viewTweetId);
 
 const tweets = defineProps({ tweets: Array });
 /* example ( i don't like how it's structured either but whatever )
@@ -28,7 +26,6 @@ const tweets = defineProps({ tweets: Array });
         :tweet="tweet.data"
         :type="tweet.type"
         :retweetedBy="tweet.retweetedBy"
-        :viewing="viewTweetId == tweet.data.id"
       />
     </TransitionGroup>
     <div class="error gray-text" v-else>No tweets to display</div>

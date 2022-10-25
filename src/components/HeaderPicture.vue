@@ -19,6 +19,6 @@ const props = defineProps({
   aspect-ratio: 16 / 6;
   background-color: rgb(88, 95, 102);
   background-size: cover;
-  background-position: center;
+  /* background-position: center; */
 }
 </style>

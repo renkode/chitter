@@ -28,7 +28,7 @@ const tweetObj = {
       quoteCount: NUMBER,
     },
     timestamp: DATE,
-    replyingTo:
+    replyingToTweet:
       {
         userIds: [STRING],
         tweetId: STRING,

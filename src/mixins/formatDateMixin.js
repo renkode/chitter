@@ -53,4 +53,14 @@ export default {
     const date = dayjs(dateString);
     return date.format("MMMM YYYY");
   },
+  formatTime(dateString) {
+    if (!dateString) return "Unknown";
+    const time = dayjs(dateString);
+    return time.format("h:mm A");
+  },
+  formatFullDate(dateString) {
+    if (!dateString) return "Unknown";
+    const date = dayjs(dateString);
+    return date.format("MMM D, YYYY");
+  },
 };
