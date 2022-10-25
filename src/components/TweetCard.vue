@@ -303,6 +303,7 @@ onMounted(() => {
 .tweet-body {
   display: flex;
   flex-direction: row;
+  gap: 1rem;
 }
 
 .profile-pic-container {
@@ -311,12 +312,11 @@ onMounted(() => {
 
 .tweet-data {
   width: 100%;
-  padding-left: 1rem;
 }
 
 .user-info-and-btn {
   width: 100%;
-  max-width: 510px;
+  max-width: 505px;
   height: 1rem;
   margin-bottom: 6px;
   display: flex;
@@ -331,7 +331,7 @@ onMounted(() => {
   max-width: 93%;
   width: 60vw;
   flex-grow: 1;
-  /* max-width: fit-content; */
+  column-gap: 5px;
 }
 
 .display-name,
@@ -349,17 +349,9 @@ onMounted(() => {
   color: white;
 }
 
-.username {
-  margin-left: 4px;
-}
-
 .tweet-time {
   flex-shrink: 0;
   white-space: nowrap;
-}
-
-.separator {
-  margin: 0px 5px;
 }
 
 .tweet-text {

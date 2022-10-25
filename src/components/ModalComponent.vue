@@ -25,19 +25,4 @@ const app = useAppStore();
   background-color: rgba(255, 255, 255, 0.164);
   z-index: 10;
 }
-
-.modal-container {
-  background-color: #262a2e;
-  border-radius: 16px;
-  position: fixed;
-  pointer-events: auto;
-  margin: auto;
-  top: 0;
-  left: 0;
-  bottom: 0;
-  right: 0;
-  max-width: 600px;
-  height: fit-content;
-  z-index: 20;
-}
 </style>

@@ -2,6 +2,7 @@
 import { defineProps, computed } from "vue";
 import ProfilePicture from "./ProfilePicture.vue";
 import HeaderPicture from "./HeaderPicture.vue";
+import FollowButton from "./FollowButton.vue";
 import formatDateMixin from "../mixins/formatDateMixin.js";
 import { useAppStore } from "@/stores/app.js";
 import { useUsersStore } from "@/stores/users.js";
@@ -36,22 +37,19 @@ const openModal = () => {
         >
           Edit Profile
         </button>
-        <button
-          class="following-btn"
-          v-else-if="users.canUnfollow(store.currentId, props.user.id)"
-          @click="users.unfollowUser(store.currentId, props.user.id)"
-        ></button>
-        <button
-          class="follow-btn"
-          v-else-if="users.canFollow(store.currentId, props.user.id)"
-          @click="users.followUser(store.currentId, props.user.id)"
-        >
-          Follow
-        </button>
+        <FollowButton v-else :userId="props.user.id" />
       </div>
       <div class="user-info-wrapper">
         <span class="display-name">{{ props.user.name }}</span>
-        <span class="username gray-text">@{{ props.user.username }}</span>
+        <span class="username-wrapper">
+          <span class="username gray-text"> @{{ props.user.username }} </span>
+          <div
+            v-if="users.isFollowingUser(props.user.id, store.currentId)"
+            class="follows-you gray-text"
+          >
+            Follows you
+          </div>
+        </span>
       </div>
       <span class="description">{{ props.user.description }}</span>
       <span class="misc-info-wrapper">
@@ -85,11 +83,11 @@ const openModal = () => {
         >
       </span>
       <span class="follow-metric-wrapper">
-        <span class="follow-metric"
+        <span class="follow-metric" @click="store.setView('following')"
           ><strong>{{ props.user.followingCount }}</strong
           ><span class="follow gray-text"> Following</span></span
         >
-        <span class="follow-metric"
+        <span class="follow-metric" @click="store.setView('followers')"
           ><strong>{{ props.user.followerCount }}</strong
           ><span class="follow gray-text"> Followers</span></span
         >
@@ -171,8 +169,6 @@ const openModal = () => {
   outline: #262a2e solid 4px;
 }
 
-.follow-btn,
-.following-btn,
 .edit-profile-btn {
   border-radius: 18px;
   cursor: pointer;
@@ -180,20 +176,6 @@ const openModal = () => {
   height: 36px;
   width: fit-content;
   padding: 0 1rem;
-}
-
-.follow-btn {
-  background-color: white;
-  color: black;
-  border: white solid 1px;
-}
-
-.follow-btn:hover {
-  background-color: rgb(228, 228, 228);
-}
-
-.edit-profile-btn,
-.following-btn {
   background-color: #262a2e;
   color: white;
   border: #ffffff80 solid 1px;
@@ -201,30 +183,6 @@ const openModal = () => {
 
 .edit-profile-btn:hover {
   background-color: #becae51e;
-}
-
-.following-btn {
-  width: 95px;
-  transition-duration: 0.1s;
-}
-
-.following-btn::before {
-  content: "Following";
-}
-
-.following-btn:hover {
-  border-color: #f4212e;
-  color: #f4212e;
-  background-color: #f4212f1c;
-}
-
-.following-btn:hover::before {
-  content: "";
-}
-
-.following-btn:hover::after {
-  content: "Unfollow";
-  color: #f4212e;
 }
 
 .user-info-container {
@@ -239,10 +197,29 @@ const openModal = () => {
   display: flex;
   flex-direction: column;
   font-size: 1.05rem;
+  width: 100%;
 }
 
-.username {
-  margin: 0;
+.username-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  height: fit-content;
+  width: 100%;
+}
+
+.follows-you {
+  border-radius: 5px;
+  background-color: rgba(255, 255, 255, 0.12);
+  font-size: 0.7rem;
+  height: 1rem;
+  padding: 0 4px;
+  display: flex;
+  align-items: center;
+  flex-wrap: nowrap;
+  word-wrap: normal;
+  word-break: normal;
+  white-space: nowrap;
 }
 
 .description {

@@ -3,7 +3,7 @@ import { ref, watch, onMounted, computed } from "vue";
 import { useAppStore } from "@/stores/app.js";
 import { useTweetStore } from "@/stores/tweets.js";
 import { useUsersStore } from "@/stores/users.js";
-import TweetListSC from "./TweetListSC.vue";
+import TweetList from "./TweetList.vue";
 import db from "../firebase.js";
 import { collection, getDocs } from "firebase/firestore";
 
@@ -39,7 +39,7 @@ onMounted(() => {
 
 <template>
   <div class="tweet-list-container">
-    <TweetListSC v-if="currentUser" :tweets="localTweets" />
+    <TweetList v-if="currentUser" :tweets="localTweets" />
   </div>
 </template>
 

@@ -200,6 +200,10 @@ export const useUsersStore = defineStore("users", {
       otherUser.followerCount--;
       otherUser.followers.splice(otherUser.followers.indexOf(currentUserId, 1));
     },
+    isFollowingUser(userId, targetId) {
+      const user = this.getUser(userId);
+      return user.following.includes(targetId);
+    },
     canFollow(currentUserId, targetId) {
       if (currentUserId == targetId) return false;
       const currentUser = this.getUser(currentUserId);

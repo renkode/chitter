@@ -3,7 +3,7 @@ import { defineProps, computed } from "vue";
 import { useUsersStore } from "@/stores/users.js";
 import { useAppStore } from "@/stores/app.js";
 import { storeToRefs } from "pinia";
-import TweetSC from "./TweetSC.vue";
+import TweetCard from "./TweetCard.vue";
 
 const users = useUsersStore();
 const app = useAppStore();
@@ -20,7 +20,7 @@ const tweets = defineProps({ tweets: Array });
 <template>
   <div class="tweet-list">
     <TransitionGroup name="fade-down" v-if="tweets && tweets.tweets.length > 0">
-      <TweetSC
+      <TweetCard
         v-for="tweet in tweets.tweets"
         :key="tweet.data.id"
         :id="tweet.data.id"

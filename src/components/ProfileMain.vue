@@ -1,7 +1,7 @@
 <script setup>
 import { ref, onMounted, computed } from "vue";
-import ProfileBioSC from "./ProfileBioSC.vue";
-import TweetListSC from "./TweetListSC.vue";
+import ProfileBio from "./ProfileBio.vue";
+import TweetList from "./TweetList.vue";
 import { useUsersStore } from "@/stores/users.js";
 import { useTweetStore } from "@/stores/tweets.js";
 import { useAppStore } from "@/stores/app.js";
@@ -41,7 +41,7 @@ const mapFromLikes = () => {
   }));
 };
 
-// filter suitable tweets then map to an object usable by TweetListSC
+// filter suitable tweets then map to an object usable by TweetList
 // idk how i managed to implement this within an hour with minimal bugs but i will not question it
 const tweets = computed(() => {
   switch (tab.value) {
@@ -71,9 +71,9 @@ const tweets = computed(() => {
 
 <template>
   <div class="profile-wrapper">
-    <ProfileBioSC v-if="user" :user="user" :tab="tab" :setTab="setTab" />
+    <ProfileBio v-if="user" :user="user" :tab="tab" :setTab="setTab" />
     <div class="error gray-text" v-else>User not found.</div>
-    <TweetListSC :tweets="tweets" />
+    <TweetList :tweets="tweets" />
   </div>
 </template>
 

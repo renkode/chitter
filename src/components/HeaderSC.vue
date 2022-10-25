@@ -13,13 +13,23 @@ const user = computed(() => users.getUser(app.viewProfileId));
 <template>
   <div class="page-header">
     <span
-      v-if="app.view === 'tweet' || app.view === 'profile'"
+      v-if="
+        app.view === 'tweet' ||
+        app.view === 'profile' ||
+        app.view === 'followers' ||
+        app.view === 'following'
+      "
       class="profile-wrapper"
-      @click="app.setView(app.previousView)"
-      ><span class="back-arrow-btn"
+      ><span
+        v-if="app.view === 'tweet' || app.view === 'profile'"
+        class="back-arrow-btn"
+        @click="app.setView(app.previousView)"
         ><v-icon name="md-arrowback" scale="1.1" fill="#ffffff80"
       /></span>
-      <div class="user-info-wrapper" v-if="app.view === 'profile'">
+      <span v-else class="back-arrow-btn" @click="app.setView('profile')"
+        ><v-icon name="md-arrowback" scale="1.1" fill="#ffffff80"
+      /></span>
+      <div class="user-info-wrapper" v-if="app.view !== 'tweet'">
         <span class="display-name">{{ user.name }}</span>
         <span class="total-tweet-count gray-text"
           >{{ user.tweetCount }} Tweets</span

@@ -3,10 +3,11 @@ import { onMounted } from "vue";
 import MenuSidebar from "./components/MenuSidebar.vue";
 import MediaSidebar from "./components/MediaSidebar.vue";
 import HeaderSC from "./components/HeaderSC.vue";
-import ComposeTweetSC from "./components/ComposeTweetSC.vue";
+import ComposeTweet from "./components/ComposeTweet.vue";
 import TimelineMain from "./components/TimelineMain.vue";
 import LocalTimeline from "./components/LocalTimeline.vue";
 import ProfileMain from "./components/ProfileMain.vue";
+import FollowLists from "./components/FollowLists.vue";
 import LoadSpinner from "./components/LoadSpinner.vue";
 import ModalComponent from "./components/ModalComponent.vue";
 import { useAppStore } from "@/stores/app.js";
@@ -27,7 +28,7 @@ onMounted(() => {
       <HeaderSC />
 
       <template v-if="app.view === 'home'">
-        <ComposeTweetSC v-if="app.currentUser" />
+        <ComposeTweet v-if="app.currentUser" />
         <Transition name="fade">
           <Suspense>
             <template #default> <LocalTimeline /> </template>
@@ -37,7 +38,7 @@ onMounted(() => {
       </template>
 
       <template v-if="app.view === 'explore'">
-        <ComposeTweetSC v-if="app.currentUser" />
+        <ComposeTweet v-if="app.currentUser" />
         <Transition name="fade">
           <Suspense>
             <template #default> <TimelineMain /> </template>
@@ -50,6 +51,15 @@ onMounted(() => {
         <Transition name="fade">
           <Suspense>
             <template #default> <ProfileMain /> </template>
+            <template #fallback> <LoadSpinner /> </template>
+          </Suspense>
+        </Transition>
+      </template>
+
+      <template v-if="app.view === 'followers' || app.view === 'following'">
+        <Transition name="fade">
+          <Suspense>
+            <template #default> <FollowLists /> </template>
             <template #fallback> <LoadSpinner /> </template>
           </Suspense>
         </Transition>
