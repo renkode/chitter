@@ -192,9 +192,10 @@ export const useTweetStore = defineStore("tweets", {
       replyingToTweet = null,
       replyingToUser = null
     ) {
+      const id = this.tweets.length + 1;
       const timestamp = new Date().toISOString();
       const newTweet = {
-        id: this.tweets.length + 1,
+        id,
         type,
         text,
         media: [...media],
@@ -203,7 +204,7 @@ export const useTweetStore = defineStore("tweets", {
         retweetCount: 0,
         likeCount: 0,
         quoteCount: 0,
-        timestamp: new Date().toISOString(),
+        timestamp,
         replyingToTweet: replyingToTweet,
         replyingToUser: replyingToUser,
         quoting: null,
@@ -212,7 +213,11 @@ export const useTweetStore = defineStore("tweets", {
         quotesFrom: [],
         likesFrom: [],
       };
-      this.tweets.unshift(newTweet); // is this a good idea?
+      this.tweets.unshift(newTweet);
+
+      if (type === "reply" && replyingToTweet) {
+        this.getTweet(replyingToTweet).repliesFrom.push(newTweet.id);
+      }
 
       const users = useUsersStore();
       const containsMedia = media.length > 0 ? true : false;

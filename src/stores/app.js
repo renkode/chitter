@@ -15,6 +15,7 @@ export const useAppStore = defineStore("app", {
     profileTab: "tweets", // tweets (default) | tweets-and-replies | media | likes
     showModal: false,
     modalType: "status", // status | reply | edit-profile | retweet-list | like-list
+    modalReply: { userId: null, tweetId: null },
     NUM_INITIAL_TWEETS: 5,
     NUM_LOAD_OLDER_TWEETS: 3,
   }),
@@ -75,6 +76,7 @@ export const useAppStore = defineStore("app", {
     },
     toggleModal() {
       this.showModal = !this.showModal;
+      if (!this.showModal) this.modalType = "status"; // FAIL SAFE
     },
     setModalType(type) {
       const types = [
@@ -88,6 +90,9 @@ export const useAppStore = defineStore("app", {
         throw Error("wrong modal type");
       }
       this.modalType = type;
+    },
+    setModalReply(userId, tweetId) {
+      this.modalReply = { userId, tweetId };
     },
   },
 });

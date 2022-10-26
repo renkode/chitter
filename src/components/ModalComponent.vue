@@ -2,6 +2,7 @@
 import { useAppStore } from "@/stores/app";
 import ModalProfile from "./ModalProfile.vue";
 import ModalUserList from "./ModalUserList.vue";
+import ModalComposeTweet from "./ModalComposeTweet.vue";
 const app = useAppStore();
 </script>
 
@@ -11,6 +12,9 @@ const app = useAppStore();
       <ModalProfile v-if="app.modalType === 'edit-profile'" />
       <ModalUserList
         v-if="app.modalType === 'retweet-list' || app.modalType === 'like-list'"
+      />
+      <ModalComposeTweet
+        v-if="app.modalType === 'status' || app.modalType === 'reply'"
       />
     </div>
   </div>
@@ -50,5 +54,56 @@ const app = useAppStore();
   display: flex;
   flex-direction: column;
   align-items: center;
+}
+
+.modal-header {
+  position: sticky;
+  top: 0;
+  background-color: #262a2ea2;
+  height: 53px;
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 1rem;
+  z-index: 21;
+  background-color: rgba(38, 42, 46, 0.836);
+  backdrop-filter: blur(10px);
+  user-select: none;
+}
+
+.header-item-wrapper {
+  display: flex;
+  align-items: center;
+}
+
+.exit-modal-btn {
+  cursor: pointer;
+  position: relative;
+  left: -4px;
+  border-radius: 100%;
+  background-color: rgba(255, 255, 255, 0);
+  width: 32px;
+  height: 32px;
+  transition: background-color 0.15s ease;
+}
+
+.exit-modal-btn:hover {
+  background-color: rgba(255, 255, 255, 0.137);
+}
+
+.header-text {
+  font-size: 1.2rem;
+  margin-left: 1rem;
+}
+
+@media screen and (max-width: 500px) {
+  .modal-container {
+    max-width: 100%;
+    max-height: 100%;
+    width: 100%;
+    height: 100%;
+    border-radius: 0;
+  }
 }
 </style>

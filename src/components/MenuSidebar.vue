@@ -5,7 +5,10 @@ import ProfilePicture from "./ProfilePicture.vue";
 
 const app = useAppStore();
 const user = computed(() => app.currentUser);
-const isCurrentView = computed((view) => view === app.view);
+const showComposeTweet = () => {
+  app.setModalType("status");
+  app.toggleModal();
+};
 </script>
 
 <template>
@@ -55,7 +58,7 @@ const isCurrentView = computed((view) => view === app.view);
           >
         </li>
       </ul>
-      <button class="new-tweet-btn">
+      <button class="new-tweet-btn" @click="showComposeTweet">
         <span class="new-tweet-btn-feather"
           ><v-icon name="gi-feather" scale="1.8"
         /></span>

@@ -101,6 +101,11 @@ const toggleRetweet = () => {
     tweets.removeRetweet(props.id, app.currentId);
   }
 };
+const setReply = () => {
+  app.setModalType("reply");
+  app.setModalReply(props.user.id, props.id);
+  app.toggleModal();
+};
 
 onMounted(() => {
   // set tweet text
@@ -142,9 +147,8 @@ onMounted(() => {
       class="user-retweet gray-text"
       v-if="props.type === 'retweet' && props.retweetedBy"
     >
-      <v-icon name="la-retweet-solid" scale="0.89" fill="#ffffff80" />{{
-        props.retweetedBy
-      }}
+      <v-icon name="la-retweet-solid" scale="0.89" fill="#ffffff80" />
+      {{ props.retweetedBy }}
       Retweeted
     </div>
     <div class="tweet-body">
@@ -248,11 +252,13 @@ onMounted(() => {
 
         <div class="tweet-actions-wrapper">
           <span class="tweet-metrics">
-            <span class="tweet-action-icon reply-btn" @click.stop="doSomething"
+            <span class="tweet-action-icon reply-btn" @click.stop="setReply"
               ><v-icon name="fa-regular-comment" scale="1.0" fill="#ffffff80"
             /></span>
             <span class="tweet-metric reply-metric gray-text">{{
-              props.tweet.replyCount || ""
+              props.tweet.repliesFrom.length > 0
+                ? props.tweet.repliesFrom.length
+                : ""
             }}</span>
           </span>
           <span class="tweet-metrics">
@@ -313,6 +319,7 @@ onMounted(() => {
   width: 100%;
   padding-left: 10%;
   margin-bottom: 3px;
+  gap: 6px;
 }
 
 .tweet-body {
@@ -402,7 +409,7 @@ onMounted(() => {
 .tweet-action-icon {
   width: 34px;
   height: 34px;
-  border-radius: 999px;
+  border-radius: 100%;
   display: flex;
   align-items: center;
   justify-content: center;

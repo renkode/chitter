@@ -90,6 +90,11 @@ const toggleRetweet = () => {
     tweets.removeRetweet(props.id, app.currentId);
   }
 };
+const setReply = () => {
+  app.setModalType("reply");
+  app.setModalReply(props.user.id, props.id);
+  app.toggleModal();
+};
 
 const clickForProfile = (e) => {
   e.stopPropagation();
@@ -255,7 +260,7 @@ onMounted(() => {
 
       <div class="tweet-actions-wrapper">
         <div class="tweet-action-container">
-          <span class="tweet-action-icon reply-btn" @click.stop="doSomething"
+          <span class="tweet-action-icon reply-btn" @click.stop="setReply"
             ><v-icon name="fa-regular-comment" scale="1.3" fill="#ffffff80"
           /></span>
         </div>
@@ -288,21 +293,12 @@ onMounted(() => {
 </template>
 
 <style scoped>
-.blue-link:focus {
-  outline: 0;
+.tweet-container {
+  cursor: auto;
 }
 
-.tweet-container {
-  border-top: rgba(255, 255, 255, 0.25) 1px solid;
-  padding: 0.75rem 1rem 0.4rem 1rem;
-  width: 598px;
-  display: flex;
-  flex-direction: column;
-  cursor: pointer;
-  transition: background-color 0.15s ease;
-}
 .tweet-container:hover {
-  background-color: rgba(255, 255, 255, 0.065);
+  background-color: rgba(255, 255, 255, 0);
 }
 
 .tweet-body {
@@ -322,10 +318,6 @@ onMounted(() => {
   width: fit-content;
 }
 
-.tweet-data {
-  width: 100%;
-}
-
 .user-info-and-btn {
   width: 100%;
   max-width: 505px;
@@ -341,37 +333,6 @@ onMounted(() => {
   flex-direction: column;
   height: 100%;
   justify-content: center;
-}
-
-.display-name,
-.username {
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  min-width: 0px;
-  width: 100%;
-  max-width: fit-content;
-  display: inline-block;
-}
-
-.display-name a {
-  color: white;
-}
-
-.tweet-time {
-  flex-shrink: 0;
-  white-space: nowrap;
-}
-
-.tweet-text {
-  word-break: break-word;
-  word-wrap: break-word;
-  white-space: pre-wrap;
-}
-
-.username a {
-  vertical-align: center;
-  color: rgba(255, 255, 255, 0.5);
 }
 
 .tweet-content {
@@ -417,67 +378,9 @@ onMounted(() => {
 }
 
 .tweet-action-icon {
-  width: 34px;
-  height: 34px;
-  border-radius: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.extra-btn {
-  position: relative;
-  left: 8px;
-}
-
-.tweet-action-icon,
-.tweet-action-icon svg,
-.tweet-metric {
-  transition-property: color, background-color, fill;
-  transition-duration: 0.15s;
-  transition-timing-function: ease;
-}
-
-.reply-btn:hover,
-.share-tweet-btn:hover,
-.extra-btn:hover {
-  background-color: rgba(0, 132, 255, 0.233);
-}
-
-.reply-btn:hover svg,
-.share-tweet-btn:hover svg,
-.extra-btn:hover > svg,
-.reply-btn:hover + .reply-metric {
-  color: rgb(20, 181, 245);
-  fill: rgb(20, 181, 245);
-}
-
-.retweet-btn:hover {
-  background-color: rgba(0, 255, 191, 0.158);
-}
-
-.retweet-btn:hover svg,
-.retweet-btn.retweeted svg,
-.retweet-btn:hover + .retweet-metric,
-.retweet-btn.retweeted + .retweet-metric {
-  color: rgb(16, 211, 169);
-  fill: rgb(16, 211, 169);
-}
-
-.like-btn:hover {
-  background-color: rgba(255, 0, 64, 0.233);
-}
-
-.like-btn:hover svg,
-.like-btn.liked svg,
-.like-btn:hover + .like-metric,
-.like-btn.liked + .like-metric {
-  color: rgb(226, 28, 104);
-  fill: rgb(226, 28, 104);
-}
-
-svg {
-  z-index: 0;
+  cursor: pointer;
+  width: 40px;
+  height: 40px;
 }
 
 .tweet-metrics-wrapper {
@@ -497,129 +400,5 @@ svg {
 
 .tweet-metric:hover {
   text-decoration: underline;
-}
-
-.tweet-media {
-  max-width: 100%;
-  width: fit-content;
-  margin-top: 0.9rem;
-  border: rgba(255, 255, 255, 0.25) 1px solid;
-  border-radius: 20px;
-  overflow: hidden;
-}
-
-.tweet-media img,
-.tweet-media div {
-  position: relative;
-  background-size: cover;
-  display: flex;
-  align-items: center;
-  justify-content: flex-start;
-  max-width: 100%;
-  height: 100%;
-  max-height: 510px;
-  object-fit: cover;
-}
-
-.two-img,
-.three-img,
-.four-img {
-  display: grid;
-  gap: 2px;
-  grid-template-columns: 50% 50%;
-  max-height: 285px;
-  height: 100%;
-  width: 100%;
-}
-
-.three-img {
-  grid-template-columns: 50% 50%;
-  grid-template-rows: 50% 50%;
-  grid-template-areas:
-    "first second"
-    "first third";
-}
-
-.three-img > :first-child {
-  grid-area: first;
-}
-
-.three-img > :nth-child(2) {
-  grid-area: second;
-}
-
-.three-img > :last-child {
-  grid-area: third;
-}
-
-.four-img {
-  grid-template-rows: 50% 50%;
-  grid-template-areas: none;
-}
-
-.three-img img,
-.four-img img {
-  width: 100%;
-}
-
-.tweet-menu-container {
-  border-radius: 10px;
-  box-shadow: 0px 0px 6px rgba(255, 255, 255, 0.3);
-  color: white;
-  position: absolute;
-  min-width: 150px;
-  width: max-content;
-  height: fit-content;
-  z-index: 5;
-  right: 8px;
-  top: 8px;
-  cursor: default;
-  overflow: hidden;
-}
-
-.tweet-menu-container li {
-  display: flex;
-  justify-content: flex-start;
-  align-items: center;
-  cursor: pointer;
-  padding: 0.7em;
-  text-align: center;
-}
-
-.tweet-menu-container li:hover {
-  background-color: rgba(255, 255, 255, 0.137);
-}
-
-.tweet-menu-list {
-  margin: 0;
-}
-
-.tweet-menu-icon {
-  margin-right: 8px;
-}
-
-.overlay {
-  position: fixed;
-  height: 100%;
-  width: 100%;
-  top: 0;
-  left: 0;
-  z-index: 4;
-  cursor: default;
-}
-
-.delete-tweet {
-  color: red;
-}
-
-.cancel-btn {
-  display: none;
-}
-
-@media screen and (max-width: 700px) {
-  .tweet-container {
-    max-width: 600px;
-    width: 100%;
-  }
 }
 </style>

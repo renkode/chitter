@@ -1,5 +1,5 @@
 <script setup>
-import { defineProps, computed } from "vue";
+import { defineProps, computed, onMounted } from "vue";
 import { useUsersStore } from "@/stores/users.js";
 import { useAppStore } from "@/stores/app.js";
 import TweetCard from "./TweetCard.vue";
@@ -7,19 +7,20 @@ import TweetCard from "./TweetCard.vue";
 const users = useUsersStore();
 const app = useAppStore();
 
-const tweets = defineProps({ tweets: Array });
+const props = defineProps({ tweets: Array });
 /* example ( i don't like how it's structured either but whatever )
 { data: tweetObj,
   type: "retweet",
   retweetedBy: "user's name"
 }*/
+const tweets = computed(() => props.tweets.filter((tweet) => !!tweet)); // FAILSAFE, weed out undefined tweets
 </script>
 
 <template>
   <div class="tweet-list">
-    <TransitionGroup name="fade-down" v-if="tweets && tweets.tweets.length > 0">
+    <TransitionGroup name="fade-down" v-if="tweets && tweets.length > 0">
       <TweetCard
-        v-for="tweet in tweets.tweets"
+        v-for="tweet in tweets"
         :key="tweet.data.id"
         :id="tweet.data.id"
         :user="users.getUser(tweet.data.authorId)"

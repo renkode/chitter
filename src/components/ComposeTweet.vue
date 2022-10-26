@@ -1,5 +1,5 @@
 <script setup>
-import { onMounted, ref, computed, watch } from "vue";
+import { onMounted, ref, computed, watch, defineProps } from "vue";
 import ProfilePicture from "./ProfilePicture.vue";
 import { useAppStore } from "@/stores/app";
 import { useTweetStore } from "@/stores/tweets";
@@ -9,6 +9,9 @@ import { getMediaClass, atRegex } from "../mixins/utilities.js";
 const app = useAppStore();
 const tweetStore = useTweetStore();
 const users = useUsersStore();
+
+const props = defineProps(["isModal"]);
+
 const textArea = ref(null);
 const circle = ref(null);
 const images = ref([]);
@@ -22,6 +25,9 @@ const maxedImages = computed(() => images.value.length === 4);
 const charactersLeft = computed(() => 280 - str.value.length);
 const isYellowRange = computed(() => charactersLeft.value <= 20);
 const isRedRange = computed(() => charactersLeft.value <= 0);
+// const replyingTo = computed(
+//   () => users.getUser(props.replyingToUserId).username
+// );
 
 const onFileChange = (e) => {
   images.value.push(URL.createObjectURL(e.currentTarget.files[0]));
@@ -40,23 +46,30 @@ const handleInput = () => {
   resizeTextArea();
 };
 
-const postTweet = (tweetId) => {
+const postTweet = () => {
   if (noContent.value) return;
-  let type = "status";
+  let type = app.modalType === "reply" ? "reply" : "status";
   let firstStr = str.value.split(" ")[0];
-  let replyingToUser = null;
-  if (firstStr[0] === "@" && users.getUserByUsername(firstStr.replace("@", "")))
-    replyingToUser = users.getUserByUsername(firstStr.replace("@", "")).id;
+  let replyingToUser = app.modalReply.userId || null;
+  if (
+    type === "status" &&
+    firstStr[0] === "@" &&
+    users.getUserByUsername(firstStr.replace("@", ""))
+  ) {
+    replyingToUser = users.getUserByUsername(firstStr.replace("@", "")).id; // e.g. "@johnsmith lorem ipsum" is a reply
+    type = "reply";
+  }
   tweetStore.addTweet(
     type,
     str.value,
     images.value,
     user.value.id,
-    tweetId,
+    app.modalReply.tweetId,
     replyingToUser
   );
   str.value = "";
   images.value = [];
+  if (app.showModal) app.toggleModal();
 };
 
 // adjust circle percentage and color
@@ -86,11 +99,23 @@ onMounted(() => {
     </div>
     <div class="compose-tweet-body">
       <div class="compose-tweet-content">
+        <!-- <div
+          class="replying-to"
+          v-if="app.modalReply.userId && app.modalReply.tweetId"
+        >
+          <span class="gray-text">Replying to </span>
+          <a
+            class="blue-link"
+            @click.stop="app.viewUserProfile(props.replyingToUserId)"
+            >@{{ replyingTo }}</a
+          >
+        </div> -->
         <textarea
           ref="textArea"
           placeholder="What's happening?"
           @input="handleInput"
           v-model="str"
+          maxlength="280"
         ></textarea>
         <div
           class="tweet-media"
@@ -115,14 +140,14 @@ onMounted(() => {
       <div class="compose-tweet-bar">
         <button class="add-image-btn" :disabled="maxedImages">
           <input
-            id="upload-image"
+            :id="`upload-image-${isModal ? 'modal' : ''}`"
             type="file"
             accept="image/png, image/gif, image/jpeg"
             @change="onFileChange"
             hidden
             :disabled="maxedImages"
           />
-          <label for="upload-image"
+          <label :for="`upload-image-${isModal ? 'modal' : ''}`"
             ><v-icon name="ri-image-add-line" scale="1.1" fill="#1d9bf0" />
           </label>
         </button>
