@@ -21,11 +21,12 @@ var relativeTime = require("dayjs/plugin/relativeTime");
 dayjs.extend(relativeTime);
 
 const props = defineProps({
-  id: Number,
+  id: String,
   user: Object,
   tweet: Object,
   type: String, // status, retweet, reply, reply-origin
   retweetedBy: String,
+  isPreviousReply: Boolean,
 });
 
 const isTweetMenuOpen = ref(false);
@@ -142,7 +143,11 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="tweet-container" @click="setTweetContext">
+  <div
+    class="tweet-container"
+    :class="{ border: !isPreviousReply }"
+    @click="setTweetContext"
+  >
     <div
       class="user-retweet gray-text"
       v-if="props.type === 'retweet' && props.retweetedBy"
@@ -158,6 +163,7 @@ onMounted(() => {
           :size="48"
           @click.stop="app.viewUserProfile(props.user.id)"
         />
+        <div class="gray-line" v-if="isPreviousReply"></div>
       </div>
       <div class="tweet-data">
         <div class="user-info-and-btn">
@@ -300,14 +306,18 @@ onMounted(() => {
 }
 
 .tweet-container {
-  border-top: rgba(255, 255, 255, 0.25) 1px solid;
-  padding: 0.75rem 1rem 0.4rem 1rem;
+  padding: 0.75rem 1rem 0 1rem;
   width: 598px;
   display: flex;
   flex-direction: column;
   cursor: pointer;
   transition: background-color 0.15s ease;
 }
+
+.border {
+  border-top: rgba(255, 255, 255, 0.25) 1px solid;
+}
+
 .tweet-container:hover {
   background-color: rgba(255, 255, 255, 0.065);
 }
@@ -329,7 +339,20 @@ onMounted(() => {
 }
 
 .profile-pic-container {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-self: stretch;
+  align-items: center;
+}
+
+.gray-line {
+  background-color: rgba(255, 255, 255, 0.25);
+  width: 2px;
   height: 100%;
+  position: relative;
+  margin: auto;
 }
 
 .tweet-data {
@@ -404,6 +427,7 @@ onMounted(() => {
   flex-direction: row;
   justify-content: space-between;
   align-items: center;
+  margin-bottom: 0.4rem;
 }
 
 .tweet-action-icon {

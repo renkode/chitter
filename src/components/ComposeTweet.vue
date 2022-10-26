@@ -49,8 +49,10 @@ const handleInput = () => {
 const postTweet = () => {
   if (noContent.value) return;
   let type = app.modalType === "reply" ? "reply" : "status";
+  let replyingToTweet =
+    app.modalType === "reply" ? app.modalReply.tweetId : null;
+  let replyingToUser = app.modalType === "reply" ? app.modalReply.userId : null;
   let firstStr = str.value.split(" ")[0];
-  let replyingToUser = app.modalReply.userId || null;
   if (
     type === "status" &&
     firstStr[0] === "@" &&
@@ -64,7 +66,7 @@ const postTweet = () => {
     str.value,
     images.value,
     user.value.id,
-    app.modalReply.tweetId,
+    replyingToTweet,
     replyingToUser
   );
   str.value = "";

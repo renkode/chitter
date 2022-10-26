@@ -64,6 +64,7 @@ onMounted(() => {
         :tweet="tweet"
         :type="tweet.type"
         :retweetedBy="tweet.retweetedBy"
+        :isPreviousReply="true"
       />
     </template>
     <template
@@ -92,6 +93,7 @@ onMounted(() => {
         :tweet="tweet"
         :type="tweet.type"
         :retweetedBy="tweet.retweetedBy"
+        :isPreviousReply="false"
       />
     </template>
   </div>

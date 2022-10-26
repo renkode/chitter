@@ -1,6 +1,5 @@
 import { createApp } from "vue";
 import { createPinia } from "pinia";
-import withUUID from "vue-uuid";
 import { firestorePlugin } from "vuefire";
 
 import App from "./App.vue";
@@ -57,7 +56,7 @@ addIcons(
 );
 
 const pinia = createPinia();
-const app = withUUID(createApp(App));
+const app = createApp(App);
 app.component("v-icon", OhVueIcon);
 app.use(pinia, firestorePlugin);
 app.mount("#app");

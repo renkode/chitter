@@ -17,7 +17,7 @@ const app = useAppStore();
 const users = useUsersStore();
 
 const props = defineProps({
-  id: Number,
+  id: String,
   user: Object,
   tweet: Object,
   type: String, // status, retweet, reply, reply-origin
@@ -103,7 +103,7 @@ const clickForProfile = (e) => {
 };
 
 const setTweetText = () => {
-  tweetText.value.innerHTML = embedLinks.value;
+  tweetText.value.innerHTML = embedLinks.value || "";
   const anchors = tweetText.value.querySelectorAll(".user-link");
   Array.from(anchors).forEach((anchor) => {
     anchor.removeEventListener("click", clickForProfile); // just in case lol
@@ -295,6 +295,7 @@ onMounted(() => {
 <style scoped>
 .tweet-container {
   cursor: auto;
+  border-top: 0;
 }
 
 .tweet-container:hover {

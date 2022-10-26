@@ -47,7 +47,8 @@ export const useAppStore = defineStore("app", {
       if (view !== "tweet") {
         this.setViewTweetId(null); // note that this means we can't go back if we go thru tweets like a chain
       }
-      this.previousView = this.view;
+      if (view !== "home" && view !== "explore" && view !== "profile")
+        this.previousView = this.view;
       this.view = view;
       console.log(
         `current view: ${this.view}`,

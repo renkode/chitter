@@ -37,7 +37,7 @@ export const useUsersStore = defineStore("users", {
             containsMedia: true,
           },
           {
-            id: 5,
+            id: "5",
             type: "reply",
             timestamp: "2022-10-24T21:21:51.181Z",
             fromUserId: "1",
@@ -49,25 +49,25 @@ export const useUsersStore = defineStore("users", {
         followers: ["2"],
         localTimeline: [
           {
-            id: 5,
+            id: "5",
             type: "reply",
             timestamp: "2022-10-24T21:21:51.181Z",
             fromUserId: "1",
           },
           {
-            id: 2,
+            id: "2",
             type: "status",
             timestamp: "2022-10-24T21:21:54.735Z",
             fromUserId: "1",
           },
           {
-            id: 3,
+            id: "3",
             type: "status",
             timestamp: "2022-10-24T21:21:53.427Z",
             fromUserId: "1",
           },
           {
-            id: 4,
+            id: "4",
             type: "status",
             timestamp: "2022-10-24T21:21:51.181Z",
             fromUserId: "1",
