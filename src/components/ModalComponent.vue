@@ -1,6 +1,7 @@
 <script setup>
 import { useAppStore } from "@/stores/app";
 import ModalProfile from "./ModalProfile.vue";
+import ModalUserList from "./ModalUserList.vue";
 const app = useAppStore();
 </script>
 
@@ -8,6 +9,9 @@ const app = useAppStore();
   <div class="modal-overlay" @click.stop.self="app.toggleModal()">
     <div class="modal-container">
       <ModalProfile v-if="app.modalType === 'edit-profile'" />
+      <ModalUserList
+        v-if="app.modalType === 'retweet-list' || app.modalType === 'like-list'"
+      />
     </div>
   </div>
 </template>
@@ -42,6 +46,9 @@ const app = useAppStore();
   max-height: 75%;
   height: fit-content;
   z-index: 20;
-  overflow-y: scroll;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 </style>

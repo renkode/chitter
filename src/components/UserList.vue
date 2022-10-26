@@ -39,8 +39,13 @@ const props = defineProps(["users"]);
 }
 
 .user-list {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   height: fit-content;
-  width: 598px;
+  max-width: 598px;
+  width: 100%;
+  flex: 1;
 }
 
 @media screen and (max-width: 700px) {

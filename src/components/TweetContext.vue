@@ -1,5 +1,5 @@
 <script setup>
-import { defineProps, ref, computed, watch, onMounted } from "vue";
+import { ref, computed, watch, onMounted } from "vue";
 import TweetCard from "./TweetCard.vue";
 import TweetCardFull from "./TweetCardFull.vue";
 import { useAppStore } from "@/stores/app.js";
@@ -9,7 +9,7 @@ import { useTweetStore } from "@/stores/tweets.js";
 const app = useAppStore();
 const users = useUsersStore();
 const store = useTweetStore();
-// const props = defineProps(["tweet"]);
+
 const tweet = computed(() => store.getTweet(app.viewTweetId));
 const previousTweet = computed(() =>
   store.getTweet(tweet.value.replyingToTweet)

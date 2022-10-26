@@ -28,54 +28,21 @@ const props = defineProps({
   retweetedBy: String,
 });
 
-const replyingTo = computed(
-  () => users.getUser(props.tweet.replyingToUser).username
-);
-
-const setTweetContext = () => {
-  if (app.viewTweetId === props.id) return;
-  if (window.getSelection().toString().length > 0) return; // don't trigger click while highlighting text
-  app.setPath(`/status/${props.id}`);
-  app.setView("tweet");
-  app.setViewTweetId(props.id);
-};
-
 const isTweetMenuOpen = ref(false);
-const toggleTweetMenu = (e) => {
-  e.preventDefault();
-  isTweetMenuOpen.value = !isTweetMenuOpen.value;
-};
+const tweetText = ref(null);
 
-const deleteTweet = () => {
-  tweets.removeTweet(props.id, props.user.id);
-};
-
-const doSomething = (e) => {
-  e.stopPropagation();
-  console.log("test");
-};
-
+const currentTime = ref(dayjs().toISOString());
+const getTimeSinceCreation = ref(
+  formatDateMixin.formatTweetDate(props.tweet.timestamp, currentTime.value)
+);
 const isLiked = computed(() => tweets.hasLiked(props.tweet.id, app.currentId));
 const isRetweeted = computed(() =>
   tweets.hasRetweeted(props.tweet.id, app.currentId)
 );
+const replyingTo = computed(
+  () => users.getUser(props.tweet.replyingToUser).username
+);
 
-const toggleLike = () => {
-  if (!isLiked.value) {
-    tweets.addLike(props.id, app.currentId);
-  } else {
-    tweets.removeLike(props.id, app.currentId);
-  }
-};
-const toggleRetweet = () => {
-  if (!isRetweeted.value) {
-    tweets.addRetweet(props.id, app.currentId);
-  } else {
-    tweets.removeRetweet(props.id, app.currentId);
-  }
-};
-
-const tweetText = ref(null);
 // embed @'s, hashtags and links inside tweets
 const embedLinks = computed(() => {
   if (!props.tweet.text || props.tweet.text.length === 0) return;
@@ -98,10 +65,42 @@ const embedLinks = computed(() => {
   return embedArr.join(" ");
 });
 
-const currentTime = ref(dayjs().toISOString());
-const getTimeSinceCreation = ref(
-  formatDateMixin.formatTweetDate(props.tweet.timestamp, currentTime.value)
-);
+const setTweetContext = () => {
+  if (app.viewTweetId === props.id) return;
+  if (window.getSelection().toString().length > 0) return; // don't trigger click while highlighting text
+  app.setPath(`/status/${props.id}`);
+  app.setView("tweet");
+  app.setViewTweetId(props.id);
+};
+
+const toggleTweetMenu = (e) => {
+  e.preventDefault();
+  isTweetMenuOpen.value = !isTweetMenuOpen.value;
+};
+
+const deleteTweet = () => {
+  tweets.removeTweet(props.id, props.user.id);
+};
+
+const doSomething = (e) => {
+  e.stopPropagation();
+  console.log("test");
+};
+
+const toggleLike = () => {
+  if (!isLiked.value) {
+    tweets.addLike(props.id, app.currentId);
+  } else {
+    tweets.removeLike(props.id, app.currentId);
+  }
+};
+const toggleRetweet = () => {
+  if (!isRetweeted.value) {
+    tweets.addRetweet(props.id, app.currentId);
+  } else {
+    tweets.removeRetweet(props.id, app.currentId);
+  }
+};
 
 onMounted(() => {
   // set tweet text

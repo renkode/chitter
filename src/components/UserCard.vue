@@ -13,21 +13,26 @@ const props = defineProps([
   "avatarUrl",
   "description",
 ]);
+
+const goToProfile = () => {
+  app.viewUserProfile(props.id);
+  if (app.showModal) app.toggleModal();
+};
 </script>
 
 <template>
-  <div class="user-container" @click="app.viewUserProfile(props.id)">
+  <div class="user-container" @click="goToProfile">
     <div class="profile-pic-container">
       <ProfilePicture
         :url="props.avatarUrl"
         :size="48"
-        @click.stop="app.viewUserProfile(props.id)"
+        @click.stop="goToProfile"
       />
     </div>
     <div class="user-body">
       <div class="user-info-and-btn">
         <div class="user-info-wrapper">
-          <span class="display-name" @click.stop="app.viewUserProfile(props.id)"
+          <span class="display-name" @click.stop="goToProfile"
             ><a href="#">{{ props.name }}</a></span
           >
           <span class="username-wrapper">
@@ -57,6 +62,8 @@ const props = defineProps([
   cursor: pointer;
   transition: background-color 0.15s ease;
   gap: 1rem;
+  width: 100%;
+  flex-grow: 1;
 }
 .user-container:hover {
   background-color: rgba(255, 255, 255, 0.065);

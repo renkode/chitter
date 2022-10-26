@@ -1,6 +1,5 @@
 <script setup>
 import { ref, defineProps, computed, onMounted, watch } from "vue";
-import dayjs from "dayjs";
 import ProfilePicture from "./ProfilePicture.vue";
 import formatDateMixin from "../mixins/formatDateMixin.js";
 import {
@@ -17,9 +16,6 @@ const tweets = useTweetStore();
 const app = useAppStore();
 const users = useUsersStore();
 
-var relativeTime = require("dayjs/plugin/relativeTime");
-dayjs.extend(relativeTime);
-
 const props = defineProps({
   id: Number,
   user: Object,
@@ -27,57 +23,17 @@ const props = defineProps({
   type: String, // status, retweet, reply, reply-origin
 });
 
-const tweetContainer = ref(null);
-
-const replyingTo = computed(
-  () => users.getUser(props.tweet.replyingToUser).username
-);
-
-const setTweetContext = () => {
-  if (app.viewTweetId === props.id) return;
-  if (window.getSelection().toString().length > 0) return; // don't trigger click while highlighting text
-  app.setPath(`/status/${props.id}`);
-  app.setView("tweet");
-  app.setViewTweetId(props.id);
-};
-
 const isTweetMenuOpen = ref(false);
-const toggleTweetMenu = (e) => {
-  e.preventDefault();
-  isTweetMenuOpen.value = !isTweetMenuOpen.value;
-};
-
-const deleteTweet = () => {
-  tweets.removeTweet(props.id, props.user.id);
-  if (app.viewTweetId == props.id) app.setViewTweetId(null);
-};
-
-const doSomething = (e) => {
-  e.stopPropagation();
-  console.log("test");
-};
+const tweetText = ref(null);
+const tweetContainer = ref(null);
 
 const isLiked = computed(() => tweets.hasLiked(props.tweet.id, app.currentId));
 const isRetweeted = computed(() =>
   tweets.hasRetweeted(props.tweet.id, app.currentId)
 );
-
-const toggleLike = () => {
-  if (!isLiked.value) {
-    tweets.addLike(props.id, app.currentId);
-  } else {
-    tweets.removeLike(props.id, app.currentId);
-  }
-};
-const toggleRetweet = () => {
-  if (!isRetweeted.value) {
-    tweets.addRetweet(props.id, app.currentId);
-  } else {
-    tweets.removeRetweet(props.id, app.currentId);
-  }
-};
-
-const tweetText = ref(null);
+const replyingTo = computed(
+  () => users.getUser(props.tweet.replyingToUser).username
+);
 // embed @'s, hashtags and links inside tweets
 const embedLinks = computed(() => {
   if (!props.tweet.text || props.tweet.text.length === 0) return;
@@ -100,30 +56,73 @@ const embedLinks = computed(() => {
   return embedArr.join(" ");
 });
 
-watch(embedLinks, () => {
+const toggleModal = (type) => {
+  app.setModalType(type);
+  app.toggleModal();
+};
+
+const toggleTweetMenu = (e) => {
+  e.preventDefault();
+  isTweetMenuOpen.value = !isTweetMenuOpen.value;
+};
+
+const deleteTweet = () => {
+  tweets.removeTweet(props.id, props.user.id);
+  if (app.viewTweetId == props.id) app.setViewTweetId(null);
+};
+
+const doSomething = (e) => {
+  e.stopPropagation();
+  console.log("test");
+};
+
+const toggleLike = () => {
+  if (!isLiked.value) {
+    tweets.addLike(props.id, app.currentId);
+  } else {
+    tweets.removeLike(props.id, app.currentId);
+  }
+};
+const toggleRetweet = () => {
+  if (!isRetweeted.value) {
+    tweets.addRetweet(props.id, app.currentId);
+  } else {
+    tweets.removeRetweet(props.id, app.currentId);
+  }
+};
+
+const clickForProfile = (e) => {
+  e.stopPropagation();
+  if (!users.getUserByUsername(e.target.dataset.username)) return;
+  app.viewUserProfile(users.getUserByUsername(e.target.dataset.username).id);
+};
+
+const setTweetText = () => {
   tweetText.value.innerHTML = embedLinks.value;
   const anchors = tweetText.value.querySelectorAll(".user-link");
-  Array.from(anchors).forEach((anchor) =>
-    anchor.addEventListener("click", (e) => {
-      e.stopPropagation();
-      if (!users.getUserByUsername(anchor.dataset.username)) return;
-      app.viewUserProfile(users.getUserByUsername(anchor.dataset.username).id);
-    })
-  );
+  Array.from(anchors).forEach((anchor) => {
+    anchor.removeEventListener("click", clickForProfile); // just in case lol
+    anchor.addEventListener("click", clickForProfile);
+  });
+};
+
+watch(embedLinks, () => {
+  setTweetText();
 });
 
 onMounted(() => {
+  setTweetText();
   tweetContainer.value.scrollIntoView({ behavior: "smooth", block: "start" });
   return () => {
     Array.from(tweetText.value.querySelectorAll(".user-link")).forEach(
-      (anchor) => anchor.removeEventListener("click", doSomething)
+      (anchor) => anchor.removeEventListener("click", clickForProfile)
     );
   };
 });
 </script>
 
 <template>
-  <div class="tweet-container" @click="setTweetContext" ref="tweetContainer">
+  <div class="tweet-container" ref="tweetContainer">
     <div class="tweet-body">
       <div class="profile-pic-and-user">
         <div class="profile-pic-container">
@@ -238,11 +237,17 @@ onMounted(() => {
         class="tweet-metrics-wrapper"
         v-if="props.tweet.retweetCount > 0 || props.tweet.likeCount > 0"
       >
-        <span class="tweet-metric" v-if="props.tweet.retweetCount > 0"
+        <span
+          class="tweet-metric"
+          v-if="props.tweet.retweetCount > 0"
+          @click="toggleModal('retweet-list')"
           ><strong>{{ props.tweet.retweetCount }}</strong>
           <span class="gray-text"> Retweets</span></span
         >
-        <span class="tweet-metric" v-if="props.tweet.likeCount > 0"
+        <span
+          class="tweet-metric"
+          v-if="props.tweet.likeCount > 0"
+          @click="toggleModal('like-list')"
           ><strong>{{ props.tweet.likeCount }}</strong>
           <span class="gray-text"> Likes</span></span
         >
