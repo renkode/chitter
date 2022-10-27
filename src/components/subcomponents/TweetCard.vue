@@ -2,13 +2,13 @@
 import { ref, defineProps, computed, onMounted } from "vue";
 import dayjs from "dayjs";
 import ProfilePicture from "./ProfilePicture.vue";
-import formatDateMixin from "../mixins/formatDateMixin.js";
+import formatDateMixin from "@/mixins/formatDateMixin.js";
 import {
   getMediaClass,
   urlRegex,
   hashtagRegex,
   atRegex,
-} from "../mixins/utilities.js";
+} from "@/mixins/utilities.js";
 import { useTweetStore } from "@/stores/tweets.js";
 import { useAppStore } from "@/stores/app.js";
 import { useUsersStore } from "@/stores/users.js";
@@ -24,7 +24,7 @@ const props = defineProps({
   id: String,
   user: Object,
   tweet: Object,
-  type: String, // status, retweet, reply, reply-origin
+  type: String, // status, retweet, reply
   retweetedBy: String,
   isPreviousReply: Boolean,
 });
@@ -133,6 +133,7 @@ onMounted(() => {
       );
     }
   }, 30000);
+  // clear on dismount
   return () => {
     Array.from(anchors).forEach((anchor) =>
       anchor.removeEventListener("click", doSomething)

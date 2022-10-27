@@ -2,7 +2,6 @@
 import { computed } from "vue";
 import { useAppStore } from "@/stores/app.js";
 import { useUsersStore } from "@/stores/users.js";
-import { storeToRefs } from "pinia";
 
 const app = useAppStore();
 const users = useUsersStore();
@@ -16,16 +15,20 @@ const user = computed(() => users.getUser(app.viewProfileId));
       v-if="
         app.view === 'tweet' ||
         app.view === 'profile' ||
+        app.view === 'notifications' ||
         app.view === 'followers' ||
         app.view === 'following'
       "
       class="profile-wrapper"
     >
-      <span class="back-arrow-btn" @click="app.setView(app.previousView)"
+      <span class="back-arrow-btn" @click="app.goToLastView()"
         ><v-icon name="md-arrowback" scale="1.1" fill="#ffffff80"
       /></span>
 
-      <div class="user-info-wrapper" v-if="app.view !== 'tweet'">
+      <div
+        class="user-info-wrapper"
+        v-if="app.view !== 'tweet' && app.view !== 'notifications'"
+      >
         <span class="display-name">{{ user.name }}</span>
         <span class="total-tweet-count gray-text"
           >{{ user.tweetCount }} Tweets</span

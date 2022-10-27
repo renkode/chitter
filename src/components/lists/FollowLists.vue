@@ -1,12 +1,9 @@
 <script setup>
-import HeaderSC from "./HeaderSC.vue";
 import UserList from "./UserList.vue";
-import { defineProps, computed } from "vue";
+import { computed } from "vue";
 import { useUsersStore } from "@/stores/users.js";
 import { useAppStore } from "@/stores/app.js";
-import UserCard from "./UserCard.vue";
 
-//const users = useUsersStore();
 const app = useAppStore();
 const users = useUsersStore();
 const user = computed(() => users.getUser(app.viewProfileId));

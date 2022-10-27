@@ -2,7 +2,7 @@
 import { ref, defineProps, onMounted } from "vue";
 import dayjs from "dayjs";
 import ProfilePicture from "./ProfilePicture.vue";
-import formatDateMixin from "../mixins/formatDateMixin.js";
+import formatDateMixin from "@/mixins/formatDateMixin.js";
 
 var relativeTime = require("dayjs/plugin/relativeTime");
 dayjs.extend(relativeTime);

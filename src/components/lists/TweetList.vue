@@ -1,11 +1,9 @@
 <script setup>
-import { defineProps, computed, onMounted } from "vue";
+import { defineProps, computed } from "vue";
 import { useUsersStore } from "@/stores/users.js";
-import { useAppStore } from "@/stores/app.js";
-import TweetCard from "./TweetCard.vue";
+import TweetCard from "../subcomponents/TweetCard.vue";
 
 const users = useUsersStore();
-const app = useAppStore();
 
 const props = defineProps({ tweets: Array });
 /* example ( i don't like how it's structured either but whatever )

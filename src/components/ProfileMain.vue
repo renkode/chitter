@@ -1,7 +1,7 @@
 <script setup>
-import { ref, onMounted, computed } from "vue";
-import ProfileBio from "./ProfileBio.vue";
-import TweetList from "./TweetList.vue";
+import { ref, computed } from "vue";
+import ProfileBio from "./subcomponents/ProfileBio.vue";
+import TweetList from "./lists/TweetList.vue";
 import { useUsersStore } from "@/stores/users.js";
 import { useTweetStore } from "@/stores/tweets.js";
 import { useAppStore } from "@/stores/app.js";

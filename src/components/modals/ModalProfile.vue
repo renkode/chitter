@@ -1,10 +1,11 @@
 <script setup>
 import { ref, watch, computed, onMounted } from "vue";
-import HeaderPicture from "./HeaderPicture.vue";
-import ProfilePicture from "./ProfilePicture.vue";
+import HeaderPicture from "../subcomponents/HeaderPicture.vue";
+import ProfilePicture from "../subcomponents/ProfilePicture.vue";
 import { useAppStore } from "@/stores/app.js";
 import { useUsersStore } from "@/stores/users";
 import { calendar } from "@/mixins/utilities.js";
+
 const app = useAppStore();
 const users = useUsersStore();
 const headerUrl = ref(app.currentUser.headerUrl);
@@ -14,7 +15,6 @@ const usernameInput = ref(app.currentUser.username);
 const bioInput = ref(app.currentUser.description);
 const locationInput = ref(app.currentUser.location);
 const websiteInput = ref(app.currentUser.website);
-const birthdayInput = ref(app.currentUser.birthday);
 
 const nameInputWrapper = ref(null);
 const usernameInputWrapper = ref(null);

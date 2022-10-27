@@ -4,7 +4,7 @@ import ProfilePicture from "./ProfilePicture.vue";
 import { useAppStore } from "@/stores/app";
 import { useTweetStore } from "@/stores/tweets";
 import { useUsersStore } from "@/stores/users";
-import { getMediaClass, atRegex } from "../mixins/utilities.js";
+import { getMediaClass } from "@/mixins/utilities.js";
 
 const app = useAppStore();
 const tweetStore = useTweetStore();
@@ -25,9 +25,6 @@ const maxedImages = computed(() => images.value.length === 4);
 const charactersLeft = computed(() => 280 - str.value.length);
 const isYellowRange = computed(() => charactersLeft.value <= 20);
 const isRedRange = computed(() => charactersLeft.value <= 0);
-// const replyingTo = computed(
-//   () => users.getUser(props.replyingToUserId).username
-// );
 
 const onFileChange = (e) => {
   images.value.push(URL.createObjectURL(e.currentTarget.files[0]));

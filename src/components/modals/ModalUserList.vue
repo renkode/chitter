@@ -1,6 +1,6 @@
 <script setup>
 import { computed } from "vue";
-import UserList from "./UserList.vue";
+import UserList from "../lists/UserList.vue";
 import { useAppStore } from "@/stores/app";
 import { useTweetStore } from "@/stores/tweets";
 import { useUsersStore } from "@/stores/users";

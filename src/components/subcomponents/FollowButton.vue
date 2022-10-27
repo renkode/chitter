@@ -2,6 +2,7 @@
 import { defineProps } from "vue";
 import { useAppStore } from "@/stores/app";
 import { useUsersStore } from "@/stores/users";
+
 const app = useAppStore();
 const users = useUsersStore();
 const props = defineProps(["userId"]);

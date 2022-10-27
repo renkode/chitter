@@ -1,13 +1,13 @@
 <script setup>
 import { ref, defineProps, computed, onMounted, watch } from "vue";
 import ProfilePicture from "./ProfilePicture.vue";
-import formatDateMixin from "../mixins/formatDateMixin.js";
+import formatDateMixin from "@/mixins/formatDateMixin.js";
 import {
   getMediaClass,
   urlRegex,
   hashtagRegex,
   atRegex,
-} from "../mixins/utilities.js";
+} from "@/mixins/utilities.js";
 import { useTweetStore } from "@/stores/tweets.js";
 import { useAppStore } from "@/stores/app.js";
 import { useUsersStore } from "@/stores/users.js";
@@ -20,7 +20,7 @@ const props = defineProps({
   id: String,
   user: Object,
   tweet: Object,
-  type: String, // status, retweet, reply, reply-origin
+  type: String, // status, retweet, reply
 });
 
 const isTweetMenuOpen = ref(false);
@@ -67,8 +67,13 @@ const toggleTweetMenu = (e) => {
 };
 
 const deleteTweet = () => {
+  if (app.viewTweetId == props.id) {
+    if (props.tweet.replyingToTweet)
+      app.setViewTweetId(props.tweet.replyingToTweet);
+  } else {
+    app.setViewTweetId(null);
+  }
   tweets.removeTweet(props.id, props.user.id);
-  if (app.viewTweetId == props.id) app.setViewTweetId(null);
 };
 
 const doSomething = (e) => {

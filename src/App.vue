@@ -2,15 +2,16 @@
 import { onMounted } from "vue";
 import MenuSidebar from "./components/MenuSidebar.vue";
 import MediaSidebar from "./components/MediaSidebar.vue";
-import HeaderSC from "./components/HeaderSC.vue";
-import ComposeTweet from "./components/ComposeTweet.vue";
+import HeaderSC from "./components/subcomponents/HeaderSC.vue";
+import ComposeTweet from "./components/subcomponents/ComposeTweet.vue";
 import TimelineMain from "./components/TimelineMain.vue";
 import LocalTimeline from "./components/LocalTimeline.vue";
+import NotificationMain from "./components/NotificationMain.vue";
 import ProfileMain from "./components/ProfileMain.vue";
 import TweetContext from "./components/TweetContext.vue";
-import FollowLists from "./components/FollowLists.vue";
-import LoadSpinner from "./components/LoadSpinner.vue";
-import ModalComponent from "./components/ModalComponent.vue";
+import FollowLists from "./components/lists/FollowLists.vue";
+import LoadSpinner from "./components/subcomponents/LoadSpinner.vue";
+import ModalComponent from "./components/modals/ModalComponent.vue";
 import { useAppStore } from "@/stores/app.js";
 import { useUsersStore } from "@/stores/users";
 const app = useAppStore();
@@ -48,6 +49,15 @@ onMounted(() => {
         </Transition>
       </template>
 
+      <template v-if="app.view === 'notifications'">
+        <Transition name="fade">
+          <Suspense>
+            <template #default> <NotificationMain /> </template>
+            <template #fallback> <LoadSpinner /> </template>
+          </Suspense>
+        </Transition>
+      </template>
+
       <template v-if="app.view === 'profile'">
         <Transition name="fade">
           <Suspense>
@@ -67,7 +77,12 @@ onMounted(() => {
       </template>
 
       <template v-if="app.view === 'tweet' && app.viewTweetId">
-        <TweetContext />
+        <Transition name="fade">
+          <Suspense>
+            <template #default> <TweetContext /> </template>
+            <template #fallback> <LoadSpinner /> </template>
+          </Suspense>
+        </Transition>
       </template>
     </div>
   </div>

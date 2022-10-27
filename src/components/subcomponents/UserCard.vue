@@ -4,6 +4,7 @@ import ProfilePicture from "./ProfilePicture.vue";
 import FollowButton from "./FollowButton.vue";
 import { useAppStore } from "@/stores/app";
 import { useUsersStore } from "@/stores/users";
+
 const app = useAppStore();
 const users = useUsersStore();
 const props = defineProps([

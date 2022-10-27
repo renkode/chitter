@@ -3,7 +3,7 @@ import { defineProps, computed } from "vue";
 import ProfilePicture from "./ProfilePicture.vue";
 import HeaderPicture from "./HeaderPicture.vue";
 import FollowButton from "./FollowButton.vue";
-import formatDateMixin from "../mixins/formatDateMixin.js";
+import formatDateMixin from "@/mixins/formatDateMixin.js";
 import { useAppStore } from "@/stores/app.js";
 import { useUsersStore } from "@/stores/users.js";
 

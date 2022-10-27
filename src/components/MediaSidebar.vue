@@ -112,6 +112,11 @@ input {
   color: #ffffffd5;
   border: 0;
   height: 44px;
+  width: 100%;
+}
+
+input:focus {
+  outline: 0;
 }
 
 .trending-wrapper {

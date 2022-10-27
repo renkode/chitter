@@ -1,7 +1,7 @@
 <script setup>
 import { ref, computed, watch, onMounted } from "vue";
-import TweetCard from "./TweetCard.vue";
-import TweetCardFull from "./TweetCardFull.vue";
+import TweetCard from "./subcomponents/TweetCard.vue";
+import TweetCardFull from "./subcomponents/TweetCardFull.vue";
 import { useAppStore } from "@/stores/app.js";
 import { useUsersStore } from "@/stores/users.js";
 import { useTweetStore } from "@/stores/tweets.js";
@@ -32,7 +32,7 @@ const fetchPreviousTweets = () => {
     try {
       let lastTweet = store.getTweet(currentTweet.replyingToTweet);
       if (!lastTweet) {
-        previousTweets.value = [null];
+        previousTweets.value.unshift(null);
         break;
       }
       previousTweets.value.unshift(lastTweet);
@@ -55,26 +55,25 @@ onMounted(() => {
 
 <template>
   <div class="tweet-list-container">
-    <template v-if="previousTweets.length > 0 && previousTweets[0]">
-      <TweetCard
-        v-for="tweet in previousTweets"
-        :key="tweet.id"
-        :id="tweet.id"
-        :user="users.getUser(tweet.authorId)"
-        :tweet="tweet"
-        :type="tweet.type"
-        :retweetedBy="tweet.retweetedBy"
-        :isPreviousReply="true"
-      />
-    </template>
-    <template
-      v-else-if="previousTweets.length > 0 && previousTweets[0] == null"
-    >
-      <div class="tweet-container">
-        <div class="deleted-tweet">
-          <span class="gray-text">Tweet has been deleted.</span>
+    <template v-for="tweet in previousTweets">
+      <template v-if="!tweet">
+        <div class="tweet-container" :key="previousTweets.indexOf(tweet)">
+          <div class="deleted-tweet">
+            <span class="gray-text">Tweet has been deleted.</span>
+          </div>
         </div>
-      </div>
+      </template>
+      <template v-else>
+        <TweetCard
+          :key="tweet.id"
+          :id="tweet.id"
+          :user="users.getUser(tweet.authorId)"
+          :tweet="tweet"
+          :type="tweet.type"
+          :retweetedBy="tweet.retweetedBy"
+          :isPreviousReply="true"
+        />
+      </template>
     </template>
     <template v-if="tweet">
       <TweetCardFull

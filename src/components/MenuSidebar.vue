@@ -1,7 +1,7 @@
 <script setup>
 import { computed } from "vue";
 import { useAppStore } from "@/stores/app.js";
-import ProfilePicture from "./ProfilePicture.vue";
+import ProfilePicture from "./subcomponents/ProfilePicture.vue";
 
 const app = useAppStore();
 const user = computed(() => app.currentUser);
@@ -42,6 +42,21 @@ const showComposeTweet = () => {
             class="nav-label"
             :class="{ 'gray-text': app.view !== 'explore' }"
             >Explore</span
+          >
+        </li>
+
+        <li class="nav-item" @click="app.setView('notifications')">
+          <span class="nav-icon"
+            ><v-icon
+              name="co-bell"
+              scale="1.8"
+              :fill="
+                app.view === 'notifications' ? 'white' : '#ffffff80'
+              " /></span
+          ><span
+            class="nav-label"
+            :class="{ 'gray-text': app.view !== 'notifications' }"
+            >Notifications</span
           >
         </li>
 

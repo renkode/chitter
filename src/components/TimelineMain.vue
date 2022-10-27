@@ -2,8 +2,7 @@
 import { onMounted, computed } from "vue";
 import { useAppStore } from "@/stores/app.js";
 import { useTweetStore } from "@/stores/tweets.js";
-import { useUsersStore } from "@/stores/users.js";
-import TweetList from "./TweetList.vue";
+import TweetList from "./lists/TweetList.vue";
 import db from "../firebase.js";
 
 import { collection, getDocs } from "firebase/firestore";

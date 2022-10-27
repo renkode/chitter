@@ -73,6 +73,8 @@ export const useUsersStore = defineStore("users", {
             fromUserId: "1",
           },
         ],
+        newNotifications: [{ fromUser: "2", type: "follow", tweet: null }], // types: follow, like, retweet, reply
+        oldNotifications: [],
       },
       {
         id: "2",
@@ -102,12 +104,12 @@ export const useUsersStore = defineStore("users", {
         following: ["1"],
         followers: [],
         localTimeline: [],
+        newNotifications: [],
+        oldNotifications: [],
       },
     ],
   }),
-  // optional getters
-  getters: {},
-  // optional actions
+  getters: {}, // can't be async so
   actions: {
     getUser(id) {
       return this.users.filter((user) => user.id == id)[0];
@@ -226,6 +228,39 @@ export const useUsersStore = defineStore("users", {
       if (currentUserId == targetId) return false;
       const currentUser = this.getUser(currentUserId);
       return currentUser.following.includes(targetId);
+    },
+    notify(toUserId, fromUserId, type, tweet = null) {
+      const currentUser = this.getUser(toUserId);
+      if (!currentUser) throw new Error("user not found");
+      const newNotif = { fromUser: fromUserId, type, tweet };
+      if (
+        currentUser.newNotifications.filter((n) => n === newNotif).length ===
+          0 &&
+        currentUser.oldNotifications.filter((n) => n === newNotif).length === 0
+      ) {
+        // don't spam the same notif
+        currentUser.newNotifications.unshift(newNotif);
+      }
+    },
+    clearNotifications(userId) {
+      const currentUser = this.getUser(userId);
+      if (!currentUser) throw new Error("user not found");
+      if (currentUser.newNotifications.length === 0) return;
+      currentUser.oldNotifications = [
+        ...currentUser.newNotifications,
+        ...currentUser.oldNotifications,
+      ];
+      currentUser.newNotifications = [];
+    },
+    hasNewNotifications(userId) {
+      const currentUser = this.getUser(userId);
+      if (!currentUser) throw new Error("user not found");
+      return currentUser.newNotifications.length > 0;
+    },
+    getAllNotifications(userId) {
+      const currentUser = this.getUser(userId);
+      if (!currentUser) throw new Error("user not found");
+      return [...currentUser.newNotifications, ...currentUser.oldNotifications];
     },
   },
 });

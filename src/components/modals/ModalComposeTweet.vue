@@ -1,10 +1,11 @@
 <script setup>
-import { computed, watch } from "vue";
-import ComposeTweet from "./ComposeTweet.vue";
-import TweetCardSimple from "./TweetCardSimple.vue";
+import { computed } from "vue";
+import ComposeTweet from "../subcomponents/ComposeTweet.vue";
+import TweetCardSimple from "../subcomponents/TweetCardSimple.vue";
 import { useAppStore } from "@/stores/app.js";
 import { useTweetStore } from "@/stores/tweets.js";
 import { useUsersStore } from "@/stores/users.js";
+
 const app = useAppStore();
 const tweets = useTweetStore();
 const users = useUsersStore();

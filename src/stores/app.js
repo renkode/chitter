@@ -9,7 +9,7 @@ export const useAppStore = defineStore("app", {
     currentUser: null, // initialized on mount
     path: "",
     view: "home", //  timeline (default) | profile | tweet | search
-    previousView: "home",
+    previousViews: ["home"],
     viewTweetId: null,
     viewProfileId: null,
     profileTab: "tweets", // tweets (default) | tweets-and-replies | media | likes
@@ -31,12 +31,16 @@ export const useAppStore = defineStore("app", {
       this.path = str;
       // call router?
     },
+    getLastView() {
+      return this.previousViews[this.previousViews.length - 1];
+    },
     setView(view) {
       if (this.view === view) return;
       const views = [
         "home",
         "explore",
         "profile",
+        "notifications",
         "tweet",
         "followers",
         "following",
@@ -47,13 +51,14 @@ export const useAppStore = defineStore("app", {
       if (view !== "tweet") {
         this.setViewTweetId(null); // note that this means we can't go back if we go thru tweets like a chain
       }
-      if (view !== "home" && view !== "explore" && view !== "profile")
-        this.previousView = this.view;
+      if (view === "tweet" || view === "followers" || view === "following") {
+        if (this.getLastView() !== this.view)
+          this.previousViews.push(this.view);
+      }
       this.view = view;
-      console.log(
-        `current view: ${this.view}`,
-        `previous view: ${this.previousView}`
-      );
+    },
+    goToLastView() {
+      this.setView(this.getLastView());
     },
     setProfileTab(tab) {
       if (this.profileTab === tab) return;

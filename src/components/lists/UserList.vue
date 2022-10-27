@@ -1,6 +1,6 @@
 <script setup>
 import { defineProps } from "vue";
-import UserCard from "./UserCard.vue";
+import UserCard from "../subcomponents/UserCard.vue";
 
 const props = defineProps(["users"]);
 </script>
