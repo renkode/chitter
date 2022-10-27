@@ -131,17 +131,22 @@ export const useTweetStore = defineStore("tweets", {
     getTweet(id) {
       return this.tweets.filter((t) => t.id == id)[0];
     },
-    addLike(id, userId) {
-      const tweet = this.tweets.filter((t) => t.id == id)[0];
+    addLike(id, userId, isRetweet) {
+      const tweet = this.getTweet(id);
       if (!tweet) throw new Error(`tweet id ${id} does not exist`);
       tweet.likeCount++;
       tweet.likesFrom.push(userId);
 
       const users = useUsersStore();
       users.addLike(userId, id);
+      if (/*tweet.authorId !== userId*/ userId) {
+        isRetweet
+          ? users.notify(tweet.authorId, userId, "like-retweet", id)
+          : users.notify(tweet.authorId, userId, "like-origin", id);
+      }
     },
     removeLike(id, userId) {
-      const tweet = this.tweets.filter((t) => t.id == id)[0];
+      const tweet = this.getTweet(id);
       if (!tweet) throw new Error(`tweet id ${id} does not exist`);
       tweet.likeCount--;
       tweet.likesFrom.splice(tweet.likesFrom.indexOf(userId), 1);
@@ -150,12 +155,12 @@ export const useTweetStore = defineStore("tweets", {
       users.removeLike(userId, id);
     },
     hasLiked(id, userId) {
-      const tweet = this.tweets.filter((t) => t.id == id)[0];
+      const tweet = this.getTweet(id);
       if (!tweet) return false;
       return tweet.likesFrom.includes(userId);
     },
-    addRetweet(id, userId) {
-      const tweet = this.tweets.filter((t) => t.id == id)[0];
+    addRetweet(id, userId, isRetweet) {
+      const tweet = this.getTweet(id);
       if (!tweet) throw new Error(`tweet id ${id} does not exist`);
       tweet.retweetCount++;
       tweet.retweetsFrom.push(userId);
@@ -168,10 +173,15 @@ export const useTweetStore = defineStore("tweets", {
         id,
         "retweet",
         new Date().toISOString()
-      ); // followers
+      );
+      if (/*tweet.authorId !== userId*/ userId) {
+        isRetweet
+          ? users.notify(tweet.authorId, userId, "retweet-retweet", id)
+          : users.notify(tweet.authorId, userId, "retweet-origin", id);
+      }
     },
     removeRetweet(id, userId) {
-      const tweet = this.tweets.filter((t) => t.id == id)[0];
+      const tweet = this.getTweet(id);
       if (!tweet) throw new Error("no such tweet");
       tweet.retweetCount--;
       tweet.retweetsFrom.splice(tweet.retweetsFrom.indexOf(userId), 1);
@@ -182,7 +192,7 @@ export const useTweetStore = defineStore("tweets", {
       users.removeFromAllFollowerTimelines(userId, id); // followers
     },
     hasRetweeted(id, userId) {
-      const tweet = this.tweets.filter((t) => t.id == id)[0];
+      const tweet = this.getTweet(id);
       if (!tweet) return false;
       return tweet.retweetsFrom.includes(userId);
     },
@@ -194,10 +204,9 @@ export const useTweetStore = defineStore("tweets", {
       replyingToTweet = null,
       replyingToUser = null
     ) {
-      const id = uid();
       const timestamp = new Date().toISOString();
       const newTweet = {
-        id,
+        id: uid(),
         type,
         text,
         media: [...media],
@@ -226,6 +235,8 @@ export const useTweetStore = defineStore("tweets", {
       users.addTweet(authorId, newTweet.id, type, containsMedia);
       users.addToLocalTimeline(authorId, newTweet.id, type, timestamp); // self
       users.addToAllFollowerTimelines(authorId, newTweet.id, type, timestamp); // followers
+      if (type === "reply" /*&& replyingToUser !== authorId*/)
+        users.notify(replyingToUser, authorId, "reply", newTweet.id);
     },
     removeTweet(id, userId) {
       const index = this.tweets.findIndex((t) => t.id === id);

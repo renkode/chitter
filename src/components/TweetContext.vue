@@ -70,7 +70,6 @@ onMounted(() => {
           :user="users.getUser(tweet.authorId)"
           :tweet="tweet"
           :type="tweet.type"
-          :retweetedBy="tweet.retweetedBy"
           :isPreviousReply="true"
         />
       </template>
@@ -91,7 +90,6 @@ onMounted(() => {
         :user="users.getUser(tweet.authorId)"
         :tweet="tweet"
         :type="tweet.type"
-        :retweetedBy="tweet.retweetedBy"
         :isPreviousReply="false"
       />
     </template>

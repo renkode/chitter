@@ -27,6 +27,7 @@ const props = defineProps({
   type: String, // status, retweet, reply
   retweetedBy: String,
   isPreviousReply: Boolean,
+  isNotification: Boolean,
 });
 
 const isTweetMenuOpen = ref(false);
@@ -66,14 +67,6 @@ const embedLinks = computed(() => {
   return embedArr.join(" ");
 });
 
-const setTweetContext = () => {
-  if (app.viewTweetId === props.id) return;
-  if (window.getSelection().toString().length > 0) return; // don't trigger click while highlighting text
-  app.setPath(`/status/${props.id}`);
-  app.setView("tweet");
-  app.setViewTweetId(props.id);
-};
-
 const toggleTweetMenu = (e) => {
   e.preventDefault();
   isTweetMenuOpen.value = !isTweetMenuOpen.value;
@@ -90,14 +83,14 @@ const doSomething = (e) => {
 
 const toggleLike = () => {
   if (!isLiked.value) {
-    tweets.addLike(props.id, app.currentId);
+    tweets.addLike(props.id, app.currentId, props.retweetedBy);
   } else {
     tweets.removeLike(props.id, app.currentId);
   }
 };
 const toggleRetweet = () => {
   if (!isRetweeted.value) {
-    tweets.addRetweet(props.id, app.currentId);
+    tweets.addRetweet(props.id, app.currentId, props.retweetedBy);
   } else {
     tweets.removeRetweet(props.id, app.currentId);
   }
@@ -146,8 +139,8 @@ onMounted(() => {
 <template>
   <div
     class="tweet-container"
-    :class="{ border: !isPreviousReply }"
-    @click="setTweetContext"
+    :class="{ border: !isPreviousReply, new: isNotification }"
+    @click="app.setTweetContext(props.id)"
   >
     <div
       class="user-retweet gray-text"
@@ -317,6 +310,10 @@ onMounted(() => {
 
 .border {
   border-top: rgba(255, 255, 255, 0.25) 1px solid;
+}
+
+.tweet-container.new {
+  background-color: rgba(255, 255, 255, 0.065);
 }
 
 .tweet-container:hover {

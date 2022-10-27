@@ -21,6 +21,7 @@ const props = defineProps({
   user: Object,
   tweet: Object,
   type: String, // status, retweet, reply
+  isRetweetedBy: String,
 });
 
 const isTweetMenuOpen = ref(false);
@@ -83,14 +84,14 @@ const doSomething = (e) => {
 
 const toggleLike = () => {
   if (!isLiked.value) {
-    tweets.addLike(props.id, app.currentId);
+    tweets.addLike(props.id, app.currentId, props.retweetedBy);
   } else {
     tweets.removeLike(props.id, app.currentId);
   }
 };
 const toggleRetweet = () => {
   if (!isRetweeted.value) {
-    tweets.addRetweet(props.id, app.currentId);
+    tweets.addRetweet(props.id, app.currentId, props.retweetedBy);
   } else {
     tweets.removeRetweet(props.id, app.currentId);
   }
@@ -133,6 +134,14 @@ onMounted(() => {
 
 <template>
   <div class="tweet-container" ref="tweetContainer">
+    <div
+      class="user-retweet gray-text"
+      v-if="props.type === 'retweet' && props.retweetedBy"
+    >
+      <v-icon name="la-retweet-solid" scale="0.89" fill="#ffffff80" />
+      {{ props.retweetedBy }}
+      Retweeted
+    </div>
     <div class="tweet-body">
       <div class="profile-pic-and-user">
         <div class="profile-pic-container">
@@ -298,6 +307,10 @@ onMounted(() => {
 </template>
 
 <style scoped>
+.blue-link {
+  cursor: pointer;
+}
+
 .tweet-container {
   cursor: auto;
   border-top: 0;

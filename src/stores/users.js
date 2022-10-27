@@ -229,10 +229,10 @@ export const useUsersStore = defineStore("users", {
       const currentUser = this.getUser(currentUserId);
       return currentUser.following.includes(targetId);
     },
-    notify(toUserId, fromUserId, type, tweet = null) {
+    notify(toUserId, fromUserId, type, tweetId = null) {
       const currentUser = this.getUser(toUserId);
       if (!currentUser) throw new Error("user not found");
-      const newNotif = { fromUser: fromUserId, type, tweet };
+      const newNotif = { fromUser: fromUserId, type, tweetId };
       if (
         currentUser.newNotifications.filter((n) => n === newNotif).length ===
           0 &&
@@ -261,6 +261,19 @@ export const useUsersStore = defineStore("users", {
       const currentUser = this.getUser(userId);
       if (!currentUser) throw new Error("user not found");
       return [...currentUser.newNotifications, ...currentUser.oldNotifications];
+    },
+    isNewNotification(userId, notif) {
+      const currentUser = this.getUser(userId);
+      if (!currentUser) throw new Error("user not found");
+      return currentUser.newNotifications.filter((n) => n === notif).length > 0;
+    },
+    replyIsNewNotification(userId, tweetId) {
+      const currentUser = this.getUser(userId);
+      if (!currentUser) throw new Error("user not found");
+      return (
+        currentUser.newNotifications.filter((n) => n.tweetId === tweetId)
+          .length > 0
+      );
     },
   },
 });

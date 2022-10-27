@@ -72,6 +72,13 @@ export const useAppStore = defineStore("app", {
     setViewTweetId(id) {
       this.viewTweetId = id;
     },
+    setTweetContext(id) {
+      if (this.viewTweetId === id) return;
+      if (window.getSelection().toString().length > 0) return; // don't trigger click while highlighting text
+      this.setPath(`/status/${id}`);
+      this.setView("tweet");
+      this.setViewTweetId(id);
+    },
     setViewProfileId(id) {
       this.viewProfileId = id;
     },

@@ -18,7 +18,10 @@ const localTweets = computed(() =>
       return {
         data: tweet,
         type: localTweet.type,
-        retweetedBy: users.getUser(localTweet.fromUserId).name || null,
+        retweetedBy:
+          localTweet.type === "retweet"
+            ? users.getUser(localTweet.fromUserId).name
+            : null,
       };
     }
   })

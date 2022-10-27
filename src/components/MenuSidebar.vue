@@ -48,8 +48,8 @@ const showComposeTweet = () => {
         <li class="nav-item" @click="app.setView('notifications')">
           <span class="nav-icon"
             ><v-icon
-              name="co-bell"
-              scale="1.8"
+              name="bi-bell"
+              scale="1.7"
               :fill="
                 app.view === 'notifications' ? 'white' : '#ffffff80'
               " /></span

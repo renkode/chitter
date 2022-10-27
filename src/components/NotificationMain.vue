@@ -31,4 +31,8 @@ onUnmounted(() => {
   </div>
 </template>
 
-<style></style>
+<style>
+.tweet-list-container {
+  width: 100%;
+}
+</style>

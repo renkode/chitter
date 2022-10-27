@@ -13,6 +13,7 @@ const props = defineProps({
     :style="{
       backgroundImage: `url(${props.url})`,
       width: props.size + 'px',
+      minWidth: props.size + 'px',
     }"
   >
     <slot></slot>
@@ -27,7 +28,6 @@ const props = defineProps({
   background-color: rgb(88, 95, 102);
   border-radius: 100%;
   cursor: pointer;
-  min-width: 44px;
   position: relative;
   transition: box-shadow 0.15s ease;
 }
