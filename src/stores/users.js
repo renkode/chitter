@@ -234,11 +234,20 @@ export const useUsersStore = defineStore("users", {
       if (!currentUser) throw new Error("user not found");
       const newNotif = { fromUser: fromUserId, type, tweetId };
       if (
-        currentUser.newNotifications.filter((n) => n === newNotif).length ===
-          0 &&
-        currentUser.oldNotifications.filter((n) => n === newNotif).length === 0
+        currentUser.newNotifications.filter(
+          (n) =>
+            n.fromUser === newNotif.fromUser &&
+            n.type === newNotif.type &&
+            n.tweetId === newNotif.tweetId
+        ).length === 0 &&
+        currentUser.oldNotifications.filter(
+          (n) =>
+            n.fromUser === newNotif.fromUser &&
+            n.type === newNotif.type &&
+            n.tweetId === newNotif.tweetId
+        ).length === 0
       ) {
-        // don't spam the same notif
+        // don't spam the same notif (idk a cleaner way to do that sorry)
         currentUser.newNotifications.unshift(newNotif);
       }
     },
@@ -251,6 +260,28 @@ export const useUsersStore = defineStore("users", {
         ...currentUser.oldNotifications,
       ];
       currentUser.newNotifications = [];
+    },
+    deleteReplyNotification(userId, tweetId) {
+      const currentUser = this.getUser(userId);
+      if (!currentUser) throw new Error("user not found");
+      if (
+        currentUser.newNotifications.filter((n) => n.tweetId === tweetId)
+          .length > 0
+      ) {
+        const index = currentUser.newNotifications.findIndex(
+          (n) => n.tweetId === tweetId
+        );
+        currentUser.newNotifications.splice(index, 1);
+      }
+      if (
+        currentUser.oldNotifications.filter((n) => n.tweetId === tweetId)
+          .length > 0
+      ) {
+        const index = currentUser.oldNotifications.findIndex(
+          (n) => n.tweetId === tweetId
+        );
+        currentUser.oldNotifications.splice(index, 1);
+      }
     },
     hasNewNotifications(userId) {
       const currentUser = this.getUser(userId);

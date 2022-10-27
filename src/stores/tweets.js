@@ -139,7 +139,7 @@ export const useTweetStore = defineStore("tweets", {
 
       const users = useUsersStore();
       users.addLike(userId, id);
-      if (/*tweet.authorId !== userId*/ userId) {
+      if (tweet.authorId !== userId) {
         isRetweet
           ? users.notify(tweet.authorId, userId, "like-retweet", id)
           : users.notify(tweet.authorId, userId, "like-origin", id);
@@ -174,7 +174,7 @@ export const useTweetStore = defineStore("tweets", {
         "retweet",
         new Date().toISOString()
       );
-      if (/*tweet.authorId !== userId*/ userId) {
+      if (tweet.authorId !== userId) {
         isRetweet
           ? users.notify(tweet.authorId, userId, "retweet-retweet", id)
           : users.notify(tweet.authorId, userId, "retweet-origin", id);
@@ -235,12 +235,13 @@ export const useTweetStore = defineStore("tweets", {
       users.addTweet(authorId, newTweet.id, type, containsMedia);
       users.addToLocalTimeline(authorId, newTweet.id, type, timestamp); // self
       users.addToAllFollowerTimelines(authorId, newTweet.id, type, timestamp); // followers
-      if (type === "reply" /*&& replyingToUser !== authorId*/)
+      if (type === "reply" && replyingToUser !== authorId)
         users.notify(replyingToUser, authorId, "reply", newTweet.id);
     },
     removeTweet(id, userId) {
       const index = this.tweets.findIndex((t) => t.id === id);
       if (index < 0) throw new Error("no such tweet");
+      const replyingToUser = this.getTweet(this.tweets[index].replyingToUser);
       const replyingToTweet = this.getTweet(this.tweets[index].replyingToTweet);
       if (replyingToTweet)
         replyingToTweet.repliesFrom = replyingToTweet.repliesFrom.filter(
@@ -254,6 +255,7 @@ export const useTweetStore = defineStore("tweets", {
       users.removeRetweet(userId, id);
       users.removeFromLocalTimeline(userId, id); // self
       users.removeFromAllFollowerTimelines(userId, id); // followers
+      if (replyingToUser) users.deleteReplyNotification(userId, id);
     },
   },
 });

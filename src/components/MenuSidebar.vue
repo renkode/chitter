@@ -1,10 +1,12 @@
 <script setup>
-import { computed } from "vue";
+import { computed, watch } from "vue";
 import { useAppStore } from "@/stores/app.js";
 import ProfilePicture from "./subcomponents/ProfilePicture.vue";
 
 const app = useAppStore();
-const user = computed(() => app.currentUser);
+const numNewNotifications = computed(
+  () => app.currentUser.newNotifications.length
+);
 const showComposeTweet = () => {
   app.setModalType("status");
   app.toggleModal();
@@ -46,21 +48,27 @@ const showComposeTweet = () => {
         </li>
 
         <li class="nav-item" @click="app.setView('notifications')">
-          <span class="nav-icon"
+          <span class="nav-icon notif-icon"
             ><v-icon
               name="bi-bell"
               scale="1.7"
-              :fill="
-                app.view === 'notifications' ? 'white' : '#ffffff80'
-              " /></span
-          ><span
+              :fill="app.view === 'notifications' ? 'white' : '#ffffff80'"
+            />
+            <div
+              class="notification-dot"
+              v-if="app.currentUser && numNewNotifications > 0"
+            >
+              {{ numNewNotifications }}
+            </div>
+          </span>
+          <span
             class="nav-label"
             :class="{ 'gray-text': app.view !== 'notifications' }"
             >Notifications</span
           >
         </li>
 
-        <li class="nav-item" @click="app.viewUserProfile(user.id)">
+        <li class="nav-item" @click="app.viewUserProfile(app.currentId)">
           <span class="nav-icon"
             ><v-icon
               name="bi-person"
@@ -79,12 +87,14 @@ const showComposeTweet = () => {
         /></span>
         <span class="new-tweet-btn-label">Tweet</span>
       </button>
-      <li class="nav-user" v-if="user">
+      <li class="nav-user" v-if="app.currentUser">
         <div class="user-info-and-btn">
-          <ProfilePicture :url="user.avatarUrl" :size="40" />
+          <ProfilePicture :url="app.currentUser.avatarUrl" :size="40" />
           <div class="user-info-wrapper">
-            <span class="display-name">{{ user.name }}</span>
-            <span class="username gray-text">@{{ user.username }}</span>
+            <span class="display-name">{{ app.currentUser.name }}</span>
+            <span class="username gray-text"
+              >@{{ app.currentUser.username }}</span
+            >
           </div>
         </div>
         <span class="tweet-action-icon extra-btn"
@@ -145,6 +155,25 @@ li .nav-icon {
   justify-content: center;
   margin-left: 4px;
   margin-right: 18px;
+}
+
+.nav-icon.notif-icon {
+  position: relative;
+}
+
+.notification-dot {
+  border-radius: 100%;
+  font-size: 0.7rem;
+  width: 1rem;
+  height: 1rem;
+  color: white;
+  background-color: #1d9bf0;
+  position: absolute;
+  top: 0;
+  right: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 li.nav-item.nav-logo {
