@@ -345,11 +345,10 @@ li.nav-item.nav-logo .nav-icon {
     z-index: 15;
   }
   nav {
-    max-height: 3.5rem;
+    position: relative;
+    height: 100%;
     width: 100%;
-    max-width: 100vw;
-    top: auto;
-    bottom: 0;
+    min-width: 100vw;
   }
   ul {
     width: 100%;
