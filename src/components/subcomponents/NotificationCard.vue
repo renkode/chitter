@@ -28,7 +28,7 @@ const notifText = computed(() => {
       return " followed you";
   }
 });
-const fakeMediaUrl = computed(() => ` pic.twitter.com/${props.id}`);
+const fakeMediaUrl = computed(() => ` pic.chitter.com/${props.id}`);
 const isLike = computed(
   () => props.type === "like-origin" || props.type === "like-retweet"
 );

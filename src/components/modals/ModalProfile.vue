@@ -133,8 +133,8 @@ watch(nameInput, () => {
     nameInputWrapper.value.className = "input-wrapper red-border";
     nameInputWrapper.value.querySelector("label").className = "red-text";
   } else {
-    usernameInputWrapper.value.className = "input-wrapper blue-border";
-    usernameInputWrapper.value.querySelector("label").className = "blue-text";
+    nameInputWrapper.value.className = "input-wrapper blue-border";
+    nameInputWrapper.value.querySelector("label").className = "blue-text";
   }
 });
 watch(usernameInput, () => {

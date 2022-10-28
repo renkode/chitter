@@ -130,6 +130,10 @@ body {
   justify-content: center;
 }
 
+button {
+  font-weight: bold;
+}
+
 ul {
   padding: 0;
 }
