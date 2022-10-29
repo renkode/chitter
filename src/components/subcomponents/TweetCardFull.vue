@@ -61,8 +61,7 @@ const toggleModal = (type) => {
   app.toggleModal();
 };
 
-const toggleTweetMenu = (e) => {
-  e.preventDefault();
+const toggleTweetMenu = () => {
   isTweetMenuOpen.value = !isTweetMenuOpen.value;
 };
 

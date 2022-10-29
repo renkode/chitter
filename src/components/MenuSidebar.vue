@@ -1,9 +1,10 @@
 <script setup>
-import { computed } from "vue";
+import { ref, computed } from "vue";
 import { useAppStore } from "@/stores/app.js";
 import ProfilePicture from "./subcomponents/ProfilePicture.vue";
 
 const app = useAppStore();
+const isAccountMenuOpen = ref(false);
 const numNewNotifications = computed(
   () => app.currentUser.newNotifications.length
 );
@@ -13,6 +14,9 @@ const showComposeTweet = () => {
 };
 const hideModalOnNavigation = () => {
   if (app.showModal) app.toggleModal();
+};
+const toggleAccountMenu = () => {
+  isAccountMenuOpen.value = !isAccountMenuOpen.value;
 };
 </script>
 
@@ -83,7 +87,12 @@ const hideModalOnNavigation = () => {
         /></span>
         <span class="new-tweet-btn-label">Tweet</span>
       </button>
-      <li class="nav-user" v-if="app.currentUser">
+
+      <li
+        class="nav-user"
+        v-if="app.currentUser"
+        @click.stop="toggleAccountMenu"
+      >
         <div class="user-info-and-btn">
           <ProfilePicture :url="app.currentUser.avatarUrl" :size="40" />
           <div class="user-info-wrapper">
@@ -96,6 +105,14 @@ const hideModalOnNavigation = () => {
         <span class="tweet-action-icon extra-btn"
           ><v-icon name="hi-dots-horizontal" scale="1.0" fill="#ffffff80"
         /></span>
+        <div v-if="isAccountMenuOpen" class="overlay"></div>
+        <div v-if="isAccountMenuOpen" class="tweet-menu-container">
+          <ul class="tweet-menu-list">
+            <li class="tweet-menu-item">
+              Log out @{{ app.currentUser.username }}
+            </li>
+          </ul>
+        </div>
       </li>
     </nav>
   </div>
@@ -157,7 +174,7 @@ ul {
   padding: 0;
 }
 
-li {
+li.nav-item {
   border-radius: 25px;
   width: min-content;
   height: 50px;
@@ -170,7 +187,8 @@ li {
   cursor: pointer;
 }
 
-li:hover {
+li.nav-item:hover,
+li.nav-user:hover {
   background-color: rgba(255, 255, 255, 0.144);
 }
 
@@ -233,10 +251,12 @@ li.nav-item.nav-logo .nav-icon {
   align-items: center;
   padding: 0.5rem;
   margin-bottom: 1rem;
+  padding-left: 0.8rem;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
 }
 
 .user-info-and-btn {
-  /* width: auto; */
   max-width: 90%;
   height: 100%;
   margin-bottom: 0;
@@ -246,10 +266,7 @@ li.nav-item.nav-logo .nav-icon {
   display: flex;
   flex-direction: column;
   justify-content: center;
-}
-
-.profile-pic {
-  margin-right: 0.5rem;
+  margin-left: 0.5rem;
 }
 
 .display-name {
@@ -298,6 +315,28 @@ li.nav-item.nav-logo .nav-icon {
   display: none;
 }
 
+.tweet-menu-container {
+  width: 100%;
+  margin: auto;
+  right: auto;
+  top: auto;
+  bottom: 100%;
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+}
+
+.tweet-menu-list {
+  display: flex;
+  width: 100%;
+}
+
+.tweet-menu-item {
+  align-self: stretch;
+  width: 100%;
+  font-size: 1rem;
+}
+
 @media screen and (max-width: 1280px) {
   .nav-sidebar {
     width: 50%;
@@ -319,7 +358,7 @@ li.nav-item.nav-logo .nav-icon {
     justify-content: center;
     align-items: center;
   }
-  li {
+  li.nav-item {
     border-radius: 99px;
     width: min-content;
     width: 50px;
@@ -336,10 +375,25 @@ li.nav-item.nav-logo .nav-icon {
   .nav-user {
     height: 64px;
     width: 64px;
+    padding-left: 0.5rem;
+    margin: 0;
   }
   .user-info-wrapper,
   .extra-btn {
     display: none;
+  }
+
+  .user-info-and-btn {
+    max-width: 100%;
+  }
+
+  .nav-user {
+    height: fit-content;
+    width: fit-content;
+  }
+
+  .tweet-menu-container {
+    width: max-content;
   }
 }
 
@@ -387,7 +441,7 @@ li.nav-item.nav-logo .nav-icon {
     margin: 0;
   }
 
-  li {
+  li.nav-item {
     margin: 0;
     padding: 0;
     display: flex;
@@ -422,9 +476,19 @@ li.nav-item.nav-logo .nav-icon {
     display: none;
   }
 
-  .nav-user,
   .nav-logo {
     display: none;
+  }
+
+  .nav-user {
+    position: fixed;
+    top: -1px;
+    right: 5px;
+  }
+
+  .tweet-menu-container {
+    top: 100%;
+    right: 0;
   }
 }
 </style>

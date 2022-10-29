@@ -24,8 +24,7 @@ onMounted(() => {
   box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.3);
   border-radius: 4px;
   width: fit-content;
-  height: 2.5rem;
-  padding: 0.5rem 1rem;
+  padding: 1rem 1.5rem;
   position: fixed;
   bottom: 10%;
   z-index: 999;

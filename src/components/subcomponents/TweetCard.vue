@@ -65,8 +65,7 @@ const embedLinks = computed(() => {
   return embedArr.join(" ");
 });
 
-const toggleTweetMenu = (e) => {
-  e.preventDefault();
+const toggleTweetMenu = () => {
   isTweetMenuOpen.value = !isTweetMenuOpen.value;
 };
 
