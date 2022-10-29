@@ -68,18 +68,13 @@ const toggleTweetMenu = (e) => {
 };
 
 const deleteTweet = () => {
-  if (app.viewTweetId == props.id) {
+  if (app.routeTweetId == props.id) {
     if (props.tweet.replyingToTweet)
-      app.setViewTweetId(props.tweet.replyingToTweet);
+      app.setTweetContext(props.tweet.replyingToTweet);
   } else {
-    app.setViewTweetId(null);
+    app.setTweetContext(null);
   }
   tweets.removeTweet(props.id, props.user.id);
-};
-
-const doSomething = (e) => {
-  e.stopPropagation();
-  console.log("test");
 };
 
 const toggleLike = () => {
@@ -100,6 +95,9 @@ const setReply = () => {
   app.setModalType("reply");
   app.setModalReply(props.user.id, props.id);
   app.toggleModal();
+};
+const shareTweet = () => {
+  navigator.clipboard.writeText(`${window.location.host}/status/${props.id}`);
 };
 
 const clickForProfile = (e) => {
@@ -294,7 +292,7 @@ onMounted(() => {
         <div class="tweet-action-container">
           <span
             class="tweet-action-icon share-tweet-btn"
-            @click.stop="doSomething"
+            @click.stop="shareTweet"
             ><v-icon name="gi-share" scale="1.3" fill="#ffffff80"
           /></span>
         </div>

@@ -39,7 +39,7 @@ const isRetweet = computed(
 
 function handleClick() {
   if (props.type === "follow") {
-    app.viewUserProfile(props.userId, props.username);
+    app.viewUserProfile(props.username);
   } else {
     app.setTweetContext(props.id);
   }
