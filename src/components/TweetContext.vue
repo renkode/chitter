@@ -13,9 +13,10 @@ const store = useTweetStore();
 const props = defineProps(["id"]);
 
 const tweet = computed(() => store.getTweet(props.id));
-const previousTweet = computed(() =>
-  store.getTweet(tweet.value.replyingToTweet)
-);
+const previousTweet = computed(() => {
+  if (tweet.value) return store.getTweet(tweet.value.replyingToTweet);
+  return null;
+});
 const previousTweets = ref([]);
 const replies = computed(() => {
   if (tweet.value) {
@@ -56,7 +57,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="tweet-list-container">
+  <div class="tweet-list-container" v-if="tweet">
     <template v-for="tweet in previousTweets">
       <template v-if="!tweet">
         <div class="tweet-container" :key="previousTweets.indexOf(tweet)">
@@ -96,6 +97,7 @@ onMounted(() => {
       />
     </template>
   </div>
+  <div class="error gray-text" v-else>Tweet does not exist.</div>
 </template>
 
 <style scoped>

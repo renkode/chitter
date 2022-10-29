@@ -6,6 +6,10 @@ import ProfileMain from "@/components/ProfileMain.vue";
 import FollowLists from "@/components/lists/FollowLists.vue";
 import TweetContext from "@/components/TweetContext.vue";
 
+const Error = {
+  template: '<div class="error gray-text" v-else>Tweet does not exist.</div>',
+};
+
 const routes = [
   {
     path: "",
@@ -53,6 +57,10 @@ const routes = [
     name: "Tweet",
     component: TweetContext,
     props: true,
+  },
+  {
+    path: "/:catchAll(.*)",
+    component: Error,
   },
 ];
 

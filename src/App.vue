@@ -3,13 +3,6 @@ import { onMounted } from "vue";
 import MenuSidebar from "./components/MenuSidebar.vue";
 import MediaSidebar from "./components/MediaSidebar.vue";
 import HeaderSC from "./components/subcomponents/HeaderSC.vue";
-import ComposeTweet from "./components/subcomponents/ComposeTweet.vue";
-import TimelineMain from "./components/TimelineMain.vue";
-import LocalTimeline from "./components/LocalTimeline.vue";
-import NotificationMain from "./components/NotificationMain.vue";
-import ProfileMain from "./components/ProfileMain.vue";
-import TweetContext from "./components/TweetContext.vue";
-import FollowLists from "./components/lists/FollowLists.vue";
 import LoadSpinner from "./components/subcomponents/LoadSpinner.vue";
 import ModalComponent from "./components/modals/ModalComponent.vue";
 import { useAppStore } from "@/stores/app.js";
@@ -28,62 +21,6 @@ onMounted(() => {
   <div class="main-wrapper">
     <div class="timeline-wrapper">
       <HeaderSC />
-
-      <!-- <template v-if="app.view === 'home'">
-        <ComposeTweet v-if="app.currentUser" />
-        <Transition name="fade">
-          <Suspense>
-            <template #default> <LocalTimeline /> </template>
-            <template #fallback> <LoadSpinner /> </template>
-          </Suspense>
-        </Transition>
-      </template>
-
-      <template v-if="app.view === 'explore'">
-        <ComposeTweet v-if="app.currentUser" />
-        <Transition name="fade">
-          <Suspense>
-            <template #default> <TimelineMain /> </template>
-            <template #fallback> <LoadSpinner /> </template>
-          </Suspense>
-        </Transition>
-      </template>
-
-      <template v-if="app.view === 'notifications'">
-        <Transition name="fade">
-          <Suspense>
-            <template #default> <NotificationMain /> </template>
-            <template #fallback> <LoadSpinner /> </template>
-          </Suspense>
-        </Transition>
-      </template>
-
-      <template v-if="app.view === 'profile'">
-        <Transition name="fade">
-          <Suspense>
-            <template #default> <ProfileMain /> </template>
-            <template #fallback> <LoadSpinner /> </template>
-          </Suspense>
-        </Transition>
-      </template>
-
-      <template v-if="app.view === 'followers' || app.view === 'following'">
-        <Transition name="fade">
-          <Suspense>
-            <template #default> <FollowLists /> </template>
-            <template #fallback> <LoadSpinner /> </template>
-          </Suspense>
-        </Transition>
-      </template>
-
-      <template v-if="app.view === 'tweet' && app.viewTweetId">
-        <Transition name="fade">
-          <Suspense>
-            <template #default> <TweetContext /> </template>
-            <template #fallback> <LoadSpinner /> </template>
-          </Suspense>
-        </Transition>
-      </template> -->
 
       <router-view v-slot="{ Component }">
         <Transition name="fade" mode="out-in">

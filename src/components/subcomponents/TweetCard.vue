@@ -76,11 +76,6 @@ const deleteTweet = () => {
   tweets.removeTweet(props.id, props.user.id);
 };
 
-const doSomething = (e) => {
-  e.stopPropagation();
-  console.log("test");
-};
-
 const toggleLike = () => {
   if (!isLiked.value) {
     tweets.addLike(props.id, app.currentId, props.retweetedBy);
@@ -99,6 +94,9 @@ const setReply = () => {
   app.setModalType("reply");
   app.setModalReply(props.user.id, props.id);
   app.toggleModal();
+};
+const shareTweet = () => {
+  navigator.clipboard.writeText(`${window.location.host}/status/${props.id}`);
 };
 
 onMounted(() => {
@@ -127,9 +125,6 @@ onMounted(() => {
   }, 30000);
   // clear on dismount
   return () => {
-    Array.from(anchors).forEach((anchor) =>
-      anchor.removeEventListener("click", doSomething)
-    );
     clearInterval(timer);
   };
 });
@@ -282,7 +277,7 @@ onMounted(() => {
           </span>
           <span
             class="tweet-action-icon share-tweet-btn"
-            @click.stop="doSomething"
+            @click.stop="shareTweet"
             ><v-icon name="gi-share" scale="1.0" fill="#ffffff80"
           /></span>
         </div>
