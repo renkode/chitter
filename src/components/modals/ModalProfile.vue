@@ -125,6 +125,7 @@ const updateProfile = () => {
     headerUrl.value
   );
   app.toggleModal();
+  app.viewUserProfile(app.currentUser.username);
 };
 
 // watchers
