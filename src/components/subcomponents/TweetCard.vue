@@ -94,6 +94,7 @@ const setReply = () => {
   app.toggleModal();
 };
 const shareTweet = () => {
+  app.toggleToast("Copied to clipboard");
   navigator.clipboard.writeText(`${window.location.host}/status/${props.id}`);
 };
 

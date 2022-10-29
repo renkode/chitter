@@ -5,6 +5,7 @@ import MediaSidebar from "./components/MediaSidebar.vue";
 import HeaderSC from "./components/subcomponents/HeaderSC.vue";
 import LoadSpinner from "./components/subcomponents/LoadSpinner.vue";
 import ModalComponent from "./components/modals/ModalComponent.vue";
+import ToastMessage from "./components/subcomponents/ToastMessage.vue";
 import { useAppStore } from "@/stores/app.js";
 import { useUsersStore } from "@/stores/users";
 const app = useAppStore();
@@ -36,7 +37,10 @@ onMounted(() => {
   <MediaSidebar />
 
   <Teleport to="body">
-    <ModalComponent v-if="app.showModal" />
+    <Transition> <ModalComponent v-if="app.showModal" /></Transition>
+    <Transition>
+      <ToastMessage v-if="app.showToast" :duration="2000" />
+    </Transition>
   </Teleport>
 </template>
 
@@ -95,6 +99,16 @@ a:visited {
 
 a:hover {
   text-decoration: underline;
+}
+
+.v-enter-active,
+.v-leave-active {
+  transition: opacity 0.1s ease;
+}
+
+.v-enter-from,
+.v-leave-to {
+  opacity: 0;
 }
 
 .fade-enter-active {

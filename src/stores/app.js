@@ -14,6 +14,8 @@ export const useAppStore = defineStore("app", {
     showModal: false,
     modalType: "status", // status | reply | edit-profile | retweet-list | like-list
     modalReply: { userId: null, tweetId: null },
+    showToast: false,
+    toastText: "",
     NUM_INITIAL_TWEETS: 5,
     NUM_LOAD_OLDER_TWEETS: 3,
   }),
@@ -67,6 +69,10 @@ export const useAppStore = defineStore("app", {
     },
     setModalReply(userId, tweetId) {
       this.modalReply = { userId, tweetId };
+    },
+    toggleToast(text) {
+      this.showToast = !this.showToast;
+      this.toastText = text;
     },
   },
 });
