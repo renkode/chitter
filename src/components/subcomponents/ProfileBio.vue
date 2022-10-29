@@ -87,7 +87,7 @@ const openModal = () => {
           class="follow-metric"
           :to="{
             name: 'Following',
-            params: { username: props.user.username, tab: 'following' },
+            params: { username: props.user.username },
           }"
           ><strong>{{ props.user.followingCount }}</strong
           ><span class="follow gray-text"> Following</span></router-link
@@ -96,7 +96,7 @@ const openModal = () => {
           class="follow-metric"
           :to="{
             name: 'Followers',
-            params: { username: props.user.username, tab: 'followers' },
+            params: { username: props.user.username },
           }"
           ><strong>{{ props.user.followerCount }}</strong
           ><span class="follow gray-text"> Followers</span></router-link

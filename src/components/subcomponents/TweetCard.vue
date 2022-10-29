@@ -108,11 +108,7 @@ onMounted(() => {
   Array.from(anchors).forEach((anchor) =>
     anchor.addEventListener("click", (e) => {
       e.stopPropagation();
-      if (!users.getUserByUsername(anchor.dataset.username)) return;
-      app.viewUserProfile(
-        users.getUserByUsername(anchor.dataset.username).id,
-        anchor.dataset.username
-      );
+      app.viewUserProfile(anchor.dataset.username);
     })
   );
   // update tweet time every 30s (if tweet isn't a day old);
@@ -158,7 +154,7 @@ onMounted(() => {
         <ProfilePicture
           :url="props.user.avatarUrl"
           :size="48"
-          @click.stop="app.viewUserProfile(props.user.id, props.user.username)"
+          @click.stop="app.viewUserProfile(props.user.username)"
         />
         <div class="gray-line" v-if="isPreviousReply"></div>
       </div>
@@ -167,16 +163,12 @@ onMounted(() => {
           <div class="user-info-wrapper">
             <span
               class="display-name"
-              @click.stop="
-                app.viewUserProfile(props.user.id, props.user.username)
-              "
+              @click.stop="app.viewUserProfile(props.user.username)"
               ><a href="#">{{ props.user.name }}</a></span
             >
             <span
               class="username gray-text"
-              @click.stop="
-                app.viewUserProfile(props.user.id, props.user.username)
-              "
+              @click.stop="app.viewUserProfile(props.user.username)"
               ><a href="#">@{{ props.user.username }}</a></span
             >
             <span class="separator gray-text">·</span>
@@ -235,11 +227,7 @@ onMounted(() => {
             v-if="props.tweet.type === 'reply' && props.tweet.replyingToTweet"
           >
             <span class="gray-text">Replying to </span>
-            <a
-              class="blue-link"
-              @click.stop="
-                app.viewUserProfile(props.tweet.replyingToUser, replyingTo)
-              "
+            <a class="blue-link" @click.stop="app.viewUserProfile(replyingTo)"
               >@{{ replyingTo }}</a
             >
           </div>

@@ -11,7 +11,11 @@ const props = defineProps({ tweets: Array });
   type: "retweet",
   retweetedBy: "user's name"
 }*/
-const tweets = computed(() => props.tweets.filter((tweet) => !!tweet)); // FAILSAFE, weed out undefined tweets
+const tweets = computed(() =>
+  props.tweets.filter(
+    (tweet) => typeof tweet !== "undefined" && typeof tweet.data !== "undefined"
+  )
+); // FAILSAFE, weed out undefined tweets
 </script>
 
 <template>

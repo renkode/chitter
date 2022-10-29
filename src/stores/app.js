@@ -68,28 +68,24 @@ export const useAppStore = defineStore("app", {
         throw Error("wrong tab");
       }
       this.profileTab = tab;
-      console.log(`current tab: ${this.profileTab}`);
     },
     setViewTweetId(id) {
       this.viewTweetId = id;
     },
     setTweetContext(id) {
-      router.push({ name: "Tweet", params: { id } });
-      if (this.viewTweetId === id) return;
       if (window.getSelection().toString().length > 0) return; // don't trigger click while highlighting text
-      // this.setPath(`/status/${id}`);
-      this.setView("tweet");
-      this.setViewTweetId(id);
+      router.push({ name: "Tweet", params: { id } });
+      // this.setView("tweet");
+      // this.setViewTweetId(id);
     },
     setViewProfileId(id) {
       this.viewProfileId = id;
     },
-    viewUserProfile(id, username) {
-      console.log(username);
+    viewUserProfile(username) {
       router.push({ name: "Profile", params: { username } });
-      this.setProfileTab("tweets");
-      this.setViewProfileId(id);
-      this.setView("profile");
+      // this.setProfileTab("tweets");
+      // this.setViewProfileId(id);
+      // this.setView("profile");
     },
     toggleModal() {
       this.showModal = !this.showModal;

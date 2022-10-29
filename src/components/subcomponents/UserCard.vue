@@ -16,7 +16,7 @@ const props = defineProps([
 ]);
 
 function goToProfile() {
-  app.viewUserProfile(props.id, props.username);
+  app.viewUserProfile(props.username);
   if (app.showModal) app.toggleModal();
 }
 </script>

@@ -44,9 +44,9 @@ const embedLinks = computed(() => {
       case urlRegex.test(str):
         return `<a class="blue-link" href="${str}" target="_blank">${str}</a>`;
       case hashtagRegex.test(str):
-        return `<a class="blue-link" href="#">${str}</a>`;
+        return `<a class="blue-link">${str}</a>`;
       case atRegex.test(str):
-        return `<a class="blue-link user-link" href="#" data-username=${str.replace(
+        return `<a class="blue-link user-link" data-username=${str.replace(
           "@",
           ""
         )}>${str}</a>`;
@@ -104,11 +104,7 @@ const setReply = () => {
 
 const clickForProfile = (e) => {
   e.stopPropagation();
-  if (!users.getUserByUsername(e.target.dataset.username)) return;
-  app.viewUserProfile(
-    users.getUserByUsername(e.target.dataset.username).id,
-    e.target.dataset.username
-  );
+  app.viewUserProfile(e.target.dataset.username);
 };
 
 const setTweetText = () => {
@@ -151,9 +147,7 @@ onMounted(() => {
           <ProfilePicture
             :url="props.user.avatarUrl"
             :size="48"
-            @click.stop="
-              app.viewUserProfile(props.user.id, props.user.username)
-            "
+            @click.stop="app.viewUserProfile(props.user.username)"
           />
         </div>
         <div class="tweet-data">
@@ -161,16 +155,12 @@ onMounted(() => {
             <div class="user-info-wrapper">
               <span
                 class="display-name"
-                @click.stop="
-                  app.viewUserProfile(props.user.id, props.user.username)
-                "
+                @click.stop="app.viewUserProfile(props.user.username)"
                 ><a href="#">{{ props.user.name }}</a></span
               >
               <span
                 class="username gray-text"
-                @click.stop="
-                  app.viewUserProfile(props.user.id, props.user.username)
-                "
+                @click.stop="app.viewUserProfile(props.user.username)"
                 ><a href="#">@{{ props.user.username }}</a></span
               >
             </div>
@@ -229,11 +219,7 @@ onMounted(() => {
           v-if="props.tweet.type === 'reply' && props.tweet.replyingToTweet"
         >
           <span class="gray-text">Replying to </span>
-          <a
-            class="blue-link"
-            @click.stop="
-              app.viewUserProfile(props.tweet.replyingToUser, replyingTo)
-            "
+          <a class="blue-link" @click.stop="app.viewUserProfile(replyingTo)"
             >@{{ replyingTo }}</a
           >
         </div>
