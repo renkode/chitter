@@ -8,7 +8,7 @@ const app = useAppStore();
 const users = useUsersStore();
 
 const user = computed(function () {
-  return users.getUserByUsername(router.currentRoute.value.params.username);
+  return users.getUserByUsername(app.routeUsername);
 });
 const canGoBack = computed(() => {
   const routes = [
@@ -18,14 +18,14 @@ const canGoBack = computed(() => {
     "Followers",
     "Following",
   ];
-  return routes.includes(router.currentRoute.value.name);
+  return routes.includes(app.routeName);
 });
 </script>
 
 <template>
   <div class="page-header">
     <span v-if="canGoBack" class="profile-wrapper">
-      <span class="back-arrow-btn" @click="this.$router.back()"
+      <span class="back-arrow-btn" @click="router.back()"
         ><v-icon name="md-arrowback" scale="1.1" fill="#ffffff80"
       /></span>
 
@@ -38,13 +38,9 @@ const canGoBack = computed(() => {
           >{{ user.tweetCount }} Tweets</span
         >
       </div>
-      <span v-else style="text-transform: capitalize">{{
-        router.currentRoute.value.name
-      }}</span>
+      <span v-else style="text-transform: capitalize">{{ app.routeName }}</span>
     </span>
-    <span v-else style="text-transform: capitalize">{{
-      router.currentRoute.value.name
-    }}</span>
+    <span v-else style="text-transform: capitalize">{{ app.routeName }}</span>
   </div>
 </template>
 

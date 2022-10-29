@@ -156,12 +156,12 @@ onMounted(() => {
               <span
                 class="display-name"
                 @click.stop="app.viewUserProfile(props.user.username)"
-                ><a href="#">{{ props.user.name }}</a></span
+                ><a>{{ props.user.name }}</a></span
               >
               <span
                 class="username gray-text"
                 @click.stop="app.viewUserProfile(props.user.username)"
-                ><a href="#">@{{ props.user.username }}</a></span
+                ><a>@{{ props.user.username }}</a></span
               >
             </div>
             <span
@@ -304,6 +304,10 @@ onMounted(() => {
 </template>
 
 <style scoped>
+a {
+  cursor: pointer;
+}
+
 .blue-link {
   cursor: pointer;
 }

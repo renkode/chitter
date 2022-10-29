@@ -20,6 +20,10 @@ const routes = [
     redirect: "/home",
   },
   {
+    path: "/chitter",
+    redirect: "/home",
+  },
+  {
     path: "/home",
     name: "Home",
     component: LocalTimeline,

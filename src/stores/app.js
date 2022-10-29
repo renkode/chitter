@@ -21,7 +21,17 @@ export const useAppStore = defineStore("app", {
     NUM_LOAD_OLDER_TWEETS: 3,
   }),
   // optional getters
-  getters: {},
+  getters: {
+    routeName: () => {
+      return router.currentRoute.value.name;
+    },
+    routeTweetId: () => {
+      return router.currentRoute.value.params.id;
+    },
+    routeUsername: () => {
+      return router.currentRoute.value.params.username;
+    },
+  },
   // optional actions
   actions: {
     setCurrentUser(user) {

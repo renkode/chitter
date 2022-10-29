@@ -1,9 +1,11 @@
 <script setup>
 import UserList from "./UserList.vue";
 import { defineProps, computed } from "vue";
+import { useAppStore } from "@/stores/app.js";
 import { useUsersStore } from "@/stores/users.js";
 import router from "@/router/index.js";
 
+const app = useAppStore();
 const users = useUsersStore();
 const props = defineProps(["username"]);
 
@@ -21,7 +23,7 @@ const userFollowers = computed(() =>
     <div class="profile-tab-container">
       <span
         class="profile-tab"
-        :class="{ 'gray-text': router.currentRoute.value.name !== 'Following' }"
+        :class="{ 'gray-text': app.routeName !== 'Following' }"
         @click="
           router.push({
             name: 'Following',
@@ -32,12 +34,12 @@ const userFollowers = computed(() =>
           >Following
           <span
             class="tab-indicator"
-            v-if="router.currentRoute.value.name === 'Following'"
+            v-if="app.routeName === 'Following'"
           ></span> </span
       ></span>
       <span
         class="profile-tab"
-        :class="{ 'gray-text': router.currentRoute.value.name !== 'Followers' }"
+        :class="{ 'gray-text': app.routeName !== 'Followers' }"
         @click="
           router.push({
             name: 'Followers',
@@ -48,15 +50,12 @@ const userFollowers = computed(() =>
           >Followers
           <span
             class="tab-indicator"
-            v-if="router.currentRoute.value.name === 'Followers'"
+            v-if="app.routeName === 'Followers'"
           ></span> </span
       ></span>
     </div>
 
-    <UserList
-      v-if="router.currentRoute.value.name === 'Following'"
-      :users="userFollowing"
-    />
+    <UserList v-if="app.routeName === 'Following'" :users="userFollowing" />
     <UserList v-else :users="userFollowers" />
   </div>
 </template>
