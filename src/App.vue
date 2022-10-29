@@ -29,7 +29,7 @@ onMounted(() => {
     <div class="timeline-wrapper">
       <HeaderSC />
 
-      <template v-if="app.view === 'home'">
+      <!-- <template v-if="app.view === 'home'">
         <ComposeTweet v-if="app.currentUser" />
         <Transition name="fade">
           <Suspense>
@@ -83,7 +83,16 @@ onMounted(() => {
             <template #fallback> <LoadSpinner /> </template>
           </Suspense>
         </Transition>
-      </template>
+      </template> -->
+
+      <router-view v-slot="{ Component }">
+        <Transition name="fade" mode="out-in">
+          <Suspense>
+            <template #default> <component :is="Component" /> </template>
+            <template #fallback> <LoadSpinner /> </template>
+          </Suspense>
+        </Transition>
+      </router-view>
     </div>
   </div>
 
@@ -151,8 +160,7 @@ a:hover {
   text-decoration: underline;
 }
 
-.fade-enter-active,
-.fade-leave-active {
+.fade-enter-active {
   transition: opacity 0.15s ease;
 }
 

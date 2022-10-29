@@ -1,5 +1,5 @@
 <script setup>
-import { computed, watch } from "vue";
+import { computed } from "vue";
 import { useAppStore } from "@/stores/app.js";
 import ProfilePicture from "./subcomponents/ProfilePicture.vue";
 
@@ -17,70 +17,89 @@ const showComposeTweet = () => {
   <div class="nav-sidebar">
     <nav>
       <ul>
-        <li class="nav-item nav-logo">
-          <span class="nav-icon" @click="app.setView('home')"
-            ><v-icon name="bi-twitter" scale="2.0" fill="white"
-          /></span>
-        </li>
+        <router-link to="/home">
+          <li class="nav-item nav-logo">
+            <span class="nav-icon" @click="app.setView('home')"
+              ><v-icon name="bi-twitter" scale="2.0" fill="white"
+            /></span></li
+        ></router-link>
 
-        <li class="nav-item" @click="app.setView('home')">
-          <span class="nav-icon"
-            ><v-icon
-              name="gi-bird-house"
-              scale="2.0"
-              :fill="app.view === 'home' ? 'white' : '#ffffff80'" /></span
-          ><span class="nav-label" :class="{ 'gray-text': app.view !== 'home' }"
-            >Home</span
-          >
-        </li>
-
-        <li class="nav-item" @click="app.setView('explore')">
-          <span class="nav-icon"
-            ><v-icon
-              name="hi-hashtag"
-              scale="1.6"
-              :fill="app.view === 'explore' ? 'white' : '#ffffff80'" /></span
-          ><span
-            class="nav-label"
-            :class="{ 'gray-text': app.view !== 'explore' }"
-            >Explore</span
-          >
-        </li>
-
-        <li class="nav-item" @click="app.setView('notifications')">
-          <span class="nav-icon notif-icon"
-            ><v-icon
-              name="bi-bell"
-              scale="1.7"
-              :fill="app.view === 'notifications' ? 'white' : '#ffffff80'"
-            />
-            <div
-              class="notification-dot"
-              v-if="app.currentUser && numNewNotifications > 0"
+        <router-link to="/home">
+          <li class="nav-item" @click="app.setView('home')">
+            <span class="nav-icon"
+              ><v-icon
+                name="gi-bird-house"
+                scale="2.0"
+                :fill="app.view === 'home' ? 'white' : '#ffffff80'" /></span
+            ><span
+              class="nav-label"
+              :class="{ 'gray-text': app.view !== 'home' }"
+              >Home</span
             >
-              {{ numNewNotifications }}
-            </div>
-          </span>
-          <span
-            class="nav-label"
-            :class="{ 'gray-text': app.view !== 'notifications' }"
-            >Notifications</span
-          >
-        </li>
+          </li></router-link
+        >
 
-        <li class="nav-item" @click="app.viewUserProfile(app.currentId)">
-          <span class="nav-icon"
-            ><v-icon
-              name="bi-person"
-              scale="1.8"
-              :fill="app.view === 'profile' ? 'white' : '#ffffff80'" /></span
-          ><span
-            class="nav-label"
-            :class="{ 'gray-text': app.view !== 'profile' }"
-            >Profile</span
-          >
-        </li>
+        <router-link to="/explore"
+          ><li class="nav-item" @click="app.setView('explore')">
+            <span class="nav-icon"
+              ><v-icon
+                name="hi-hashtag"
+                scale="1.6"
+                :fill="app.view === 'explore' ? 'white' : '#ffffff80'" /></span
+            ><span
+              class="nav-label"
+              :class="{ 'gray-text': app.view !== 'explore' }"
+              >Explore</span
+            >
+          </li></router-link
+        >
+
+        <router-link to="/notifications"
+          ><li class="nav-item" @click="app.setView('notifications')">
+            <span class="nav-icon notif-icon"
+              ><v-icon
+                name="bi-bell"
+                scale="1.7"
+                :fill="app.view === 'notifications' ? 'white' : '#ffffff80'"
+              />
+              <div
+                class="notification-dot"
+                v-if="app.currentUser && numNewNotifications > 0"
+              >
+                {{ numNewNotifications }}
+              </div>
+            </span>
+            <span
+              class="nav-label"
+              :class="{ 'gray-text': app.view !== 'notifications' }"
+              >Notifications</span
+            >
+          </li></router-link
+        >
+
+        <router-link
+          v-if="app.currentUser"
+          :to="{
+            name: 'Profile',
+            params: { username: app.currentUser.username },
+          }"
+          @click="app.setView('profile')"
+        >
+          <li class="nav-item">
+            <span class="nav-icon"
+              ><v-icon
+                name="bi-person"
+                scale="1.8"
+                :fill="app.view === 'profile' ? 'white' : '#ffffff80'" /></span
+            ><span
+              class="nav-label"
+              :class="{ 'gray-text': app.view !== 'profile' }"
+              >Profile</span
+            >
+          </li></router-link
+        >
       </ul>
+
       <button class="new-tweet-btn" @click="showComposeTweet">
         <span class="new-tweet-btn-feather"
           ><v-icon name="gi-feather" scale="1.8"
@@ -105,6 +124,24 @@ const showComposeTweet = () => {
   </div>
 </template>
 <style scoped>
+a {
+  display: flex;
+  align-items: center;
+}
+
+a:hover {
+  text-decoration: none;
+}
+
+a:visited,
+a:link {
+  color: white;
+}
+
+a:focus {
+  outline: none;
+}
+
 .nav-sidebar {
   width: 110%;
   height: 100%;

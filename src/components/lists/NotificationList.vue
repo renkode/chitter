@@ -43,6 +43,7 @@ const users = useUsersStore();
             :type="notif.type"
             :iconUrl="users.getUser(notif.fromUser).avatarUrl"
             :name="users.getUser(notif.fromUser).name"
+            :username="users.getUser(notif.fromUser).username"
             :tweetText="tweets.getTweet(notif.tweetId).text"
             :containsMedia="tweets.getTweet(notif.tweetId).media.length > 0"
             :isNew="users.isNewNotification(app.currentId, notif)"
@@ -56,6 +57,7 @@ const users = useUsersStore();
             :userId="users.getUser(notif.fromUser).id"
             :iconUrl="users.getUser(notif.fromUser).avatarUrl"
             :name="users.getUser(notif.fromUser).name"
+            :username="users.getUser(notif.fromUser).username"
             :isNew="users.isNewNotification(app.currentId, notif)"
           />
         </template>

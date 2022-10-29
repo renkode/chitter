@@ -105,7 +105,10 @@ const setReply = () => {
 const clickForProfile = (e) => {
   e.stopPropagation();
   if (!users.getUserByUsername(e.target.dataset.username)) return;
-  app.viewUserProfile(users.getUserByUsername(e.target.dataset.username).id);
+  app.viewUserProfile(
+    users.getUserByUsername(e.target.dataset.username).id,
+    e.target.dataset.username
+  );
 };
 
 const setTweetText = () => {
@@ -148,7 +151,9 @@ onMounted(() => {
           <ProfilePicture
             :url="props.user.avatarUrl"
             :size="48"
-            @click.stop="app.viewUserProfile(props.user.id)"
+            @click.stop="
+              app.viewUserProfile(props.user.id, props.user.username)
+            "
           />
         </div>
         <div class="tweet-data">
@@ -156,12 +161,16 @@ onMounted(() => {
             <div class="user-info-wrapper">
               <span
                 class="display-name"
-                @click.stop="app.viewUserProfile(props.user.id)"
+                @click.stop="
+                  app.viewUserProfile(props.user.id, props.user.username)
+                "
                 ><a href="#">{{ props.user.name }}</a></span
               >
               <span
                 class="username gray-text"
-                @click.stop="app.viewUserProfile(props.user.id)"
+                @click.stop="
+                  app.viewUserProfile(props.user.id, props.user.username)
+                "
                 ><a href="#">@{{ props.user.username }}</a></span
               >
             </div>
@@ -222,7 +231,9 @@ onMounted(() => {
           <span class="gray-text">Replying to </span>
           <a
             class="blue-link"
-            @click.stop="app.viewUserProfile(props.tweet.replyingToUser)"
+            @click.stop="
+              app.viewUserProfile(props.tweet.replyingToUser, replyingTo)
+            "
             >@{{ replyingTo }}</a
           >
         </div>

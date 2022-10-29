@@ -214,6 +214,9 @@ export const useUsersStore = defineStore("users", {
       currentUser.following.splice(currentUser.following.indexOf(targetId, 1));
       otherUser.followerCount--;
       otherUser.followers.splice(otherUser.followers.indexOf(currentUserId, 1));
+      currentUser.localTimeline = currentUser.localTimeline.filter(
+        (lt) => lt.fromUserId !== targetId
+      );
     },
     isFollowingUser(userId, targetId) {
       const user = this.getUser(userId);

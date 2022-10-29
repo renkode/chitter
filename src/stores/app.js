@@ -1,4 +1,5 @@
 import { defineStore } from "pinia";
+import router from "@/router/index.js";
 
 // main is the name of the store. It is unique across your application
 // and will appear in devtools
@@ -73,16 +74,19 @@ export const useAppStore = defineStore("app", {
       this.viewTweetId = id;
     },
     setTweetContext(id) {
+      router.push({ name: "Tweet", params: { id } });
       if (this.viewTweetId === id) return;
       if (window.getSelection().toString().length > 0) return; // don't trigger click while highlighting text
-      this.setPath(`/status/${id}`);
+      // this.setPath(`/status/${id}`);
       this.setView("tweet");
       this.setViewTweetId(id);
     },
     setViewProfileId(id) {
       this.viewProfileId = id;
     },
-    viewUserProfile(id) {
+    viewUserProfile(id, username) {
+      console.log(username);
+      router.push({ name: "Profile", params: { username } });
       this.setProfileTab("tweets");
       this.setViewProfileId(id);
       this.setView("profile");

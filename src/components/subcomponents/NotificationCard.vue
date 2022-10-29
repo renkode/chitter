@@ -10,6 +10,7 @@ const props = defineProps({
   userId: String,
   iconUrl: String,
   name: String,
+  username: String,
   tweetText: String,
   containsMedia: Boolean,
   isNew: Boolean,
@@ -36,13 +37,13 @@ const isRetweet = computed(
   () => props.type === "retweet-origin" || props.type === "retweet-retweet"
 );
 
-const handleClick = () => {
+function handleClick() {
   if (props.type === "follow") {
-    app.viewUserProfile(props.userId);
+    app.viewUserProfile(props.userId, props.username);
   } else {
     app.setTweetContext(props.id);
   }
-};
+}
 </script>
 
 <template>

@@ -54,9 +54,9 @@ const embedLinks = computed(() => {
       case urlRegex.test(str):
         return `<a class="blue-link" href="${str}" target="_blank">${str}</a>`;
       case hashtagRegex.test(str):
-        return `<a class="blue-link" href="#">${str}</a>`;
+        return `<a class="blue-link">${str}</a>`;
       case atRegex.test(str):
-        return `<a class="blue-link user-link" href="#" data-username=${str.replace(
+        return `<a class="blue-link user-link" data-username=${str.replace(
           "@",
           ""
         )}>${str}</a>`;
@@ -109,7 +109,10 @@ onMounted(() => {
     anchor.addEventListener("click", (e) => {
       e.stopPropagation();
       if (!users.getUserByUsername(anchor.dataset.username)) return;
-      app.viewUserProfile(users.getUserByUsername(anchor.dataset.username).id);
+      app.viewUserProfile(
+        users.getUserByUsername(anchor.dataset.username).id,
+        anchor.dataset.username
+      );
     })
   );
   // update tweet time every 30s (if tweet isn't a day old);
@@ -155,7 +158,7 @@ onMounted(() => {
         <ProfilePicture
           :url="props.user.avatarUrl"
           :size="48"
-          @click.stop="app.viewUserProfile(props.user.id)"
+          @click.stop="app.viewUserProfile(props.user.id, props.user.username)"
         />
         <div class="gray-line" v-if="isPreviousReply"></div>
       </div>
@@ -164,12 +167,16 @@ onMounted(() => {
           <div class="user-info-wrapper">
             <span
               class="display-name"
-              @click.stop="app.viewUserProfile(props.user.id)"
+              @click.stop="
+                app.viewUserProfile(props.user.id, props.user.username)
+              "
               ><a href="#">{{ props.user.name }}</a></span
             >
             <span
               class="username gray-text"
-              @click.stop="app.viewUserProfile(props.user.id)"
+              @click.stop="
+                app.viewUserProfile(props.user.id, props.user.username)
+              "
               ><a href="#">@{{ props.user.username }}</a></span
             >
             <span class="separator gray-text">·</span>
@@ -230,7 +237,9 @@ onMounted(() => {
             <span class="gray-text">Replying to </span>
             <a
               class="blue-link"
-              @click.stop="app.viewUserProfile(props.tweet.replyingToUser)"
+              @click.stop="
+                app.viewUserProfile(props.tweet.replyingToUser, replyingTo)
+              "
               >@{{ replyingTo }}</a
             >
           </div>
