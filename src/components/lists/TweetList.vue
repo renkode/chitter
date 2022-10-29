@@ -4,7 +4,6 @@ import { useUsersStore } from "@/stores/users.js";
 import TweetCard from "../subcomponents/TweetCard.vue";
 
 const users = useUsersStore();
-
 const props = defineProps({ tweets: Array });
 /* example ( i don't like how it's structured either but whatever )
 { data: tweetObj,
@@ -29,6 +28,7 @@ const tweets = computed(() =>
         :tweet="tweet.data"
         :type="tweet.type"
         :retweetedBy="tweet.retweetedBy"
+        :replyingTo="users.getUsername(tweet.data.replyingToUser)"
       />
     </TransitionGroup>
     <div class="error gray-text" v-else>No tweets to display</div>

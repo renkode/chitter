@@ -114,9 +114,17 @@ export const useUsersStore = defineStore("users", {
     getUser(id) {
       return this.users.filter((user) => user.id == id)[0];
     },
+
+    getUsername(id) {
+      if (this.users.filter((user) => user.id == id)[0])
+        return this.users.filter((user) => user.id == id)[0].username;
+      return null;
+    },
+
     getUserByUsername(username) {
       return this.users.filter((user) => user.username == username)[0];
     },
+
     updateProfile(
       id,
       name,
@@ -140,6 +148,7 @@ export const useUsersStore = defineStore("users", {
       user.headerUrl = headerUrl;
       Object.assign(this.users[index], user);
     },
+
     addTweet(userId, tweetId, type = "status", containsMedia = false) {
       const user = this.getUser(userId);
       user.authoredTweets.unshift({
@@ -148,29 +157,35 @@ export const useUsersStore = defineStore("users", {
         containsMedia,
       });
     },
+
     removeTweet(userId, tweetId) {
       const user = this.getUser(userId);
       const tweetIndex = user.authoredTweets.findIndex((t) => t.id == tweetId);
       user.authoredTweets.splice(tweetIndex, 1);
     },
+
     addRetweet(userId, tweetId) {
       const user = this.getUser(userId);
       user.retweets.push({ id: tweetId, timestamp: new Date().toISOString() });
     },
+
     removeRetweet(userId, tweetId) {
       const user = this.getUser(userId);
       const tweetIndex = user.retweets.findIndex((t) => t.id == tweetId);
       user.retweets.splice(tweetIndex, 1);
     },
+
     addLike(userId, tweetId) {
       const user = this.getUser(userId);
       user.likes.push(tweetId);
     },
+
     removeLike(userId, tweetId) {
       const user = this.getUser(userId);
       const tweetIndex = user.likes.indexOf(tweetId);
       user.likes.splice(tweetIndex, 1);
     },
+
     addToLocalTimeline(userId, tweetId, type, timestamp) {
       const user = this.getUser(userId);
       user.localTimeline.unshift({
@@ -180,23 +195,27 @@ export const useUsersStore = defineStore("users", {
         fromUserId: userId,
       });
     },
+
     addToAllFollowerTimelines(currentUserId, tweetId, type, timestamp) {
       const user = this.getUser(currentUserId);
       user.followers.forEach((follower) => {
         this.addToLocalTimeline(follower, tweetId, type, timestamp);
       });
     },
+
     removeFromLocalTimeline(userId, tweetId) {
       const user = this.getUser(userId);
       const tweetIndex = user.localTimeline.findIndex((t) => t.id == tweetId);
       user.localTimeline.splice(tweetIndex, 1);
     },
+
     removeFromAllFollowerTimelines(currentUserId, tweetId) {
       const user = this.getUser(currentUserId);
       user.followers.forEach((follower) => {
         this.removeFromLocalTimeline(follower, tweetId);
       });
     },
+
     followUser(currentUserId, targetId) {
       const currentUser = this.getUser(currentUserId);
       const otherUser = this.getUser(targetId);
@@ -206,6 +225,7 @@ export const useUsersStore = defineStore("users", {
       otherUser.followerCount++;
       otherUser.followers.unshift(currentUserId);
     },
+
     unfollowUser(currentUserId, targetId) {
       const currentUser = this.getUser(currentUserId);
       const otherUser = this.getUser(targetId);
@@ -218,20 +238,24 @@ export const useUsersStore = defineStore("users", {
         (lt) => lt.fromUserId !== targetId
       );
     },
+
     isFollowingUser(userId, targetId) {
       const user = this.getUser(userId);
       return user.following.includes(targetId);
     },
+
     canFollow(currentUserId, targetId) {
       if (currentUserId == targetId) return false;
       const currentUser = this.getUser(currentUserId);
       return !currentUser.following.includes(targetId);
     },
+
     canUnfollow(currentUserId, targetId) {
       if (currentUserId == targetId) return false;
       const currentUser = this.getUser(currentUserId);
       return currentUser.following.includes(targetId);
     },
+
     notify(toUserId, fromUserId, type, tweetId = null) {
       const currentUser = this.getUser(toUserId);
       if (!currentUser) throw new Error("user not found");
@@ -254,6 +278,7 @@ export const useUsersStore = defineStore("users", {
         currentUser.newNotifications.unshift(newNotif);
       }
     },
+
     clearNotifications(userId) {
       const currentUser = this.getUser(userId);
       if (!currentUser) throw new Error("user not found");
@@ -264,6 +289,7 @@ export const useUsersStore = defineStore("users", {
       ];
       currentUser.newNotifications = [];
     },
+
     deleteReplyNotification(userId, tweetId) {
       const currentUser = this.getUser(userId);
       if (!currentUser) throw new Error("user not found");
@@ -286,21 +312,25 @@ export const useUsersStore = defineStore("users", {
         currentUser.oldNotifications.splice(index, 1);
       }
     },
+
     hasNewNotifications(userId) {
       const currentUser = this.getUser(userId);
       if (!currentUser) throw new Error("user not found");
       return currentUser.newNotifications.length > 0;
     },
+
     getAllNotifications(userId) {
       const currentUser = this.getUser(userId);
       if (!currentUser) throw new Error("user not found");
       return [...currentUser.newNotifications, ...currentUser.oldNotifications];
     },
+
     isNewNotification(userId, notif) {
       const currentUser = this.getUser(userId);
       if (!currentUser) throw new Error("user not found");
       return currentUser.newNotifications.filter((n) => n === notif).length > 0;
     },
+
     replyIsNewNotification(userId, tweetId) {
       const currentUser = this.getUser(userId);
       if (!currentUser) throw new Error("user not found");

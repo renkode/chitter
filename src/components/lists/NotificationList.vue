@@ -6,17 +6,10 @@ import { useUsersStore } from "@/stores/users.js";
 import TweetCard from "../subcomponents/TweetCard.vue";
 import NotificationCard from "../subcomponents/NotificationCard.vue";
 
-const props = defineProps({ notifs: Array }); // { fromUser, type, tweetId }
 const tweets = useTweetStore();
 const app = useAppStore();
 const users = useUsersStore();
-
-// type: String,
-//   id: String,
-//   iconUrl: String,
-//   name: String,
-//   tweetText: String,
-//   containsMedia: Boolean,
+const props = defineProps({ notifs: Array }); // { fromUser, type, tweetId }
 </script>
 
 <template>

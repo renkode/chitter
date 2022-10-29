@@ -26,8 +26,9 @@ const props = defineProps({
   tweet: Object,
   type: String, // status, retweet, reply
   retweetedBy: String,
-  isPreviousReply: Boolean,
-  isNotification: Boolean,
+  replyingTo: String,
+  isPreviousReply: Boolean, // render gray line for tweet thread
+  isNotification: Boolean, // highlight if new notification
 });
 
 const isTweetMenuOpen = ref(false);
@@ -40,9 +41,6 @@ const getTimeSinceCreation = ref(
 const isLiked = computed(() => tweets.hasLiked(props.tweet.id, app.currentId));
 const isRetweeted = computed(() =>
   tweets.hasRetweeted(props.tweet.id, app.currentId)
-);
-const replyingTo = computed(
-  () => users.getUser(props.tweet.replyingToUser).username
 );
 
 // embed @'s, hashtags and links inside tweets
@@ -222,8 +220,10 @@ onMounted(() => {
             v-if="props.tweet.type === 'reply' && props.tweet.replyingToTweet"
           >
             <span class="gray-text">Replying to </span>
-            <a class="blue-link" @click.stop="app.viewUserProfile(replyingTo)"
-              >@{{ replyingTo }}</a
+            <a
+              class="blue-link"
+              @click.stop="app.viewUserProfile(props.replyingTo)"
+              >@{{ props.replyingTo }}</a
             >
           </div>
           <div class="tweet-text" ref="tweetText">{{ embedLinks }}</div>

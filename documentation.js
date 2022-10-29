@@ -235,8 +235,7 @@ const components = {
 const notes = [
   "vue rules: https://vuejs.org/style-guide/rules-essential.html",
   "vue router docs: https://router.vuejs.org/guide/",
-  "fade in loaded tweets on scroll down",
-  "other features: notifications, DMs",
+  "most of the business logic are in the stores",
   "scaling up concerns: pagination",
   'SANITIZE NEW TWEETS WITH <script type="application/javascript" defer src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/2.4.0/purify.min.js"></script>',
   "take a look at for sanitization example https://codepen.io/openjavascriptadmin/pen/NWvqwqx",

@@ -68,7 +68,7 @@ const openModal = () => {
             shortURL
           }}</a></span
         >
-        <span class="misc-info gray-text" v-if="props.user.birthday">
+        <span class="misc-info gray-text" v-if="props.user.birthday.length > 1">
           <span class="misc-icon"
             ><v-icon
               name="la-birthday-cake-solid"

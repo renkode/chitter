@@ -6,10 +6,10 @@ import { useAppStore } from "@/stores/app.js";
 import { useUsersStore } from "@/stores/users.js";
 import { useTweetStore } from "@/stores/tweets.js";
 
+// didn't use tweetlist since deleted tweets would have to be handled differently
 const app = useAppStore();
 const users = useUsersStore();
 const store = useTweetStore();
-
 const props = defineProps(["id"]);
 
 const tweet = computed(() => store.getTweet(props.id));
@@ -26,7 +26,7 @@ const replies = computed(() => {
   }
 });
 
-// kinda like a linked list. don't ask me.
+// kinda like a linked list
 const fetchPreviousTweets = () => {
   previousTweets.value = [];
   if (!tweet.value) return;
@@ -73,6 +73,7 @@ onMounted(() => {
           :user="users.getUser(tweet.authorId)"
           :tweet="tweet"
           :type="tweet.type"
+          :replyingTo="users.getUsername(tweet.replyingToUser)"
           :isPreviousReply="true"
         />
       </template>
@@ -83,6 +84,7 @@ onMounted(() => {
         :user="users.getUser(tweet.authorId)"
         :tweet="tweet"
         :type="tweet.type"
+        :replyingTo="users.getUsername(tweet.replyingToUser)"
     /></template>
 
     <template v-if="replies && replies.length > 0">
@@ -93,6 +95,7 @@ onMounted(() => {
         :user="users.getUser(tweet.authorId)"
         :tweet="tweet"
         :type="tweet.type"
+        :replyingTo="users.getUsername(tweet.replyingToUser)"
         :isPreviousReply="false"
       />
     </template>

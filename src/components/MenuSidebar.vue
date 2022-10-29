@@ -11,20 +11,23 @@ const showComposeTweet = () => {
   app.setModalType("status");
   app.toggleModal();
 };
+const hideModalOnNavigation = () => {
+  if (app.showModal) app.toggleModal();
+};
 </script>
 
 <template>
   <div class="nav-sidebar">
     <nav>
       <ul>
-        <router-link to="/home">
-          <li class="nav-item nav-logo">
+        <router-link to="/home" class="nav-logo" @click="hideModalOnNavigation">
+          <li class="nav-item">
             <span class="nav-icon"
               ><v-icon name="bi-twitter" scale="2.0" fill="white"
             /></span></li
         ></router-link>
 
-        <router-link to="/home">
+        <router-link to="/home" @click="hideModalOnNavigation">
           <li class="nav-item">
             <span class="nav-icon"
               ><v-icon
@@ -35,7 +38,7 @@ const showComposeTweet = () => {
           </li></router-link
         >
 
-        <router-link to="/explore"
+        <router-link to="/explore" @click="hideModalOnNavigation"
           ><li class="nav-item">
             <span class="nav-icon stroke"
               ><v-icon name="hi-hashtag" scale="1.6" fill="#ffffff80" /></span
@@ -43,7 +46,7 @@ const showComposeTweet = () => {
           </li></router-link
         >
 
-        <router-link to="/notifications"
+        <router-link to="/notifications" @click="hideModalOnNavigation"
           ><li class="nav-item">
             <span class="nav-icon notif-icon"
               ><v-icon name="bi-bell" scale="1.7" fill="#ffffff80" />
@@ -59,6 +62,7 @@ const showComposeTweet = () => {
         >
 
         <router-link
+          @click="hideModalOnNavigation"
           v-if="app.currentUser"
           :to="{
             name: 'Profile',
@@ -419,7 +423,7 @@ li.nav-item.nav-logo .nav-icon {
   }
 
   .nav-user,
-  li.nav-item.nav-logo {
+  .nav-logo {
     display: none;
   }
 }

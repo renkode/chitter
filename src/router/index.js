@@ -1,10 +1,10 @@
 import { createWebHistory, createRouter } from "vue-router";
-import LocalTimeline from "@/components/LocalTimeline.vue";
-import TimelineMain from "@/components/TimelineMain.vue";
-import NotificationMain from "@/components/NotificationMain.vue";
-import ProfileMain from "@/components/ProfileMain.vue";
-import FollowLists from "@/components/lists/FollowLists.vue";
-import TweetContext from "@/components/TweetContext.vue";
+const LocalTimeline = () => import("@/components/LocalTimeline.vue"); // lazy load routes
+const TimelineMain = () => import("@/components/TimelineMain.vue");
+const NotificationMain = () => import("@/components/NotificationMain.vue");
+const ProfileMain = () => import("@/components/ProfileMain.vue");
+const FollowLists = () => import("@/components/lists/FollowLists.vue");
+const TweetContext = () => import("@/components/TweetContext.vue");
 
 const Error = {
   template: '<div class="error gray-text" v-else>Tweet does not exist.</div>',
