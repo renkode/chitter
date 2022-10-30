@@ -23,7 +23,11 @@ const user = computed(() => users.getUser(app.modalReply.userId));
   </div>
   <TweetCardSimple
     v-if="app.modalType === 'reply'"
-    :user="user"
+    :user="{
+      name: user.name,
+      username: user.username,
+      avatarUrl: user.avatarUrl,
+    }"
     :tweet="tweet"
   />
   <ComposeTweet :isModal="true" />

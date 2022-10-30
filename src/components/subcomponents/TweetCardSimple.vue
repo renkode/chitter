@@ -1,5 +1,5 @@
 <script setup>
-import { ref, defineProps, onMounted } from "vue";
+import { ref, defineProps, onMounted, onUnmounted } from "vue";
 import dayjs from "dayjs";
 import ProfilePicture from "./ProfilePicture.vue";
 import formatDateMixin from "@/mixins/formatDateMixin.js";
@@ -12,6 +12,7 @@ const props = defineProps({
   tweet: Object,
 });
 
+let timer = null;
 const currentTime = ref(dayjs().toISOString());
 const getTimeSinceCreation = ref(
   formatDateMixin.formatTweetDate(props.tweet.timestamp, currentTime.value)
@@ -21,7 +22,7 @@ onMounted(() => {
   // update tweet time every 30s (if tweet isn't a day old);
   if (dayjs(currentTime.value).diff(dayjs(props.tweet.timestamp), "hour") > 23)
     return;
-  const timer = setInterval(() => {
+  timer = setInterval(() => {
     if (
       getTimeSinceCreation.value !==
       formatDateMixin.formatTweetDate(props.tweet.timestamp, currentTime.value)
@@ -32,9 +33,10 @@ onMounted(() => {
       );
     }
   }, 30000);
-  return () => {
-    clearInterval(timer);
-  };
+});
+
+onUnmounted(() => {
+  clearInterval(timer);
 });
 </script>
 

@@ -1,19 +1,22 @@
 <script setup>
-import { ref, computed, watch, onMounted } from "vue";
+import { defineProps, ref, computed, watch, onMounted } from "vue";
 import TweetCard from "./subcomponents/TweetCard.vue";
 import TweetCardFull from "./subcomponents/TweetCardFull.vue";
 import { useAppStore } from "@/stores/app.js";
 import { useUsersStore } from "@/stores/users.js";
 import { useTweetStore } from "@/stores/tweets.js";
 
+// didn't use tweetlist since deleted tweets would have to be handled differently
 const app = useAppStore();
 const users = useUsersStore();
 const store = useTweetStore();
+const props = defineProps(["id"]);
 
-const tweet = computed(() => store.getTweet(app.viewTweetId));
-const previousTweet = computed(() =>
-  store.getTweet(tweet.value.replyingToTweet)
-);
+const tweet = computed(() => store.getTweet(props.id));
+const previousTweet = computed(() => {
+  if (tweet.value) return store.getTweet(tweet.value.replyingToTweet);
+  return null;
+});
 const previousTweets = ref([]);
 const replies = computed(() => {
   if (tweet.value) {
@@ -23,7 +26,7 @@ const replies = computed(() => {
   }
 });
 
-// kinda like a linked list. don't ask me.
+// kinda like a linked list
 const fetchPreviousTweets = () => {
   previousTweets.value = [];
   if (!tweet.value) return;
@@ -54,7 +57,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="tweet-list-container">
+  <div class="tweet-list-container" v-if="tweet">
     <template v-for="tweet in previousTweets">
       <template v-if="!tweet">
         <div class="tweet-container" :key="previousTweets.indexOf(tweet)">
@@ -67,9 +70,15 @@ onMounted(() => {
         <TweetCard
           :key="tweet.id"
           :id="tweet.id"
-          :user="users.getUser(tweet.authorId)"
+          :user="{
+            id: tweet.authorId,
+            name: users.getUser(tweet.authorId).name,
+            username: users.getUser(tweet.authorId).username,
+            avatarUrl: users.getUser(tweet.authorId).avatarUrl,
+          }"
           :tweet="tweet"
           :type="tweet.type"
+          :replyingTo="users.getUsername(tweet.replyingToUser)"
           :isPreviousReply="true"
         />
       </template>
@@ -77,9 +86,15 @@ onMounted(() => {
     <template v-if="tweet">
       <TweetCardFull
         :id="tweet.id"
-        :user="users.getUser(tweet.authorId)"
+        :user="{
+          id: tweet.authorId,
+          name: users.getUser(tweet.authorId).name,
+          username: users.getUser(tweet.authorId).username,
+          avatarUrl: users.getUser(tweet.authorId).avatarUrl,
+        }"
         :tweet="tweet"
         :type="tweet.type"
+        :replyingTo="users.getUsername(tweet.replyingToUser)"
     /></template>
 
     <template v-if="replies && replies.length > 0">
@@ -87,13 +102,20 @@ onMounted(() => {
         v-for="tweet in replies"
         :key="tweet.id"
         :id="tweet.id"
-        :user="users.getUser(tweet.authorId)"
+        :user="{
+          id: tweet.authorId,
+          name: users.getUser(tweet.authorId).name,
+          username: users.getUser(tweet.authorId).username,
+          avatarUrl: users.getUser(tweet.authorId).avatarUrl,
+        }"
         :tweet="tweet"
         :type="tweet.type"
+        :replyingTo="users.getUsername(tweet.replyingToUser)"
         :isPreviousReply="false"
       />
     </template>
   </div>
+  <div class="error gray-text" v-else>Tweet does not exist.</div>
 </template>
 
 <style scoped>

@@ -4,6 +4,7 @@ import { useAppStore } from "@/stores/app.js";
 import { useTweetStore } from "@/stores/tweets.js";
 import { useUsersStore } from "@/stores/users.js";
 import TweetList from "./lists/TweetList.vue";
+import ComposeTweet from "./subcomponents/ComposeTweet.vue";
 import db from "../firebase.js";
 import { collection, getDocs } from "firebase/firestore";
 
@@ -20,7 +21,7 @@ const localTweets = computed(() =>
         type: localTweet.type,
         retweetedBy:
           localTweet.type === "retweet"
-            ? users.getUser(localTweet.fromUserId).name
+            ? users.getUser(localTweet.retweetedBy).name
             : null,
       };
     }
@@ -41,8 +42,11 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="tweet-list-container">
-    <TweetList v-if="currentUser" :tweets="localTweets" />
+  <div>
+    <ComposeTweet />
+    <div class="tweet-list-container">
+      <TweetList v-if="currentUser" :tweets="localTweets" />
+    </div>
   </div>
 </template>
 

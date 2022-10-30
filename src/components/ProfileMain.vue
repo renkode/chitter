@@ -1,15 +1,18 @@
 <script setup>
-import { ref, computed } from "vue";
+import { defineProps, ref, computed } from "vue";
 import ProfileBio from "./subcomponents/ProfileBio.vue";
 import TweetList from "./lists/TweetList.vue";
 import { useUsersStore } from "@/stores/users.js";
 import { useTweetStore } from "@/stores/tweets.js";
-import { useAppStore } from "@/stores/app.js";
 
-const app = useAppStore();
 const tweetStore = useTweetStore();
 const users = useUsersStore();
-const user = computed(() => users.getUser(app.viewProfileId));
+
+const props = defineProps(["username"]);
+
+const user = computed(
+  () => users.getUserByUsername(props.username) // even if i use a regular function, this.$route won't work so...
+);
 const tab = ref("tweets"); // tweets-and-replies | media | likes
 
 const setTab = (newTab) => {
@@ -72,8 +75,8 @@ const tweets = computed(() => {
 <template>
   <div class="profile-wrapper">
     <ProfileBio v-if="user" :user="user" :tab="tab" :setTab="setTab" />
+    <TweetList v-if="user" :tweets="tweets" />
     <div class="error gray-text" v-else>User not found.</div>
-    <TweetList :tweets="tweets" />
   </div>
 </template>
 

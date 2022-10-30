@@ -4,14 +4,17 @@ import { useUsersStore } from "@/stores/users.js";
 import TweetCard from "../subcomponents/TweetCard.vue";
 
 const users = useUsersStore();
-
 const props = defineProps({ tweets: Array });
 /* example ( i don't like how it's structured either but whatever )
 { data: tweetObj,
   type: "retweet",
   retweetedBy: "user's name"
 }*/
-const tweets = computed(() => props.tweets.filter((tweet) => !!tweet)); // FAILSAFE, weed out undefined tweets
+const tweets = computed(() =>
+  props.tweets.filter(
+    (tweet) => typeof tweet !== "undefined" && typeof tweet.data !== "undefined"
+  )
+); // FAILSAFE, weed out undefined tweets
 </script>
 
 <template>
@@ -21,10 +24,16 @@ const tweets = computed(() => props.tweets.filter((tweet) => !!tweet)); // FAILS
         v-for="tweet in tweets"
         :key="tweet.data.id"
         :id="tweet.data.id"
-        :user="users.getUser(tweet.data.authorId)"
+        :user="{
+          id: tweet.data.authorId,
+          name: users.getUser(tweet.data.authorId).name,
+          username: users.getUser(tweet.data.authorId).username,
+          avatarUrl: users.getUser(tweet.data.authorId).avatarUrl,
+        }"
         :tweet="tweet.data"
         :type="tweet.type"
         :retweetedBy="tweet.retweetedBy"
+        :replyingTo="users.getUsername(tweet.data.replyingToUser)"
       />
     </TransitionGroup>
     <div class="error gray-text" v-else>No tweets to display</div>

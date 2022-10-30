@@ -1,13 +1,9 @@
 <script setup>
-import { ref, defineProps, computed, onMounted, watch } from "vue";
+import { ref, defineProps, computed, onMounted } from "vue";
 import ProfilePicture from "./ProfilePicture.vue";
+import EmbeddedText from "./EmbeddedText.vue";
 import formatDateMixin from "@/mixins/formatDateMixin.js";
-import {
-  getMediaClass,
-  urlRegex,
-  hashtagRegex,
-  atRegex,
-} from "@/mixins/utilities.js";
+import { getMediaClass } from "@/mixins/utilities.js";
 import { useTweetStore } from "@/stores/tweets.js";
 import { useAppStore } from "@/stores/app.js";
 import { useUsersStore } from "@/stores/users.js";
@@ -15,71 +11,40 @@ import { useUsersStore } from "@/stores/users.js";
 const tweets = useTweetStore();
 const app = useAppStore();
 const users = useUsersStore();
-
 const props = defineProps({
   id: String,
   user: Object,
   tweet: Object,
   type: String, // status, retweet, reply
+  replyingTo: String,
   isRetweetedBy: String,
 });
 
 const isTweetMenuOpen = ref(false);
-const tweetText = ref(null);
 const tweetContainer = ref(null);
 
 const isLiked = computed(() => tweets.hasLiked(props.tweet.id, app.currentId));
 const isRetweeted = computed(() =>
   tweets.hasRetweeted(props.tweet.id, app.currentId)
 );
-const replyingTo = computed(
-  () => users.getUser(props.tweet.replyingToUser).username
-);
-// embed @'s, hashtags and links inside tweets
-const embedLinks = computed(() => {
-  if (!props.tweet.text || props.tweet.text.length === 0) return;
-
-  const embedArr = props.tweet.text.split(" ").map((str) => {
-    switch (true) {
-      case urlRegex.test(str):
-        return `<a class="blue-link" href="${str}" target="_blank">${str}</a>`;
-      case hashtagRegex.test(str):
-        return `<a class="blue-link" href="#">${str}</a>`;
-      case atRegex.test(str):
-        return `<a class="blue-link user-link" href="#" data-username=${str.replace(
-          "@",
-          ""
-        )}>${str}</a>`;
-      default:
-        return str;
-    }
-  });
-  return embedArr.join(" ");
-});
 
 const toggleModal = (type) => {
   app.setModalType(type);
   app.toggleModal();
 };
 
-const toggleTweetMenu = (e) => {
-  e.preventDefault();
+const toggleTweetMenu = () => {
   isTweetMenuOpen.value = !isTweetMenuOpen.value;
 };
 
 const deleteTweet = () => {
-  if (app.viewTweetId == props.id) {
+  if (app.routeTweetId == props.id) {
     if (props.tweet.replyingToTweet)
-      app.setViewTweetId(props.tweet.replyingToTweet);
+      app.setTweetContext(props.tweet.replyingToTweet);
   } else {
-    app.setViewTweetId(null);
+    app.setTweetContext(null);
   }
   tweets.removeTweet(props.id, props.user.id);
-};
-
-const doSomething = (e) => {
-  e.stopPropagation();
-  console.log("test");
 };
 
 const toggleLike = () => {
@@ -101,35 +66,10 @@ const setReply = () => {
   app.setModalReply(props.user.id, props.id);
   app.toggleModal();
 };
-
-const clickForProfile = (e) => {
-  e.stopPropagation();
-  if (!users.getUserByUsername(e.target.dataset.username)) return;
-  app.viewUserProfile(users.getUserByUsername(e.target.dataset.username).id);
+const shareTweet = () => {
+  app.toggleToast("Copied to clipboard");
+  navigator.clipboard.writeText(`${window.location.host}/status/${props.id}`);
 };
-
-const setTweetText = () => {
-  tweetText.value.innerHTML = embedLinks.value || "";
-  const anchors = tweetText.value.querySelectorAll(".user-link");
-  Array.from(anchors).forEach((anchor) => {
-    anchor.removeEventListener("click", clickForProfile); // just in case lol
-    anchor.addEventListener("click", clickForProfile);
-  });
-};
-
-watch(embedLinks, () => {
-  setTweetText();
-});
-
-onMounted(() => {
-  setTweetText();
-  tweetContainer.value.scrollIntoView({ behavior: "smooth", block: "start" });
-  return () => {
-    Array.from(tweetText.value.querySelectorAll(".user-link")).forEach(
-      (anchor) => anchor.removeEventListener("click", clickForProfile)
-    );
-  };
-});
 </script>
 
 <template>
@@ -148,7 +88,7 @@ onMounted(() => {
           <ProfilePicture
             :url="props.user.avatarUrl"
             :size="48"
-            @click.stop="app.viewUserProfile(props.user.id)"
+            @click.stop="app.viewUserProfile(props.user.username)"
           />
         </div>
         <div class="tweet-data">
@@ -156,13 +96,13 @@ onMounted(() => {
             <div class="user-info-wrapper">
               <span
                 class="display-name"
-                @click.stop="app.viewUserProfile(props.user.id)"
-                ><a href="#">{{ props.user.name }}</a></span
+                @click.stop="app.viewUserProfile(props.user.username)"
+                ><a>{{ props.user.name }}</a></span
               >
               <span
                 class="username gray-text"
-                @click.stop="app.viewUserProfile(props.user.id)"
-                ><a href="#">@{{ props.user.username }}</a></span
+                @click.stop="app.viewUserProfile(props.user.username)"
+                ><a>@{{ props.user.username }}</a></span
               >
             </div>
             <span
@@ -185,7 +125,7 @@ onMounted(() => {
                   </li>
                   <li
                     class="tweet-menu-item"
-                    v-if="users.canFollow(app.currentId, props.user.id)"
+                    v-if="users.canFollow(app.currentUser, props.user.id)"
                     @click="users.followUser(app.currentId, props.user.id)"
                   >
                     <span class="tweet-menu-icon"
@@ -197,7 +137,7 @@ onMounted(() => {
                   </li>
                   <li
                     class="tweet-menu-item"
-                    v-if="users.canUnfollow(app.currentId, props.user.id)"
+                    v-if="users.canUnfollow(app.currentUser, props.user.id)"
                     @click="users.unfollowUser(app.currentId, props.user.id)"
                   >
                     <span class="tweet-menu-icon"
@@ -222,11 +162,11 @@ onMounted(() => {
           <span class="gray-text">Replying to </span>
           <a
             class="blue-link"
-            @click.stop="app.viewUserProfile(props.tweet.replyingToUser)"
-            >@{{ replyingTo }}</a
+            @click.stop="app.viewUserProfile(props.replyingTo)"
+            >@{{ props.replyingTo }}</a
           >
         </div>
-        <div class="tweet-text" ref="tweetText"></div>
+        <div class="tweet-text"><EmbeddedText :text="props.tweet.text" /></div>
         <div
           class="tweet-media"
           :class="[getMediaClass(props.tweet.media)]"
@@ -297,7 +237,7 @@ onMounted(() => {
         <div class="tweet-action-container">
           <span
             class="tweet-action-icon share-tweet-btn"
-            @click.stop="doSomething"
+            @click.stop="shareTweet"
             ><v-icon name="gi-share" scale="1.3" fill="#ffffff80"
           /></span>
         </div>
@@ -307,10 +247,6 @@ onMounted(() => {
 </template>
 
 <style scoped>
-.blue-link {
-  cursor: pointer;
-}
-
 .tweet-container {
   cursor: auto;
   border-top: 0;
@@ -359,6 +295,10 @@ onMounted(() => {
   flex-direction: column;
   margin-bottom: 0;
   margin-top: 0.7rem;
+}
+
+.tweet-text {
+  font-size: 1.2rem;
 }
 
 .date-and-time {

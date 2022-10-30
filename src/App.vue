@@ -4,14 +4,9 @@ import MenuSidebar from "./components/MenuSidebar.vue";
 import MediaSidebar from "./components/MediaSidebar.vue";
 import HeaderSC from "./components/subcomponents/HeaderSC.vue";
 import ComposeTweet from "./components/subcomponents/ComposeTweet.vue";
-import TimelineMain from "./components/TimelineMain.vue";
-import LocalTimeline from "./components/LocalTimeline.vue";
-import NotificationMain from "./components/NotificationMain.vue";
-import ProfileMain from "./components/ProfileMain.vue";
-import TweetContext from "./components/TweetContext.vue";
-import FollowLists from "./components/lists/FollowLists.vue";
 import LoadSpinner from "./components/subcomponents/LoadSpinner.vue";
 import ModalComponent from "./components/modals/ModalComponent.vue";
+import ToastMessage from "./components/subcomponents/ToastMessage.vue";
 import { useAppStore } from "@/stores/app.js";
 import { useUsersStore } from "@/stores/users";
 const app = useAppStore();
@@ -28,69 +23,24 @@ onMounted(() => {
   <div class="main-wrapper">
     <div class="timeline-wrapper">
       <HeaderSC />
-
-      <template v-if="app.view === 'home'">
-        <ComposeTweet v-if="app.currentUser" />
-        <Transition name="fade">
+      <router-view v-slot="{ Component }">
+        <Transition name="fade" mode="out-in">
           <Suspense>
-            <template #default> <LocalTimeline /> </template>
+            <template #default> <component :is="Component" /> </template>
             <template #fallback> <LoadSpinner /> </template>
           </Suspense>
         </Transition>
-      </template>
-
-      <template v-if="app.view === 'explore'">
-        <ComposeTweet v-if="app.currentUser" />
-        <Transition name="fade">
-          <Suspense>
-            <template #default> <TimelineMain /> </template>
-            <template #fallback> <LoadSpinner /> </template>
-          </Suspense>
-        </Transition>
-      </template>
-
-      <template v-if="app.view === 'notifications'">
-        <Transition name="fade">
-          <Suspense>
-            <template #default> <NotificationMain /> </template>
-            <template #fallback> <LoadSpinner /> </template>
-          </Suspense>
-        </Transition>
-      </template>
-
-      <template v-if="app.view === 'profile'">
-        <Transition name="fade">
-          <Suspense>
-            <template #default> <ProfileMain /> </template>
-            <template #fallback> <LoadSpinner /> </template>
-          </Suspense>
-        </Transition>
-      </template>
-
-      <template v-if="app.view === 'followers' || app.view === 'following'">
-        <Transition name="fade">
-          <Suspense>
-            <template #default> <FollowLists /> </template>
-            <template #fallback> <LoadSpinner /> </template>
-          </Suspense>
-        </Transition>
-      </template>
-
-      <template v-if="app.view === 'tweet' && app.viewTweetId">
-        <Transition name="fade">
-          <Suspense>
-            <template #default> <TweetContext /> </template>
-            <template #fallback> <LoadSpinner /> </template>
-          </Suspense>
-        </Transition>
-      </template>
+      </router-view>
     </div>
   </div>
 
   <MediaSidebar />
 
   <Teleport to="body">
-    <ModalComponent v-if="app.showModal" />
+    <Transition> <ModalComponent v-if="app.showModal" /></Transition>
+    <Transition>
+      <ToastMessage v-if="app.showToast" :duration="1500" />
+    </Transition>
   </Teleport>
 </template>
 
@@ -130,6 +80,10 @@ body {
   justify-content: center;
 }
 
+button {
+  font-weight: bold;
+}
+
 ul {
   padding: 0;
 }
@@ -147,8 +101,17 @@ a:hover {
   text-decoration: underline;
 }
 
-.fade-enter-active,
-.fade-leave-active {
+.v-enter-active,
+.v-leave-active {
+  transition: opacity 0.1s ease;
+}
+
+.v-enter-from,
+.v-leave-to {
+  opacity: 0;
+}
+
+.fade-enter-active {
   transition: opacity 0.15s ease;
 }
 

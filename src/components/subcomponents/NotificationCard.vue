@@ -10,6 +10,7 @@ const props = defineProps({
   userId: String,
   iconUrl: String,
   name: String,
+  username: String,
   tweetText: String,
   containsMedia: Boolean,
   isNew: Boolean,
@@ -28,7 +29,7 @@ const notifText = computed(() => {
       return " followed you";
   }
 });
-const fakeMediaUrl = computed(() => ` pic.twitter.com/${props.id}`);
+const fakeMediaUrl = computed(() => ` pic.chitter.com/${props.id}`);
 const isLike = computed(
   () => props.type === "like-origin" || props.type === "like-retweet"
 );
@@ -36,13 +37,13 @@ const isRetweet = computed(
   () => props.type === "retweet-origin" || props.type === "retweet-retweet"
 );
 
-const handleClick = () => {
+function handleClick() {
   if (props.type === "follow") {
-    app.viewUserProfile(props.userId);
+    app.viewUserProfile(props.username);
   } else {
     app.setTweetContext(props.id);
   }
-};
+}
 </script>
 
 <template>

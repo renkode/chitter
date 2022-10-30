@@ -68,7 +68,7 @@ const openModal = () => {
             shortURL
           }}</a></span
         >
-        <span class="misc-info gray-text" v-if="props.user.birthday">
+        <span class="misc-info gray-text" v-if="props.user.birthday.length > 1">
           <span class="misc-icon"
             ><v-icon
               name="la-birthday-cake-solid"
@@ -83,13 +83,23 @@ const openModal = () => {
         >
       </span>
       <span class="follow-metric-wrapper">
-        <span class="follow-metric" @click="store.setView('following')"
+        <router-link
+          class="follow-metric"
+          :to="{
+            name: 'Following',
+            params: { username: props.user.username },
+          }"
           ><strong>{{ props.user.followingCount }}</strong
-          ><span class="follow gray-text"> Following</span></span
+          ><span class="follow gray-text"> Following</span></router-link
         >
-        <span class="follow-metric" @click="store.setView('followers')"
+        <router-link
+          class="follow-metric"
+          :to="{
+            name: 'Followers',
+            params: { username: props.user.username },
+          }"
           ><strong>{{ props.user.followerCount }}</strong
-          ><span class="follow gray-text"> Followers</span></span
+          ><span class="follow gray-text"> Followers</span></router-link
         >
       </span>
     </div>
@@ -144,6 +154,12 @@ const openModal = () => {
 </template>
 
 <style scoped>
+a.follow-metric,
+a.follow-metric:link,
+a.follow-metric:visited {
+  color: white;
+}
+
 .profile-container {
   max-width: 600px;
   width: 100%;

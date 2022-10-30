@@ -15,10 +15,10 @@ const props = defineProps([
   "description",
 ]);
 
-const goToProfile = () => {
-  app.viewUserProfile(props.id);
+function goToProfile() {
+  app.viewUserProfile(props.username);
   if (app.showModal) app.toggleModal();
-};
+}
 </script>
 
 <template>

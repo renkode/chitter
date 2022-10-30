@@ -2,46 +2,51 @@
 import { computed } from "vue";
 import { useAppStore } from "@/stores/app.js";
 import { useUsersStore } from "@/stores/users.js";
+import router from "@/router/index.js";
 
 const app = useAppStore();
 const users = useUsersStore();
 
-const user = computed(() => users.getUser(app.viewProfileId));
+const user = computed(function () {
+  return users.getUserByUsername(app.routeUsername);
+});
+const canGoBack = computed(() => {
+  const routes = [
+    "Tweet",
+    "Profile",
+    "Notifications",
+    "Followers",
+    "Following",
+  ];
+  return routes.includes(app.routeName);
+});
 </script>
 
 <template>
   <div class="page-header">
-    <span
-      v-if="
-        app.view === 'tweet' ||
-        app.view === 'profile' ||
-        app.view === 'notifications' ||
-        app.view === 'followers' ||
-        app.view === 'following'
-      "
-      class="profile-wrapper"
-    >
-      <span class="back-arrow-btn" @click="app.goToLastView()"
+    <span v-if="canGoBack" class="profile-wrapper">
+      <span class="back-arrow-btn" @click="router.back()"
         ><v-icon name="md-arrowback" scale="1.1" fill="#ffffff80"
       /></span>
 
       <div
         class="user-info-wrapper"
-        v-if="app.view !== 'tweet' && app.view !== 'notifications'"
+        v-if="user && app.view !== 'tweet' && app.view !== 'notifications'"
       >
         <span class="display-name">{{ user.name }}</span>
         <span class="total-tweet-count gray-text"
           >{{ user.tweetCount }} Tweets</span
         >
       </div>
-      <span v-else style="text-transform: capitalize">{{ app.view }}</span>
+      <span v-else style="text-transform: capitalize">{{ app.routeName }}</span>
     </span>
-    <span v-else style="text-transform: capitalize">{{ app.view }}</span>
+    <span v-else style="text-transform: capitalize">{{ app.routeName }}</span>
   </div>
 </template>
 
 <style scoped>
 .page-header {
+  font-weight: bold;
   font-size: 1.2rem;
   min-height: 53px;
   height: 53px;
@@ -83,6 +88,7 @@ const user = computed(() => users.getUser(app.viewProfileId));
 }
 
 .total-tweet-count {
+  font-weight: normal;
   font-size: 0.9rem;
   margin: 0;
 }

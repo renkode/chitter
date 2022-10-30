@@ -87,7 +87,7 @@ watch(str, () => {
 });
 
 onMounted(() => {
-  resizeTextArea();
+  // resizeTextArea();
 });
 </script>
 

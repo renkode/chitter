@@ -6,10 +6,7 @@ const date = new Date();
 const iso = date.toISOString();
 var uid = new ShortUniqueId();
 
-// main is the name of the store. It is unique across your application
-// and will appear in devtools
 export const useTweetStore = defineStore("tweets", {
-  // a function that returns a fresh state
   state: () => ({
     // STATE MUST BE AN OBJECT JFC
     tweets: [
@@ -124,13 +121,12 @@ export const useTweetStore = defineStore("tweets", {
       },
     ],
   }),
-  // optional getters
   getters: {},
-  // optional actions
   actions: {
     getTweet(id) {
       return this.tweets.filter((t) => t.id == id)[0];
     },
+
     addLike(id, userId, isRetweet) {
       const tweet = this.getTweet(id);
       if (!tweet) throw new Error(`tweet id ${id} does not exist`);
@@ -145,6 +141,7 @@ export const useTweetStore = defineStore("tweets", {
           : users.notify(tweet.authorId, userId, "like-origin", id);
       }
     },
+
     removeLike(id, userId) {
       const tweet = this.getTweet(id);
       if (!tweet) throw new Error(`tweet id ${id} does not exist`);
@@ -154,11 +151,13 @@ export const useTweetStore = defineStore("tweets", {
       const users = useUsersStore();
       users.removeLike(userId, id);
     },
+
     hasLiked(id, userId) {
       const tweet = this.getTweet(id);
       if (!tweet) return false;
       return tweet.likesFrom.includes(userId);
     },
+
     addRetweet(id, userId, isRetweet) {
       const tweet = this.getTweet(id);
       if (!tweet) throw new Error(`tweet id ${id} does not exist`);
@@ -167,12 +166,19 @@ export const useTweetStore = defineStore("tweets", {
 
       const users = useUsersStore();
       users.addRetweet(userId, id);
-      users.addToLocalTimeline(userId, id, "retweet", new Date().toISOString()); // self
+      users.addToLocalTimeline(
+        userId,
+        id,
+        "retweet",
+        new Date().toISOString(),
+        userId
+      ); // self
       users.addToAllFollowerTimelines(
         userId,
         id,
         "retweet",
-        new Date().toISOString()
+        new Date().toISOString(),
+        userId
       );
       if (tweet.authorId !== userId) {
         isRetweet
@@ -180,6 +186,7 @@ export const useTweetStore = defineStore("tweets", {
           : users.notify(tweet.authorId, userId, "retweet-origin", id);
       }
     },
+
     removeRetweet(id, userId) {
       const tweet = this.getTweet(id);
       if (!tweet) throw new Error("no such tweet");
@@ -191,11 +198,13 @@ export const useTweetStore = defineStore("tweets", {
       users.removeFromLocalTimeline(userId, id); // self
       users.removeFromAllFollowerTimelines(userId, id); // followers
     },
+
     hasRetweeted(id, userId) {
       const tweet = this.getTweet(id);
       if (!tweet) return false;
       return tweet.retweetsFrom.includes(userId);
     },
+
     addTweet(
       type = "status",
       text = "",
@@ -238,10 +247,10 @@ export const useTweetStore = defineStore("tweets", {
       if (type === "reply" && replyingToUser !== authorId)
         users.notify(replyingToUser, authorId, "reply", newTweet.id);
     },
+
     removeTweet(id, userId) {
       const index = this.tweets.findIndex((t) => t.id === id);
       if (index < 0) throw new Error("no such tweet");
-      const replyingToUser = this.getTweet(this.tweets[index].replyingToUser);
       const replyingToTweet = this.getTweet(this.tweets[index].replyingToTweet);
       if (replyingToTweet)
         replyingToTweet.repliesFrom = replyingToTweet.repliesFrom.filter(
@@ -255,7 +264,8 @@ export const useTweetStore = defineStore("tweets", {
       users.removeRetweet(userId, id);
       users.removeFromLocalTimeline(userId, id); // self
       users.removeFromAllFollowerTimelines(userId, id); // followers
-      if (replyingToUser) users.deleteReplyNotification(userId, id);
+      if (this.tweets[index].replyingToUser)
+        users.deleteReplyNotification(this.tweets[index].replyingToUser, id);
     },
   },
 });

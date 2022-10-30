@@ -16,7 +16,7 @@ const headerText = computed(() =>
     ? "Liked by"
     : ""
 );
-const currentTweet = computed(() => tweets.getTweet(app.viewTweetId));
+const currentTweet = computed(() => tweets.getTweet(app.routeTweetId));
 const list = computed(() => {
   if (currentTweet.value && app.modalType === "retweet-list") {
     return currentTweet.value.retweetsFrom.map((id) => users.getUser(id));

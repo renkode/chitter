@@ -1,14 +1,10 @@
 <script setup>
-import { ref, defineProps, computed, onMounted } from "vue";
+import { ref, defineProps, computed, onMounted, onUnmounted } from "vue";
 import dayjs from "dayjs";
 import ProfilePicture from "./ProfilePicture.vue";
+import EmbeddedText from "./EmbeddedText.vue";
 import formatDateMixin from "@/mixins/formatDateMixin.js";
-import {
-  getMediaClass,
-  urlRegex,
-  hashtagRegex,
-  atRegex,
-} from "@/mixins/utilities.js";
+import { getMediaClass } from "@/mixins/utilities.js";
 import { useTweetStore } from "@/stores/tweets.js";
 import { useAppStore } from "@/stores/app.js";
 import { useUsersStore } from "@/stores/users.js";
@@ -16,23 +12,22 @@ import { useUsersStore } from "@/stores/users.js";
 const tweets = useTweetStore();
 const app = useAppStore();
 const users = useUsersStore();
-
-var relativeTime = require("dayjs/plugin/relativeTime");
-dayjs.extend(relativeTime);
-
 const props = defineProps({
   id: String,
-  user: Object,
+  user: Object, // id, name, username, avatarUrl
   tweet: Object,
   type: String, // status, retweet, reply
   retweetedBy: String,
-  isPreviousReply: Boolean,
-  isNotification: Boolean,
+  replyingTo: String,
+  isPreviousReply: Boolean, // render gray line for tweet thread
+  isNotification: Boolean, // highlight if new notification
 });
 
-const isTweetMenuOpen = ref(false);
-const tweetText = ref(null);
+var relativeTime = require("dayjs/plugin/relativeTime");
+dayjs.extend(relativeTime);
+let timer = null;
 
+const isTweetMenuOpen = ref(false);
 const currentTime = ref(dayjs().toISOString());
 const getTimeSinceCreation = ref(
   formatDateMixin.formatTweetDate(props.tweet.timestamp, currentTime.value)
@@ -41,44 +36,13 @@ const isLiked = computed(() => tweets.hasLiked(props.tweet.id, app.currentId));
 const isRetweeted = computed(() =>
   tweets.hasRetweeted(props.tweet.id, app.currentId)
 );
-const replyingTo = computed(
-  () => users.getUser(props.tweet.replyingToUser).username
-);
 
-// embed @'s, hashtags and links inside tweets
-const embedLinks = computed(() => {
-  if (!props.tweet.text || props.tweet.text.length === 0) return;
-
-  const embedArr = props.tweet.text.split(" ").map((str) => {
-    switch (true) {
-      case urlRegex.test(str):
-        return `<a class="blue-link" href="${str}" target="_blank">${str}</a>`;
-      case hashtagRegex.test(str):
-        return `<a class="blue-link" href="#">${str}</a>`;
-      case atRegex.test(str):
-        return `<a class="blue-link user-link" href="#" data-username=${str.replace(
-          "@",
-          ""
-        )}>${str}</a>`;
-      default:
-        return str;
-    }
-  });
-  return embedArr.join(" ");
-});
-
-const toggleTweetMenu = (e) => {
-  e.preventDefault();
+const toggleTweetMenu = () => {
   isTweetMenuOpen.value = !isTweetMenuOpen.value;
 };
 
 const deleteTweet = () => {
   tweets.removeTweet(props.id, props.user.id);
-};
-
-const doSomething = (e) => {
-  e.stopPropagation();
-  console.log("test");
 };
 
 const toggleLike = () => {
@@ -100,22 +64,16 @@ const setReply = () => {
   app.setModalReply(props.user.id, props.id);
   app.toggleModal();
 };
+const shareTweet = () => {
+  app.toggleToast("Copied to clipboard");
+  navigator.clipboard.writeText(`${window.location.host}/status/${props.id}`);
+};
 
 onMounted(() => {
-  // set tweet text
-  tweetText.value.innerHTML = embedLinks.value || ""; // dangerous
-  const anchors = tweetText.value.querySelectorAll(".user-link");
-  Array.from(anchors).forEach((anchor) =>
-    anchor.addEventListener("click", (e) => {
-      e.stopPropagation();
-      if (!users.getUserByUsername(anchor.dataset.username)) return;
-      app.viewUserProfile(users.getUserByUsername(anchor.dataset.username).id);
-    })
-  );
   // update tweet time every 30s (if tweet isn't a day old);
   if (dayjs(currentTime.value).diff(dayjs(props.tweet.timestamp), "hour") > 23)
     return;
-  const timer = setInterval(() => {
+  timer = setInterval(() => {
     if (
       getTimeSinceCreation.value !==
       formatDateMixin.formatTweetDate(props.tweet.timestamp, currentTime.value)
@@ -126,13 +84,10 @@ onMounted(() => {
       );
     }
   }, 30000);
-  // clear on dismount
-  return () => {
-    Array.from(anchors).forEach((anchor) =>
-      anchor.removeEventListener("click", doSomething)
-    );
-    clearInterval(timer);
-  };
+});
+
+onUnmounted(() => {
+  clearInterval(timer);
 });
 </script>
 
@@ -155,7 +110,7 @@ onMounted(() => {
         <ProfilePicture
           :url="props.user.avatarUrl"
           :size="48"
-          @click.stop="app.viewUserProfile(props.user.id)"
+          @click.stop="app.viewUserProfile(props.user.username)"
         />
         <div class="gray-line" v-if="isPreviousReply"></div>
       </div>
@@ -164,13 +119,13 @@ onMounted(() => {
           <div class="user-info-wrapper">
             <span
               class="display-name"
-              @click.stop="app.viewUserProfile(props.user.id)"
-              ><a href="#">{{ props.user.name }}</a></span
+              @click.stop="app.viewUserProfile(props.user.username)"
+              ><a>{{ props.user.name }}</a></span
             >
             <span
               class="username gray-text"
-              @click.stop="app.viewUserProfile(props.user.id)"
-              ><a href="#">@{{ props.user.username }}</a></span
+              @click.stop="app.viewUserProfile(props.user.username)"
+              ><a>@{{ props.user.username }}</a></span
             >
             <span class="separator gray-text">·</span>
             <span class="tweet-time gray-text">{{ getTimeSinceCreation }}</span>
@@ -195,7 +150,7 @@ onMounted(() => {
                 </li>
                 <li
                   class="tweet-menu-item"
-                  v-if="users.canFollow(app.currentId, props.user.id)"
+                  v-if="users.canFollow(app.currentUser, props.user.id)"
                   @click="users.followUser(app.currentId, props.user.id)"
                 >
                   <span class="tweet-menu-icon"
@@ -207,7 +162,7 @@ onMounted(() => {
                 </li>
                 <li
                   class="tweet-menu-item"
-                  v-if="users.canUnfollow(app.currentId, props.user.id)"
+                  v-if="users.canUnfollow(app.currentUser, props.user.id)"
                   @click="users.unfollowUser(app.currentId, props.user.id)"
                 >
                   <span class="tweet-menu-icon"
@@ -230,11 +185,13 @@ onMounted(() => {
             <span class="gray-text">Replying to </span>
             <a
               class="blue-link"
-              @click.stop="app.viewUserProfile(props.tweet.replyingToUser)"
-              >@{{ replyingTo }}</a
+              @click.stop="app.viewUserProfile(props.replyingTo)"
+              >@{{ props.replyingTo }}</a
             >
           </div>
-          <div class="tweet-text" ref="tweetText">{{ embedLinks }}</div>
+          <div class="tweet-text">
+            <EmbeddedText :text="props.tweet.text" />
+          </div>
           <div
             class="tweet-media"
             :class="[getMediaClass(props.tweet.media)]"
@@ -285,7 +242,7 @@ onMounted(() => {
           </span>
           <span
             class="tweet-action-icon share-tweet-btn"
-            @click.stop="doSomething"
+            @click.stop="shareTweet"
             ><v-icon name="gi-share" scale="1.0" fill="#ffffff80"
           /></span>
         </div>
@@ -295,6 +252,10 @@ onMounted(() => {
 </template>
 
 <style>
+.blue-link {
+  cursor: pointer;
+}
+
 .blue-link:focus {
   outline: 0;
 }

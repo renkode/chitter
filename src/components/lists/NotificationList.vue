@@ -6,17 +6,10 @@ import { useUsersStore } from "@/stores/users.js";
 import TweetCard from "../subcomponents/TweetCard.vue";
 import NotificationCard from "../subcomponents/NotificationCard.vue";
 
-const props = defineProps({ notifs: Array }); // { fromUser, type, tweetId }
 const tweets = useTweetStore();
 const app = useAppStore();
 const users = useUsersStore();
-
-// type: String,
-//   id: String,
-//   iconUrl: String,
-//   name: String,
-//   tweetText: String,
-//   containsMedia: Boolean,
+const props = defineProps({ notifs: Array }); // { fromUser, type, tweetId }
 </script>
 
 <template>
@@ -27,9 +20,15 @@ const users = useUsersStore();
           <TweetCard
             :key="index"
             :id="notif.tweetId"
-            :user="users.getUser(notif.fromUser)"
+            :user="{
+              id: notif.fromUser,
+              name: users.getUser(notif.fromUser).name,
+              username: users.getUser(notif.fromUser).username,
+              avatarUrl: users.getUser(notif.fromUser).avatarUrl,
+            }"
             :tweet="tweets.getTweet(notif.tweetId)"
             :type="'reply'"
+            :replyingTo="app.currentUser.username"
             :isNotification="
               users.replyIsNewNotification(app.currentId, notif.tweetId)
             "
@@ -43,6 +42,7 @@ const users = useUsersStore();
             :type="notif.type"
             :iconUrl="users.getUser(notif.fromUser).avatarUrl"
             :name="users.getUser(notif.fromUser).name"
+            :username="users.getUser(notif.fromUser).username"
             :tweetText="tweets.getTweet(notif.tweetId).text"
             :containsMedia="tweets.getTweet(notif.tweetId).media.length > 0"
             :isNew="users.isNewNotification(app.currentId, notif)"
@@ -56,6 +56,7 @@ const users = useUsersStore();
             :userId="users.getUser(notif.fromUser).id"
             :iconUrl="users.getUser(notif.fromUser).avatarUrl"
             :name="users.getUser(notif.fromUser).name"
+            :username="users.getUser(notif.fromUser).username"
             :isNew="users.isNewNotification(app.currentId, notif)"
           />
         </template>
