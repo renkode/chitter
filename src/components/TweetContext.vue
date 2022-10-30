@@ -70,7 +70,12 @@ onMounted(() => {
         <TweetCard
           :key="tweet.id"
           :id="tweet.id"
-          :user="users.getUser(tweet.authorId)"
+          :user="{
+            id: tweet.authorId,
+            name: users.getUser(tweet.authorId).name,
+            username: users.getUser(tweet.authorId).username,
+            avatarUrl: users.getUser(tweet.authorId).avatarUrl,
+          }"
           :tweet="tweet"
           :type="tweet.type"
           :replyingTo="users.getUsername(tweet.replyingToUser)"
@@ -81,7 +86,12 @@ onMounted(() => {
     <template v-if="tweet">
       <TweetCardFull
         :id="tweet.id"
-        :user="users.getUser(tweet.authorId)"
+        :user="{
+          id: tweet.authorId,
+          name: users.getUser(tweet.authorId).name,
+          username: users.getUser(tweet.authorId).username,
+          avatarUrl: users.getUser(tweet.authorId).avatarUrl,
+        }"
         :tweet="tweet"
         :type="tweet.type"
         :replyingTo="users.getUsername(tweet.replyingToUser)"
@@ -92,7 +102,12 @@ onMounted(() => {
         v-for="tweet in replies"
         :key="tweet.id"
         :id="tweet.id"
-        :user="users.getUser(tweet.authorId)"
+        :user="{
+          id: tweet.authorId,
+          name: users.getUser(tweet.authorId).name,
+          username: users.getUser(tweet.authorId).username,
+          avatarUrl: users.getUser(tweet.authorId).avatarUrl,
+        }"
         :tweet="tweet"
         :type="tweet.type"
         :replyingTo="users.getUsername(tweet.replyingToUser)"

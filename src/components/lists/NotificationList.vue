@@ -20,7 +20,12 @@ const props = defineProps({ notifs: Array }); // { fromUser, type, tweetId }
           <TweetCard
             :key="index"
             :id="notif.tweetId"
-            :user="users.getUser(notif.fromUser)"
+            :user="{
+              id: notif.fromUser,
+              name: users.getUser(notif.fromUser).name,
+              username: users.getUser(notif.fromUser).username,
+              avatarUrl: users.getUser(notif.fromUser).avatarUrl,
+            }"
             :tweet="tweets.getTweet(notif.tweetId)"
             :type="'reply'"
             :replyingTo="app.currentUser.username"

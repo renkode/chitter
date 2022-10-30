@@ -24,7 +24,12 @@ const tweets = computed(() =>
         v-for="tweet in tweets"
         :key="tweet.data.id"
         :id="tweet.data.id"
-        :user="users.getUser(tweet.data.authorId)"
+        :user="{
+          id: tweet.data.authorId,
+          name: users.getUser(tweet.data.authorId).name,
+          username: users.getUser(tweet.data.authorId).username,
+          avatarUrl: users.getUser(tweet.data.authorId).avatarUrl,
+        }"
         :tweet="tweet.data"
         :type="tweet.type"
         :retweetedBy="tweet.retweetedBy"
