@@ -59,7 +59,10 @@ const toggleUser = () => {
           </li></router-link
         >
 
-        <router-link to="/notifications" @click="hideModalOnNavigation"
+        <router-link
+          to="/notifications"
+          v-if="app.currentUser"
+          @click="hideModalOnNavigation"
           ><li class="nav-item">
             <span class="nav-icon notif-icon"
               ><v-icon name="bi-bell" scale="1.7" fill="#ffffff80" />
@@ -117,7 +120,7 @@ const toggleUser = () => {
         <div v-if="isAccountMenuOpen" class="overlay"></div>
         <div v-if="isAccountMenuOpen" class="tweet-menu-container">
           <ul class="tweet-menu-list">
-            <li class="tweet-menu-item" @click="toggleUser">
+            <li class="tweet-menu-item" @click="app.logOut">
               Log out @{{ app.currentUser.username }}
             </li>
           </ul>
@@ -269,6 +272,7 @@ li.nav-item.nav-logo .nav-icon {
   max-width: 90%;
   height: 100%;
   margin-bottom: 0;
+  display: flex;
 }
 
 .user-info-wrapper {
@@ -385,7 +389,6 @@ li.nav-item.nav-logo .nav-icon {
     height: 64px;
     width: 64px;
     padding-left: 0.5rem;
-    margin: 0;
   }
   .user-info-wrapper,
   .extra-btn {
@@ -493,6 +496,7 @@ li.nav-item.nav-logo .nav-icon {
     position: fixed;
     top: -1px;
     right: 5px;
+    margin: 0;
   }
 
   .tweet-menu-container {

@@ -1,5 +1,5 @@
 <script setup>
-import { ref, defineProps, computed, onMounted, watch } from "vue";
+import { ref, defineProps, onMounted, watch, onBeforeUnmount } from "vue";
 import { urlRegex, hashtagRegex, atRegex } from "@/mixins/utilities.js";
 import { useAppStore } from "@/stores/app";
 
@@ -7,7 +7,7 @@ const props = defineProps(["text"]);
 const textEl = ref(null);
 const app = useAppStore();
 
-const embedLinks = computed(() => {
+const embedLinks = () => {
   if (!props.text || props.text.length === 0) return;
 
   const embedArr = props.text.split(" ").map((str) => {
@@ -30,24 +30,28 @@ const embedLinks = computed(() => {
     }
   });
   return embedArr.join(" ");
-});
+};
 
 onMounted(() => {
   const anchors = textEl.value.querySelectorAll(".user-link");
   Array.from(anchors).forEach((anchor) =>
-    anchor.addEventListener("click", function handleClick(e) {
-      e.stopPropagation();
-      app.viewUserProfile(anchor.dataset.username);
-      this.removeEventListener("click", handleClick);
-    })
+    anchor.addEventListener(
+      "click",
+      function handleClick(e) {
+        e.stopPropagation();
+        app.viewUserProfile(anchor.dataset.username);
+      },
+      {
+        capture: false,
+        once: true,
+      }
+    )
   );
 });
-
-watch(textEl, () => {});
 </script>
 
 <template>
-  <div ref="textEl" v-html="embedLinks"></div>
+  <div ref="textEl" v-html="embedLinks()"></div>
 </template>
 
 <style scoped>

@@ -94,7 +94,7 @@ onMounted(() => {
 <template>
   <div class="compose-tweet-container">
     <div class="profile-pic-container">
-      <ProfilePicture :url="user.avatarUrl" :size="48" />
+      <ProfilePicture :url="user ? user.avatarUrl : ''" :size="48" />
     </div>
     <div class="compose-tweet-body">
       <div class="compose-tweet-content">
@@ -163,7 +163,7 @@ onMounted(() => {
           >
           <button
             class="new-tweet-btn"
-            :disabled="isRedRange || noContent"
+            :disabled="!user || isRedRange || noContent"
             @click="postTweet(null)"
           >
             Tweet

@@ -128,6 +128,7 @@ export const useTweetStore = defineStore("tweets", {
     },
 
     addLike(id, userId, isRetweet) {
+      if (!userId) return;
       const tweet = this.getTweet(id);
       if (!tweet) throw new Error(`tweet id ${id} does not exist`);
       tweet.likeCount++;
@@ -143,6 +144,7 @@ export const useTweetStore = defineStore("tweets", {
     },
 
     removeLike(id, userId) {
+      if (!userId) return;
       const tweet = this.getTweet(id);
       if (!tweet) throw new Error(`tweet id ${id} does not exist`);
       tweet.likeCount--;
@@ -159,6 +161,7 @@ export const useTweetStore = defineStore("tweets", {
     },
 
     addRetweet(id, userId, isRetweet) {
+      if (!userId) return;
       const tweet = this.getTweet(id);
       if (!tweet) throw new Error(`tweet id ${id} does not exist`);
       tweet.retweetCount++;
@@ -188,6 +191,7 @@ export const useTweetStore = defineStore("tweets", {
     },
 
     removeRetweet(id, userId) {
+      if (!userId) return;
       const tweet = this.getTweet(id);
       if (!tweet) throw new Error("no such tweet");
       tweet.retweetCount--;

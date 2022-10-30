@@ -1,5 +1,5 @@
 <script setup>
-import { ref, defineProps, onMounted, onUnmounted } from "vue";
+import { ref, defineProps, onMounted, onBeforeUnmount } from "vue";
 import dayjs from "dayjs";
 import ProfilePicture from "./ProfilePicture.vue";
 import formatDateMixin from "@/mixins/formatDateMixin.js";
@@ -35,7 +35,7 @@ onMounted(() => {
   }, 30000);
 });
 
-onUnmounted(() => {
+onBeforeUnmount(() => {
   clearInterval(timer);
 });
 </script>

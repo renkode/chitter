@@ -42,4 +42,8 @@ onMounted(() => {
   </div>
 </template>
 
-<style></style>
+<style scoped>
+div {
+  width: 100%;
+}
+</style>

@@ -1,5 +1,5 @@
 <script setup>
-import { ref, defineProps, computed, onMounted, onUnmounted } from "vue";
+import { ref, defineProps, computed, onMounted, onBeforeUnmount } from "vue";
 import dayjs from "dayjs";
 import ProfilePicture from "./ProfilePicture.vue";
 import EmbeddedText from "./EmbeddedText.vue";
@@ -38,6 +38,7 @@ const isRetweeted = computed(() =>
 );
 
 const toggleTweetMenu = () => {
+  if (!app.currentUser) return;
   isTweetMenuOpen.value = !isTweetMenuOpen.value;
 };
 
@@ -86,7 +87,7 @@ onMounted(() => {
   }, 30000);
 });
 
-onUnmounted(() => {
+onBeforeUnmount(() => {
   clearInterval(timer);
 });
 </script>

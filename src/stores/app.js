@@ -35,6 +35,10 @@ export const useAppStore = defineStore("app", {
       this.currentUser = user || null;
       this.currentId = user.id;
     },
+    logOut() {
+      this.currentUser = null;
+      this.currentId = null;
+    },
     setProfileTab(tab) {
       if (this.profileTab === tab) return;
       const tabs = ["tweets", "tweets-and-replies", "media", "likes"];

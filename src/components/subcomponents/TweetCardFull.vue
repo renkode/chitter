@@ -1,5 +1,5 @@
 <script setup>
-import { ref, defineProps, computed, onMounted } from "vue";
+import { ref, defineProps, computed } from "vue";
 import ProfilePicture from "./ProfilePicture.vue";
 import EmbeddedText from "./EmbeddedText.vue";
 import formatDateMixin from "@/mixins/formatDateMixin.js";
@@ -34,6 +34,7 @@ const toggleModal = (type) => {
 };
 
 const toggleTweetMenu = () => {
+  if (!app.currentUser) return;
   isTweetMenuOpen.value = !isTweetMenuOpen.value;
 };
 

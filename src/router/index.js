@@ -63,6 +63,16 @@ const routes = [
     props: true,
   },
   {
+    path: "/signup",
+    name: "Signup",
+    component: TweetContext,
+  },
+  {
+    path: "/login",
+    name: "Login",
+    component: TweetContext,
+  },
+  {
     path: "/:catchAll(.*)",
     component: Error,
   },

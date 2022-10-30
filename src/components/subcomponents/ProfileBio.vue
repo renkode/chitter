@@ -37,14 +37,17 @@ const openModal = () => {
         >
           Edit Profile
         </button>
-        <FollowButton v-else :userId="props.user.id" />
+        <FollowButton v-else-if="store.currentUser" :userId="props.user.id" />
       </div>
       <div class="user-info-wrapper">
         <span class="display-name">{{ props.user.name }}</span>
         <span class="username-wrapper">
           <span class="username gray-text"> @{{ props.user.username }} </span>
           <div
-            v-if="users.isFollowingUser(props.user.id, store.currentId)"
+            v-if="
+              store.currentId &&
+              users.isFollowingUser(props.user.id, store.currentId)
+            "
             class="follows-you gray-text"
           >
             Follows you
@@ -94,10 +97,7 @@ const openModal = () => {
         >
         <router-link
           class="follow-metric"
-          :to="{
-            name: 'Followers',
-            params: { username: props.user.username },
-          }"
+          :to="{ name: 'Followers', params: { username: props.user.username } }"
           ><strong>{{ props.user.followerCount }}</strong
           ><span class="follow gray-text"> Followers</span></router-link
         >

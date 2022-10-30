@@ -1,5 +1,5 @@
 <script setup>
-import { onMounted, computed } from "vue";
+import { onMounted, onUnmounted, computed } from "vue";
 import { useAppStore } from "@/stores/app.js";
 import { useTweetStore } from "@/stores/tweets.js";
 import { useUsersStore } from "@/stores/users.js";
@@ -27,18 +27,6 @@ const localTweets = computed(() =>
     }
   })
 );
-
-async function delay(time) {
-  await new Promise((res) => {
-    setTimeout(() => {
-      //console.log(res);
-    }, time);
-  });
-}
-
-onMounted(() => {
-  delay(0);
-});
 </script>
 
 <template>
@@ -50,4 +38,8 @@ onMounted(() => {
   </div>
 </template>
 
-<style></style>
+<style scoped>
+div {
+  width: 100%;
+}
+</style>

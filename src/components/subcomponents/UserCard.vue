@@ -34,19 +34,21 @@ function goToProfile() {
       <div class="user-info-and-btn">
         <div class="user-info-wrapper">
           <span class="display-name" @click.stop="goToProfile"
-            ><a href="#">{{ props.name }}</a></span
+            ><a>{{ props.name }}</a></span
           >
           <span class="username-wrapper">
             <span class="username gray-text"> @{{ props.username }} </span>
             <div
-              v-if="users.isFollowingUser(props.id, app.currentId)"
+              v-if="
+                app.currentId && users.isFollowingUser(props.id, app.currentId)
+              "
               class="follows-you gray-text"
             >
               Follows you
             </div>
           </span>
         </div>
-        <FollowButton :userId="props.id" />
+        <FollowButton v-if="app.currentId" :userId="props.id" />
       </div>
       <div class="description">{{ props.description }}</div>
     </div>

@@ -7,9 +7,7 @@ import router from "@/router/index.js";
 const app = useAppStore();
 const users = useUsersStore();
 
-const user = computed(function () {
-  return users.getUserByUsername(app.routeUsername);
-});
+const user = computed(() => users.getUserByUsername(app.routeUsername));
 const canGoBack = computed(() => {
   const routes = [
     "Tweet",
@@ -24,23 +22,31 @@ const canGoBack = computed(() => {
 
 <template>
   <div class="page-header">
-    <span v-if="canGoBack" class="profile-wrapper">
-      <span class="back-arrow-btn" @click="router.back()"
-        ><v-icon name="md-arrowback" scale="1.1" fill="#ffffff80"
-      /></span>
+    <span class="header-wrapper">
+      <span v-if="canGoBack" class="profile-wrapper">
+        <span class="back-arrow-btn" @click="router.back()"
+          ><v-icon name="md-arrowback" scale="1.1" fill="#ffffff80"
+        /></span>
 
-      <div
-        class="user-info-wrapper"
-        v-if="user && app.view !== 'tweet' && app.view !== 'notifications'"
-      >
-        <span class="display-name">{{ user.name }}</span>
-        <span class="total-tweet-count gray-text"
-          >{{ user.tweetCount }} Tweets</span
+        <div
+          class="user-info-wrapper"
+          v-if="user && app.view !== 'tweet' && app.view !== 'notifications'"
         >
-      </div>
-      <span v-else style="text-transform: capitalize">{{ app.routeName }}</span>
-    </span>
-    <span v-else style="text-transform: capitalize">{{ app.routeName }}</span>
+          <span class="display-name">{{ user.name }}</span>
+          <span class="total-tweet-count gray-text"
+            >{{ user.tweetCount }} Tweets</span
+          >
+        </div>
+        <span v-else style="text-transform: capitalize">{{
+          app.routeName
+        }}</span>
+      </span>
+      <span v-else style="text-transform: capitalize">{{
+        app.routeName
+      }}</span></span
+    >
+
+    <button v-if="!app.currentId" class="sign-up-btn">Sign Up</button>
   </div>
 </template>
 
@@ -48,13 +54,14 @@ const canGoBack = computed(() => {
 .page-header {
   font-weight: bold;
   font-size: 1.2rem;
-  min-height: 53px;
-  height: 53px;
+  min-height: 54px;
+  height: 54px;
   width: 100%;
-  padding-left: 16px;
+  padding: 0 1rem;
   background-color: rgba(38, 42, 46, 0.836);
   backdrop-filter: blur(10px);
   display: flex;
+  justify-content: space-between;
   align-items: center;
   position: sticky;
   user-select: none;
@@ -84,12 +91,40 @@ const canGoBack = computed(() => {
   flex-direction: column;
   justify-content: flex-start;
   font-size: 1rem;
-  margin-left: 1rem;
+  margin-left: 2.5rem;
+  width: 100%;
 }
 
 .total-tweet-count {
   font-weight: normal;
   font-size: 0.9rem;
   margin: 0;
+}
+
+.header-wrapper {
+  display: flex;
+  width: fit-content;
+}
+
+.sign-up-btn {
+  color: white;
+  cursor: pointer;
+  border: 0;
+  border-radius: 20px;
+  background-color: #1d9bf0;
+  font-size: 1rem;
+  height: 40px;
+  padding: 0.5rem 1rem;
+  transition: background-color 0.15s ease;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.sign-up-btn:hover {
+  background-color: #1687d3;
+}
+
+@media screen and (max-width: 1000px) {
 }
 </style>
