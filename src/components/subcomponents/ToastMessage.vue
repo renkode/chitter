@@ -1,15 +1,13 @@
 <script setup>
-import { defineProps, onMounted } from "vue";
+import { defineProps, onUnmounted } from "vue";
 import { useAppStore } from "@/stores/app";
 
 const app = useAppStore();
 const props = defineProps(["duration"]);
+const t = setTimeout(() => (app.showToast = false), props.duration);
 
-onMounted(() => {
-  const t = setTimeout(() => (app.showToast = false), props.duration);
-  return () => {
-    clearTimeout(t);
-  };
+onUnmounted(() => {
+  clearTimeout(t);
 });
 </script>
 

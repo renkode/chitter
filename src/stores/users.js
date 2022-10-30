@@ -188,6 +188,11 @@ export const useUsersStore = defineStore("users", {
 
     addToLocalTimeline(userId, tweetId, type, timestamp, retweetedBy) {
       const user = this.getUser(userId);
+      if (
+        user.localTimeline.filter((t) => t.id === tweetId && t.type === type)
+          .length > 0
+      )
+        return; // no repeats
       user.localTimeline.unshift({
         id: tweetId,
         type,
@@ -257,15 +262,13 @@ export const useUsersStore = defineStore("users", {
       return user.following.includes(targetId);
     },
 
-    canFollow(currentUserId, targetId) {
-      if (currentUserId == targetId) return false;
-      const currentUser = this.getUser(currentUserId);
+    canFollow(currentUser, targetId) {
+      if (currentUser.id == targetId) return false;
       return !currentUser.following.includes(targetId);
     },
 
-    canUnfollow(currentUserId, targetId) {
-      if (currentUserId == targetId) return false;
-      const currentUser = this.getUser(currentUserId);
+    canUnfollow(currentUser, targetId) {
+      if (currentUser.id == targetId) return false;
       return currentUser.following.includes(targetId);
     },
 

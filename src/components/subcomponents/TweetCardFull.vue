@@ -1,13 +1,9 @@
 <script setup>
-import { ref, defineProps, computed, onMounted, watch } from "vue";
+import { ref, defineProps, computed, onMounted } from "vue";
 import ProfilePicture from "./ProfilePicture.vue";
+import EmbeddedText from "./EmbeddedText.vue";
 import formatDateMixin from "@/mixins/formatDateMixin.js";
-import {
-  getMediaClass,
-  urlRegex,
-  hashtagRegex,
-  atRegex,
-} from "@/mixins/utilities.js";
+import { getMediaClass } from "@/mixins/utilities.js";
 import { useTweetStore } from "@/stores/tweets.js";
 import { useAppStore } from "@/stores/app.js";
 import { useUsersStore } from "@/stores/users.js";
@@ -15,7 +11,6 @@ import { useUsersStore } from "@/stores/users.js";
 const tweets = useTweetStore();
 const app = useAppStore();
 const users = useUsersStore();
-
 const props = defineProps({
   id: String,
   user: Object,
@@ -26,35 +21,12 @@ const props = defineProps({
 });
 
 const isTweetMenuOpen = ref(false);
-const tweetText = ref(null);
 const tweetContainer = ref(null);
 
 const isLiked = computed(() => tweets.hasLiked(props.tweet.id, app.currentId));
 const isRetweeted = computed(() =>
   tweets.hasRetweeted(props.tweet.id, app.currentId)
 );
-
-// embed @'s, hashtags and links inside tweets
-const embedLinks = computed(() => {
-  if (!props.tweet.text || props.tweet.text.length === 0) return;
-
-  const embedArr = props.tweet.text.split(" ").map((str) => {
-    switch (true) {
-      case urlRegex.test(str):
-        return `<a class="blue-link" href="${str}" target="_blank">${str}</a>`;
-      case hashtagRegex.test(str):
-        return `<a class="blue-link">${str}</a>`;
-      case atRegex.test(str):
-        return `<a class="blue-link user-link" data-username=${str.replace(
-          "@",
-          ""
-        )}>${str}</a>`;
-      default:
-        return str;
-    }
-  });
-  return embedArr.join(" ");
-});
 
 const toggleModal = (type) => {
   app.setModalType(type);
@@ -98,34 +70,6 @@ const shareTweet = () => {
   app.toggleToast("Copied to clipboard");
   navigator.clipboard.writeText(`${window.location.host}/status/${props.id}`);
 };
-
-const clickForProfile = (e) => {
-  e.stopPropagation();
-  app.viewUserProfile(e.target.dataset.username);
-};
-
-const setTweetText = () => {
-  tweetText.value.innerHTML = embedLinks.value || "";
-  const anchors = tweetText.value.querySelectorAll(".user-link");
-  Array.from(anchors).forEach((anchor) => {
-    anchor.removeEventListener("click", clickForProfile); // just in case lol
-    anchor.addEventListener("click", clickForProfile);
-  });
-};
-
-watch(embedLinks, () => {
-  setTweetText();
-});
-
-onMounted(() => {
-  setTweetText();
-  tweetContainer.value.scrollIntoView({ behavior: "smooth", block: "start" });
-  return () => {
-    Array.from(tweetText.value.querySelectorAll(".user-link")).forEach(
-      (anchor) => anchor.removeEventListener("click", clickForProfile)
-    );
-  };
-});
 </script>
 
 <template>
@@ -181,7 +125,7 @@ onMounted(() => {
                   </li>
                   <li
                     class="tweet-menu-item"
-                    v-if="users.canFollow(app.currentId, props.user.id)"
+                    v-if="users.canFollow(app.currentUser, props.user.id)"
                     @click="users.followUser(app.currentId, props.user.id)"
                   >
                     <span class="tweet-menu-icon"
@@ -193,7 +137,7 @@ onMounted(() => {
                   </li>
                   <li
                     class="tweet-menu-item"
-                    v-if="users.canUnfollow(app.currentId, props.user.id)"
+                    v-if="users.canUnfollow(app.currentUser, props.user.id)"
                     @click="users.unfollowUser(app.currentId, props.user.id)"
                   >
                     <span class="tweet-menu-icon"
@@ -222,7 +166,7 @@ onMounted(() => {
             >@{{ props.replyingTo }}</a
           >
         </div>
-        <div class="tweet-text" ref="tweetText"></div>
+        <div class="tweet-text"><EmbeddedText :text="props.tweet.text" /></div>
         <div
           class="tweet-media"
           :class="[getMediaClass(props.tweet.media)]"
@@ -303,14 +247,6 @@ onMounted(() => {
 </template>
 
 <style scoped>
-a {
-  cursor: pointer;
-}
-
-.blue-link {
-  cursor: pointer;
-}
-
 .tweet-container {
   cursor: auto;
   border-top: 0;

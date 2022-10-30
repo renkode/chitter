@@ -39,7 +39,7 @@ onMounted(() => {
   <Teleport to="body">
     <Transition> <ModalComponent v-if="app.showModal" /></Transition>
     <Transition>
-      <ToastMessage v-if="app.showToast" :duration="2000" />
+      <ToastMessage v-if="app.showToast" :duration="1500" />
     </Transition>
   </Teleport>
 </template>
