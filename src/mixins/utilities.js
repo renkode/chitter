@@ -2,7 +2,7 @@ const urlRegex = new RegExp(
   /[-a-zA-Z0-9@:%._~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_.~#?&//=]*)?/i
 );
 const hashtagRegex = new RegExp(/(#+[a-zA-Z0-9(_)]{1,})/);
-const atRegex = new RegExp(/(@+[a-zA-Z0-9(_)]{1,})/);
+const atRegex = new RegExp(/(@[a-zA-Z0-9_]{1,}[\s\S])/);
 
 const getMediaClass = (images) => {
   if (!images || images.length === 0) return;

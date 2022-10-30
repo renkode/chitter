@@ -23,9 +23,6 @@ onMounted(() => {
   <div class="main-wrapper">
     <div class="timeline-wrapper">
       <HeaderSC />
-      <ComposeTweet
-        v-if="app.routeName === 'Home' || app.routeName === 'Explore'"
-      />
       <router-view v-slot="{ Component }">
         <Transition name="fade" mode="out-in">
           <Suspense>

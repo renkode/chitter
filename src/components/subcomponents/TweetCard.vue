@@ -53,11 +53,15 @@ const embedLinks = computed(() => {
         return `<a class="blue-link" href="${str}" target="_blank">${str}</a>`;
       case hashtagRegex.test(str):
         return `<a class="blue-link">${str}</a>`;
-      case atRegex.test(str):
+      case atRegex.test(str.split(/\r?\n/)[0]): // SPLIT BY NEWLINE
         return `<a class="blue-link user-link" data-username=${str.replace(
           "@",
           ""
-        )}>${str}</a>`;
+        )}>${str.split(/\r?\n/)[0]}</a>${
+          str.split(/\r?\n/).length > 1
+            ? "\n" + str.split(/\r?\n/).slice(1).join("\n")
+            : ""
+        }`;
       default:
         return str;
     }
