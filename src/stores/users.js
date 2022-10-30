@@ -82,7 +82,7 @@ export const useUsersStore = defineStore("users", {
         username: "mikulover",
         description: "Randomly just made some toast pyon★. I am a freak pyon★",
         location: "h",
-        website: null,
+        website: "",
         birthday: "",
         avatarUrl:
           "https://pbs.twimg.com/profile_images/1573329090865778690/Nu2FIMbX_400x400.jpg",
