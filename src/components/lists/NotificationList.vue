@@ -23,6 +23,7 @@ const props = defineProps({ notifs: Array }); // { fromUser, type, tweetId }
             :user="users.getUser(notif.fromUser)"
             :tweet="tweets.getTweet(notif.tweetId)"
             :type="'reply'"
+            :replyingTo="app.currentUser.username"
             :isNotification="
               users.replyIsNewNotification(app.currentId, notif.tweetId)
             "

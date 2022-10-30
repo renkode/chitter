@@ -1,8 +1,10 @@
 <script setup>
 import { ref, computed } from "vue";
 import { useAppStore } from "@/stores/app.js";
+import { useUsersStore } from "@/stores/users.js";
 import ProfilePicture from "./subcomponents/ProfilePicture.vue";
 
+const users = useUsersStore();
 const app = useAppStore();
 const isAccountMenuOpen = ref(false);
 const numNewNotifications = computed(
@@ -17,6 +19,13 @@ const hideModalOnNavigation = () => {
 };
 const toggleAccountMenu = () => {
   isAccountMenuOpen.value = !isAccountMenuOpen.value;
+};
+const toggleUser = () => {
+  if (app.currentId === "1") {
+    app.setCurrentUser(users.getUser("2"));
+  } else {
+    app.setCurrentUser(users.getUser("1"));
+  }
 };
 </script>
 
@@ -75,7 +84,7 @@ const toggleAccountMenu = () => {
         >
           <li class="nav-item">
             <span class="nav-icon"
-              ><v-icon name="bi-person" scale="1.8" fill="#ffffff80" /></span
+              ><v-icon name="bi-person" scale="2.0" fill="#ffffff80" /></span
             ><span class="nav-label">Profile</span>
           </li></router-link
         >
@@ -108,7 +117,7 @@ const toggleAccountMenu = () => {
         <div v-if="isAccountMenuOpen" class="overlay"></div>
         <div v-if="isAccountMenuOpen" class="tweet-menu-container">
           <ul class="tweet-menu-list">
-            <li class="tweet-menu-item">
+            <li class="tweet-menu-item" @click="toggleUser">
               Log out @{{ app.currentUser.username }}
             </li>
           </ul>
@@ -316,7 +325,7 @@ li.nav-item.nav-logo .nav-icon {
 }
 
 .tweet-menu-container {
-  width: 100%;
+  width: 95%;
   margin: auto;
   right: auto;
   top: auto;

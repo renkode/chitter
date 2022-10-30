@@ -186,20 +186,32 @@ export const useUsersStore = defineStore("users", {
       user.likes.splice(tweetIndex, 1);
     },
 
-    addToLocalTimeline(userId, tweetId, type, timestamp) {
+    addToLocalTimeline(userId, tweetId, type, timestamp, retweetedBy) {
       const user = this.getUser(userId);
       user.localTimeline.unshift({
         id: tweetId,
         type,
         timestamp,
-        fromUserId: userId,
+        retweetedBy,
       });
     },
 
-    addToAllFollowerTimelines(currentUserId, tweetId, type, timestamp) {
+    addToAllFollowerTimelines(
+      currentUserId,
+      tweetId,
+      type,
+      timestamp,
+      retweetedBy
+    ) {
       const user = this.getUser(currentUserId);
       user.followers.forEach((follower) => {
-        this.addToLocalTimeline(follower, tweetId, type, timestamp);
+        this.addToLocalTimeline(
+          follower,
+          tweetId,
+          type,
+          timestamp,
+          retweetedBy
+        );
       });
     },
 
@@ -224,6 +236,7 @@ export const useUsersStore = defineStore("users", {
       currentUser.following.unshift(targetId);
       otherUser.followerCount++;
       otherUser.followers.unshift(currentUserId);
+      this.notify(targetId, currentUserId, "follow");
     },
 
     unfollowUser(currentUserId, targetId) {

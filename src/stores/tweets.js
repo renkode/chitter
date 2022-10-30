@@ -166,12 +166,19 @@ export const useTweetStore = defineStore("tweets", {
 
       const users = useUsersStore();
       users.addRetweet(userId, id);
-      users.addToLocalTimeline(userId, id, "retweet", new Date().toISOString()); // self
+      users.addToLocalTimeline(
+        userId,
+        id,
+        "retweet",
+        new Date().toISOString(),
+        userId
+      ); // self
       users.addToAllFollowerTimelines(
         userId,
         id,
         "retweet",
-        new Date().toISOString()
+        new Date().toISOString(),
+        userId
       );
       if (tweet.authorId !== userId) {
         isRetweet
@@ -244,7 +251,6 @@ export const useTweetStore = defineStore("tweets", {
     removeTweet(id, userId) {
       const index = this.tweets.findIndex((t) => t.id === id);
       if (index < 0) throw new Error("no such tweet");
-      const replyingToUser = this.getTweet(this.tweets[index].replyingToUser);
       const replyingToTweet = this.getTweet(this.tweets[index].replyingToTweet);
       if (replyingToTweet)
         replyingToTweet.repliesFrom = replyingToTweet.repliesFrom.filter(
@@ -258,7 +264,8 @@ export const useTweetStore = defineStore("tweets", {
       users.removeRetweet(userId, id);
       users.removeFromLocalTimeline(userId, id); // self
       users.removeFromAllFollowerTimelines(userId, id); // followers
-      if (replyingToUser) users.deleteReplyNotification(userId, id);
+      if (this.tweets[index].replyingToUser)
+        users.deleteReplyNotification(this.tweets[index].replyingToUser, id);
     },
   },
 });

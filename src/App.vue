@@ -3,6 +3,7 @@ import { onMounted } from "vue";
 import MenuSidebar from "./components/MenuSidebar.vue";
 import MediaSidebar from "./components/MediaSidebar.vue";
 import HeaderSC from "./components/subcomponents/HeaderSC.vue";
+import ComposeTweet from "./components/subcomponents/ComposeTweet.vue";
 import LoadSpinner from "./components/subcomponents/LoadSpinner.vue";
 import ModalComponent from "./components/modals/ModalComponent.vue";
 import ToastMessage from "./components/subcomponents/ToastMessage.vue";
@@ -22,7 +23,9 @@ onMounted(() => {
   <div class="main-wrapper">
     <div class="timeline-wrapper">
       <HeaderSC />
-
+      <ComposeTweet
+        v-if="app.routeName === 'Home' || app.routeName === 'Explore'"
+      />
       <router-view v-slot="{ Component }">
         <Transition name="fade" mode="out-in">
           <Suspense>
