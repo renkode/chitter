@@ -14,9 +14,6 @@ const showComposeTweet = () => {
   app.setModalType("status");
   app.toggleModal();
 };
-const hideModalOnNavigation = () => {
-  if (app.showModal) app.toggleModal();
-};
 const toggleAccountMenu = () => {
   isAccountMenuOpen.value = !isAccountMenuOpen.value;
 };
@@ -33,14 +30,14 @@ const toggleUser = () => {
   <div class="nav-sidebar">
     <nav>
       <ul>
-        <router-link to="/home" class="nav-logo" @click="hideModalOnNavigation">
+        <router-link to="/home" class="nav-logo">
           <li class="nav-item">
             <span class="nav-icon"
               ><v-icon name="bi-twitter" scale="2.0" fill="white"
             /></span></li
         ></router-link>
 
-        <router-link to="/home" @click="hideModalOnNavigation">
+        <router-link to="/home">
           <li class="nav-item">
             <span class="nav-icon"
               ><v-icon
@@ -51,7 +48,7 @@ const toggleUser = () => {
           </li></router-link
         >
 
-        <router-link to="/explore" @click="hideModalOnNavigation"
+        <router-link to="/explore"
           ><li class="nav-item">
             <span class="nav-icon stroke"
               ><v-icon name="hi-hashtag" scale="1.6" fill="#ffffff80" /></span
@@ -59,10 +56,7 @@ const toggleUser = () => {
           </li></router-link
         >
 
-        <router-link
-          to="/notifications"
-          v-if="app.currentUser"
-          @click="hideModalOnNavigation"
+        <router-link to="/notifications" v-if="app.currentUser"
           ><li class="nav-item">
             <span class="nav-icon notif-icon"
               ><v-icon name="bi-bell" scale="1.7" fill="#ffffff80" />
@@ -78,7 +72,6 @@ const toggleUser = () => {
         >
 
         <router-link
-          @click="hideModalOnNavigation"
           v-if="app.currentUser"
           :to="{
             name: 'Profile',

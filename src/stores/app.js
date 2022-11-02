@@ -35,7 +35,8 @@ export const useAppStore = defineStore("app", {
       this.currentUser = user || null;
       this.currentId = user.id;
     },
-    logOut() {
+    async logOut() {
+      await router.push("/home");
       this.currentUser = null;
       this.currentId = null;
     },

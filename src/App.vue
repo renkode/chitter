@@ -147,6 +147,10 @@ a:hover {
   border: 1px solid #f4212e;
 }
 
+.gray-text {
+  color: #ffffff80;
+}
+
 .blue-text,
 .blue-link,
 .blue-link a {
@@ -156,10 +160,6 @@ a:hover {
 .blue-link:visited,
 .blue-link a:visited {
   color: #1d9bf0;
-}
-
-.gray-text {
-  color: #ffffff80;
 }
 
 .error {

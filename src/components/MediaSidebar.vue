@@ -1,13 +1,14 @@
 <script setup>
 import { ref, onMounted, onUnmounted } from "vue";
+import { useAppStore } from "@/stores/app";
 
+const app = useAppStore();
 const width = ref(window.innerWidth);
 const onWidthChange = () => {
   width.value = window.innerWidth;
 };
 
 onMounted(() => {
-  //console.log(`Width: ${width.value}.`);
   window.addEventListener("resize", onWidthChange);
 });
 
@@ -27,8 +28,28 @@ onUnmounted(() => {
           <input type="search" placeholder="Search Chitter" />
         </div>
 
-        <div class="trending-wrapper">
-          <div class="trending-header">What's happening</div>
+        <div class="media-container" v-if="!app.currentUser">
+          <div class="media-header">New to Chitter?</div>
+          <div class="media-body">
+            <div class="gray-text">
+              Sign up now to get your own personalized timeline!
+            </div>
+            <router-link to="/signup"
+              ><button class="sign-up-btn">
+                Sign up with email
+              </button></router-link
+            >
+            <div class="gray-text">
+              By signing up, you agree to the
+              <a class="blue-link">Terms of Service</a> and
+              <a class="blue-link">Privacy Policy</a>, including
+              <a class="blue-link">Cookie Use</a>.
+            </div>
+          </div>
+        </div>
+
+        <div class="media-container">
+          <div class="media-header">What's happening</div>
           <div class="trend-container">
             <div class="trend-info">
               <span class="trend-type">World news</span>
@@ -65,6 +86,15 @@ onUnmounted(() => {
 </template>
 
 <style scoped>
+.blue-link {
+  color: #1d9bf0;
+}
+
+.blue-link:hover,
+.blue-link:visited {
+  color: #1d9bf0;
+}
+
 .media-sidebar {
   width: 100%;
   max-height: 100vh;
@@ -80,7 +110,7 @@ onUnmounted(() => {
 }
 
 .search-tweet,
-.trending-wrapper,
+.media-container,
 .trend-container {
   width: 100%;
 }
@@ -90,7 +120,7 @@ onUnmounted(() => {
   width: 100%;
   height: 44px;
   padding: 6px 0;
-  margin: 10px 0;
+  margin: 1rem 0;
   border-radius: 22px;
   display: flex;
   flex-direction: row;
@@ -119,16 +149,42 @@ input:focus {
   outline: 0;
 }
 
-.trending-wrapper {
+.media-container {
   background-color: rgba(255, 255, 255, 0.062);
   border-radius: 15px;
   overflow: hidden;
+  margin-bottom: 1rem;
 }
 
-.trending-header {
+.media-header {
   font-size: 1.5rem;
   font-weight: bold;
   padding: 14px;
+}
+
+.media-body {
+  font-size: 0.9rem;
+  padding: 0px 14px 14px 14px;
+}
+
+.sign-up-btn {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: transparent;
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.384);
+  border-radius: 1.5rem;
+  font-size: 1.1rem;
+  height: 3rem;
+  width: 100%;
+  margin: 1rem 0;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+.sign-up-btn:hover {
+  background-color: rgba(255, 255, 255, 0.07);
 }
 
 .trend-info {
@@ -158,7 +214,7 @@ footer {
 }
 
 footer {
-  padding: 14px;
+  padding: 0 14px;
 }
 
 a,
