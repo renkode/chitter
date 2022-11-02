@@ -2,6 +2,8 @@
 import { ref, watch, computed, onMounted } from "vue";
 import HeaderPicture from "../subcomponents/HeaderPicture.vue";
 import ProfilePicture from "../subcomponents/ProfilePicture.vue";
+import ModalHeader from "./ModalHeader.vue";
+import InputComponent from "../subcomponents/InputComponent.vue";
 import { useAppStore } from "@/stores/app.js";
 import { useUsersStore } from "@/stores/users";
 import { calendar } from "@/mixins/utilities.js";
@@ -15,10 +17,6 @@ const usernameInput = ref(app.currentUser.username);
 const bioInput = ref(app.currentUser.description);
 const locationInput = ref(app.currentUser.location);
 const websiteInput = ref(app.currentUser.website);
-
-const nameInputWrapper = ref(null);
-const usernameInputWrapper = ref(null);
-const websiteInputWrapper = ref(null);
 const monthInput = ref(null);
 const dayInput = ref(null);
 
@@ -26,8 +24,11 @@ const dayInput = ref(null);
 const nameError = computed(() => nameInput.value.length === 0);
 
 // username validation
-const MAX_USERNAME_LENGTH = 3;
+const MIN_USERNAME_LENGTH = 3;
 const ALPHANUMERIC_UNDERSCORE = new RegExp("^[a-zA-Z0-9_]*$");
+const usernameMeetsLength = computed(
+  () => usernameInput.value.length >= MIN_USERNAME_LENGTH
+);
 const validUsername = computed(() =>
   ALPHANUMERIC_UNDERSCORE.test(usernameInput.value)
 );
@@ -40,10 +41,7 @@ const isUsernameTaken = computed(
 );
 const usernameError = computed(
   () =>
-    (usernameInput.value.length >= 0 &&
-      usernameInput.value.length < MAX_USERNAME_LENGTH) ||
-    !validUsername.value ||
-    isUsernameTaken.value
+    !usernameMeetsLength.value || !validUsername.value || isUsernameTaken.value
 );
 
 // website url validation
@@ -67,20 +65,6 @@ const setHeader = (e) => {
 };
 const clearHeader = () => {
   headerUrl.value = "";
-};
-
-// add blue border and blue label on input focus
-const setFocus = (e) => {
-  e.currentTarget.nextElementSibling
-    .querySelector("label")
-    .classList.toggle("gray-text");
-  e.currentTarget.nextElementSibling
-    .querySelector("label")
-    .classList.toggle("blue-text");
-  e.currentTarget.nextElementSibling
-    .querySelector(".text-limit")
-    .classList.toggle("show");
-  e.currentTarget.closest(".input-wrapper").classList.toggle("blue-border");
 };
 
 // programmatically add month and day options to select
@@ -128,35 +112,6 @@ const updateProfile = () => {
   app.viewUserProfile(app.currentUser.username);
 };
 
-// watchers
-watch(nameInput, () => {
-  if (nameError.value) {
-    nameInputWrapper.value.className = "input-wrapper red-border";
-    nameInputWrapper.value.querySelector("label").className = "red-text";
-  } else {
-    nameInputWrapper.value.className = "input-wrapper blue-border";
-    nameInputWrapper.value.querySelector("label").className = "blue-text";
-  }
-});
-watch(usernameInput, () => {
-  if (usernameError.value) {
-    usernameInputWrapper.value.className = "input-wrapper red-border";
-    usernameInputWrapper.value.querySelector("label").className = "red-text";
-  } else {
-    usernameInputWrapper.value.className = "input-wrapper blue-border";
-    usernameInputWrapper.value.querySelector("label").className = "blue-text";
-  }
-});
-watch(websiteInput, () => {
-  if (URLError.value) {
-    websiteInputWrapper.value.className = "input-wrapper red-border";
-    websiteInputWrapper.value.querySelector("label").className = "red-text";
-  } else {
-    websiteInputWrapper.value.className = "input-wrapper blue-border";
-    websiteInputWrapper.value.querySelector("label").className = "blue-text";
-  }
-});
-
 // on mount
 onMounted(() => {
   populateMonths();
@@ -166,21 +121,17 @@ onMounted(() => {
 
 <template>
   <div class="modal-wrapper">
-    <div class="modal-header">
-      <span class="header-item-wrapper">
-        <span class="exit-modal-btn" @click="app.toggleModal"
-          ><v-icon name="bi-x" scale="1.6" fill="white"
-        /></span>
-        <span class="header-text"><strong>Edit profile</strong></span></span
-      >
+    <ModalHeader text="Edit Profile">
       <button
         class="save-btn"
+        type="submit"
+        form="edit-profile-form"
         :disabled="containsError"
         @click.prevent="updateProfile"
       >
         Save
       </button>
-    </div>
+    </ModalHeader>
 
     <div class="header-wrapper">
       <HeaderPicture :url="headerUrl" />
@@ -218,120 +169,71 @@ onMounted(() => {
               /></label> </span></span
         ></ProfilePicture>
       </div>
-      <div class="modal-form">
+      <form id="edit-profile-form" class="modal-form">
         <div class="name-and-username">
-          <div class="validation-wrapper">
-            <div class="input-wrapper" ref="nameInputWrapper">
-              <input
-                id="nameInput"
-                type="text"
-                v-model="nameInput"
-                @focusin="setFocus"
-                @focusout="setFocus"
-                min-length="1"
-                maxlength="50"
-              />
-              <span class="label-wrapper"
-                ><label class="gray-text" for="nameInput">Name</label
-                ><span class="text-limit gray-text"
-                  >{{ nameInput.length }} / 50</span
-                ></span
-              >
-            </div>
-            <span class="error-input red-text" v-if="nameInput.length === 0"
-              >Name can't be blank.</span
-            >
-          </div>
-          <div class="validation-wrapper">
-            <div class="input-wrapper" ref="usernameInputWrapper">
-              <input
-                id="usernameInput"
-                type="text"
-                v-model="usernameInput"
-                @focusin="setFocus"
-                @focusout="setFocus"
-                @keydown.space.prevent=""
-                :minlength="MAX_USERNAME_LENGTH"
-                maxlength="15"
-              />
-              <span class="label-wrapper"
-                ><label class="gray-text" for="usernameInput">Username</label
-                ><span class="text-limit gray-text"
-                  >{{ usernameInput.length }} / 15</span
-                ></span
-              >
-            </div>
-            <span
-              class="error-input red-text"
-              v-if="
-                usernameInput.length > 0 &&
-                usernameInput.length < MAX_USERNAME_LENGTH
-              "
-              >Username must be at least
-              {{ MAX_USERNAME_LENGTH }} characters.</span
-            >
-            <span class="error-input red-text" v-if="!validUsername"
-              >Username can't contain special characters.</span
-            >
-            <span class="error-input red-text" v-if="isUsernameTaken"
-              >Username is taken.</span
-            >
-          </div>
-        </div>
-        <div class="input-wrapper">
-          <textarea
-            id="bioInput"
-            v-model="bioInput"
-            @focusin="setFocus"
-            @focusout="setFocus"
-            maxlength="160"
-            rows="3"
-            @keydown.enter.prevent=""
-          ></textarea>
-          <span class="label-wrapper"
-            ><label class="gray-text" for="bioInput">Bio</label
-            ><span class="text-limit gray-text"
-              >{{ bioInput.length }} / 160</span
-            ></span
-          >
-        </div>
-        <div class="input-wrapper">
-          <input
-            id="locationInput"
-            type="text"
-            v-model="locationInput"
-            @focusin="setFocus"
-            @focusout="setFocus"
-            maxlength="30"
+          <InputComponent
+            v-model:inputValue="nameInput"
+            name="nameInput"
+            label="Name"
+            :validation="[
+              { errorText: 'Name can\'t be blank', hasError: nameError },
+            ]"
+            minLength="1"
+            maxLength="50"
           />
-          <span class="label-wrapper"
-            ><label class="gray-text" for="locationInput">Location</label
-            ><span class="text-limit gray-text"
-              >{{ locationInput.length }} / 30</span
-            ></span
-          >
+
+          <InputComponent
+            v-model:inputValue="usernameInput"
+            name="usernameInput"
+            label="Username"
+            :validation="[
+              {
+                errorText: `Username must be at least
+              ${MIN_USERNAME_LENGTH} characters.`,
+                hasError: !usernameMeetsLength,
+              },
+              {
+                errorText: `Username can't contain special characters.`,
+                hasError: !validUsername,
+              },
+              {
+                errorText: `Username is taken.`,
+                hasError: isUsernameTaken,
+              },
+            ]"
+            :minLength="MIN_USERNAME_LENGTH"
+            maxLength="15"
+            @keydown.space.prevent=""
+          />
         </div>
-        <div class="validation-wrapper">
-          <div class="input-wrapper" ref="websiteInputWrapper">
-            <input
-              id="websiteInput"
-              type="text"
-              v-model="websiteInput"
-              @focusin="setFocus"
-              @focusout="setFocus"
-              maxlength="50"
-            />
-            <span class="label-wrapper"
-              ><label class="gray-text" for="websiteInput">Website</label
-              ><span class="text-limit gray-text"
-                >{{ websiteInput.length }} / 50</span
-              ></span
-            >
-          </div>
-          <span class="error-input red-text" v-if="URLError"
-            >URL is not valid.</span
-          >
-        </div>
+
+        <InputComponent
+          v-model:inputValue="bioInput"
+          :isTextArea="true"
+          name="bioInput"
+          label="Bio"
+          :validation="[]"
+          maxLength="160"
+          rows="3"
+          @keydown.enter.prevent=""
+        />
+
+        <InputComponent
+          v-model:inputValue="locationInput"
+          name="locationInput"
+          label="Location"
+          :validation="[]"
+          maxLength="30"
+        />
+
+        <InputComponent
+          v-model:inputValue="websiteInput"
+          name="websiteInput"
+          label="Website"
+          :validation="[{ errorText: 'URL is not valid.', hasError: URLError }]"
+          maxLength="50"
+        />
+
         <div class="birthday-wrapper">
           <span class="birthday-label gray-text">Birth date</span>
           <span class="birthday-input-wrapper"
@@ -344,7 +246,7 @@ onMounted(() => {
             <select id="day" name="day" ref="dayInput"></select
           ></span>
         </div>
-      </div>
+      </form>
     </div>
   </div>
 </template>
@@ -445,24 +347,6 @@ onMounted(() => {
   gap: 1.5rem;
 }
 
-.validation-wrapper {
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-start;
-  align-items: flex-start;
-  width: 100%;
-}
-
-.input-wrapper {
-  position: relative;
-  display: flex;
-  flex-direction: row;
-  justify-content: center;
-  align-items: center;
-  width: 100%;
-  height: 4rem;
-}
-
 .name-and-username {
   display: flex;
   flex-direction: row;
@@ -472,15 +356,25 @@ onMounted(() => {
   gap: 6px;
 }
 
+.validation-wrapper {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: flex-start;
+  width: 100%;
+}
 .input-wrapper {
   border: rgba(255, 255, 255, 0.25) 1px solid;
   border-radius: 6px;
   padding: 8px;
+  position: relative;
   display: flex;
+  justify-content: center;
   align-items: flex-start;
   flex-direction: column;
   flex-flow: column-reverse;
   height: fit-content;
+  width: 100%;
 }
 
 .input-wrapper input,

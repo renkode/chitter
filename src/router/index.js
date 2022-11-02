@@ -6,8 +6,8 @@ const NotificationMain = () => import("@/components/NotificationMain.vue");
 const ProfileMain = () => import("@/components/ProfileMain.vue");
 const FollowLists = () => import("@/components/lists/FollowLists.vue");
 const TweetContext = () => import("@/components/TweetContext.vue");
-const SignUp = () => import("@/components/SignUp.vue");
-const LogIn = () => import("@/components/LogIn.vue");
+// const SignUp = () => import("@/components/SignUp.vue");
+// const LogIn = () => import("@/components/LogIn.vue");
 
 const Error = {
   template: '<div class="error gray-text" v-else>Tweet does not exist.</div>',
@@ -65,16 +65,16 @@ const routes = [
     component: TweetContext,
     props: true,
   },
-  {
-    path: "/signup",
-    name: "Signup",
-    component: SignUp,
-  },
-  {
-    path: "/login",
-    name: "Login",
-    component: LogIn,
-  },
+  // {
+  //   path: "/signup",
+  //   name: "Signup",
+  //   component: SignUp,
+  // },
+  // {
+  //   path: "/login",
+  //   name: "Login",
+  //   component: LogIn,
+  // },
   {
     path: "/:catchAll(.*)",
     component: Error,

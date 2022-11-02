@@ -85,7 +85,7 @@ export const useUsersStore = defineStore("users", {
         website: "",
         birthday: "",
         avatarUrl:
-          "https://pbs.twimg.com/profile_images/1573329090865778690/Nu2FIMbX_400x400.jpg",
+          "https://pbs.twimg.com/profile_images/1584210745247600643/mQ9zmvni_400x400.jpg",
         headerUrl:
           "https://pbs.twimg.com/profile_banners/840764077681061889/1646410641/1500x500",
         followingCount: 1,

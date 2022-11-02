@@ -1,6 +1,7 @@
 <script setup>
 import { computed } from "vue";
 import UserList from "../lists/UserList.vue";
+import ModalHeader from "./ModalHeader.vue";
 import { useAppStore } from "@/stores/app";
 import { useTweetStore } from "@/stores/tweets";
 import { useUsersStore } from "@/stores/users";
@@ -28,16 +29,7 @@ const list = computed(() => {
 </script>
 
 <template>
-  <div class="modal-header">
-    <span class="header-item-wrapper">
-      <span class="exit-modal-btn" @click="app.toggleModal"
-        ><v-icon name="bi-x" scale="1.6" fill="white"
-      /></span>
-      <span class="header-text"
-        ><strong>{{ headerText }}</strong></span
-      ></span
-    >
-  </div>
+  <ModalHeader :text="headerText" />
   <UserList v-if="list" :users="list" />
 </template>
 

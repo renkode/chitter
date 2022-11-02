@@ -66,6 +66,8 @@ export const useAppStore = defineStore("app", {
         "edit-profile",
         "retweet-list",
         "like-list",
+        "signup",
+        "login",
       ];
       if (!types.includes(type)) {
         throw Error("wrong modal type");

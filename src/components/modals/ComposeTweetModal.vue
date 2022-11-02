@@ -2,6 +2,7 @@
 import { computed } from "vue";
 import ComposeTweet from "../subcomponents/ComposeTweet.vue";
 import TweetCardSimple from "../subcomponents/TweetCardSimple.vue";
+import ModalHeader from "./ModalHeader.vue";
 import { useAppStore } from "@/stores/app.js";
 import { useTweetStore } from "@/stores/tweets.js";
 import { useUsersStore } from "@/stores/users.js";
@@ -14,13 +15,7 @@ const user = computed(() => users.getUser(app.modalReply.userId));
 </script>
 
 <template>
-  <div class="modal-header">
-    <span class="header-item-wrapper">
-      <span class="exit-modal-btn" @click="app.toggleModal"
-        ><v-icon name="bi-x" scale="1.6" fill="white"
-      /></span>
-    </span>
-  </div>
+  <ModalHeader />
   <TweetCardSimple
     v-if="app.modalType === 'reply'"
     :user="{
