@@ -1,4 +1,6 @@
 import { defineStore } from "pinia";
+import ShortUniqueId from "short-unique-id";
+var uid = new ShortUniqueId();
 
 export const useUsersStore = defineStore("users", {
   state: () => ({
@@ -111,6 +113,35 @@ export const useUsersStore = defineStore("users", {
   }),
   getters: {}, // can't be async so
   actions: {
+    createUser(isAdmin, name, username) {
+      const newUser = {
+        id: uid(),
+        isAdmin,
+        isPrivate: false,
+        name,
+        username,
+        description: "",
+        location: "",
+        website: "",
+        birthday: "",
+        avatarUrl: "",
+        headerUrl: "",
+        followingCount: 0,
+        followerCount: 0,
+        tweetCount: 0,
+        timestamp: new Date().toISOString(),
+        authoredTweets: [],
+        retweets: [],
+        likes: [],
+        following: [],
+        followers: [],
+        localTimeline: [],
+        newNotifications: [],
+        oldNotifications: [],
+      };
+      this.users.push(newUser);
+      return newUser;
+    },
     getUser(id) {
       return this.users.filter((user) => user.id == id)[0];
     },
@@ -347,7 +378,7 @@ export const useUsersStore = defineStore("users", {
       return currentUser.newNotifications.filter((n) => n === notif).length > 0;
     },
 
-    replyIsNewNotification(userId, tweetId) {
+    tweetIsNewNotification(userId, tweetId) {
       const currentUser = this.getUser(userId);
       if (!currentUser) throw new Error("user not found");
       return (

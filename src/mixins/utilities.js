@@ -2,7 +2,8 @@ const urlRegex = new RegExp(
   /[-a-zA-Z0-9@:%._~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_.~#?&//=]*)?/i
 );
 const hashtagRegex = new RegExp(/(#+[a-zA-Z0-9(_)]{1,})/);
-const atRegex = new RegExp(/(@[a-zA-Z0-9_]{1,}[\s\S])/);
+const atRegex = new RegExp(/^(@[a-zA-Z0-9_]{1,}[\s\S])*$/);
+const usernameRegex = new RegExp(/^[a-zA-Z0-9_]*$/);
 const emailRegex = new RegExp(
   /[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?/
 );
@@ -78,4 +79,12 @@ const calendar = [
   },
 ];
 
-export { getMediaClass, urlRegex, hashtagRegex, atRegex, emailRegex, calendar };
+export {
+  getMediaClass,
+  urlRegex,
+  hashtagRegex,
+  atRegex,
+  usernameRegex,
+  emailRegex,
+  calendar,
+};

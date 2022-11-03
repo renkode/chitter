@@ -30,7 +30,25 @@ const props = defineProps({ notifs: Array }); // { fromUser, type, tweetId }
             :type="'reply'"
             :replyingTo="app.currentUser.username"
             :isNotification="
-              users.replyIsNewNotification(app.currentId, notif.tweetId)
+              users.tweetIsNewNotification(app.currentId, notif.tweetId)
+            "
+          />
+        </template>
+
+        <template v-else-if="notif.type === 'mention'">
+          <TweetCard
+            :key="index"
+            :id="notif.tweetId"
+            :user="{
+              id: notif.fromUser,
+              name: users.getUser(notif.fromUser).name,
+              username: users.getUser(notif.fromUser).username,
+              avatarUrl: users.getUser(notif.fromUser).avatarUrl,
+            }"
+            :tweet="tweets.getTweet(notif.tweetId)"
+            :type="'status'"
+            :isNotification="
+              users.tweetIsNewNotification(app.currentId, notif.tweetId)
             "
           />
         </template>

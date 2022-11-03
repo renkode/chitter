@@ -11,20 +11,25 @@ const embedLinks = () => {
   if (!props.text || props.text.length === 0) return;
 
   const embedArr = props.text.split(" ").map((str) => {
+    const newLineSplit = str.split(/\r?\n/);
     switch (true) {
       case urlRegex.test(str):
         return `<a class="blue-link" href="${str}" target="_blank">${str}</a>`;
       case hashtagRegex.test(str):
         return `<a class="blue-link">${str}</a>`;
-      case atRegex.test(str.split(/\r?\n/)[0]): // SPLIT BY NEWLINE
-        return `<a class="blue-link user-link" data-username=${str.replace(
-          "@",
-          ""
-        )}>${str.split(/\r?\n/)[0]}</a>${
-          str.split(/\r?\n/).length > 1
-            ? "\n" + str.split(/\r?\n/).slice(1).join("\n")
-            : ""
-        }`;
+      case newLineSplit.some((word) => atRegex.test(word)): // SPLIT BY NEWLINE
+        return newLineSplit
+          .map((word) => {
+            if (atRegex.test(word)) {
+              return `<a class="blue-link user-link" data-username=${str.replace(
+                "@",
+                ""
+              )}>${newLineSplit.filter((word) => atRegex.test(word))[0]}</a>`;
+            } else {
+              return word;
+            }
+          })
+          .join("\n");
       default:
         return str;
     }

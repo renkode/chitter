@@ -4,7 +4,7 @@ import ProfilePicture from "./ProfilePicture.vue";
 import { useAppStore } from "@/stores/app";
 import { useTweetStore } from "@/stores/tweets";
 import { useUsersStore } from "@/stores/users";
-import { getMediaClass } from "@/mixins/utilities.js";
+import { getMediaClass, atRegex } from "@/mixins/utilities.js";
 
 const app = useAppStore();
 const tweetStore = useTweetStore();
@@ -43,28 +43,59 @@ const handleInput = () => {
   resizeTextArea();
 };
 
+const getInitialReplyUser = (str) => {
+  const firstWord = str.replace(/\r?\n/, " ").split(" ")[0];
+  console.log(firstWord);
+  if (
+    atRegex.test(firstWord) &&
+    users.getUserByUsername(firstWord.replace("@", ""))
+  ) {
+    return users.getUserByUsername(firstWord.replace("@", "")).id;
+  } else {
+    return null;
+  }
+};
+
+const getMentions = (str) => {
+  if (
+    str
+      .replace(/\r?\n/, "")
+      .split(" ")
+      .some((word) => atRegex.test(word))
+  ) {
+    return str
+      .split(" ")
+      .filter((word) => atRegex.test(word) && word !== str.split(" ")[0])
+      .map((word) => {
+        const user = users.getUserByUsername(word.replace("@", ""));
+        if (user) return user.id;
+      });
+  } else {
+    return null;
+  }
+};
+
 const postTweet = () => {
   if (noContent.value) return;
-  let type = app.modalType === "reply" ? "reply" : "status";
   let replyingToTweet =
     app.modalType === "reply" ? app.modalReply.tweetId : null;
-  let replyingToUser = app.modalType === "reply" ? app.modalReply.userId : null;
-  let firstStr = str.value.split(" ")[0];
-  if (
-    type === "status" &&
-    firstStr[0] === "@" &&
-    users.getUserByUsername(firstStr.replace("@", ""))
-  ) {
-    replyingToUser = users.getUserByUsername(firstStr.replace("@", "")).id; // e.g. "@johnsmith lorem ipsum" is a reply
-    type = "reply";
-  }
+  const replyingToUser =
+    app.modalType === "reply"
+      ? app.modalReply.userId
+      : getInitialReplyUser(str.value);
+  const mentionedUsers = getMentions(str.value);
+  let type = app.modalType === "reply" || replyingToUser ? "reply" : "status";
+  // console.log(
+  //   `type: ${type}, mentionedUsers: ${mentionedUsers}, replyingToUser: ${replyingToUser}`
+  // );
   tweetStore.addTweet(
     type,
     str.value,
     images.value,
     user.value.id,
     replyingToTweet,
-    replyingToUser
+    replyingToUser,
+    mentionedUsers
   );
   str.value = "";
   images.value = [];

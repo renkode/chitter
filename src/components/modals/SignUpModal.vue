@@ -4,7 +4,7 @@ import ModalHeader from "./ModalHeader.vue";
 import InputComponent from "../subcomponents/InputComponent.vue";
 import { useAppStore } from "@/stores/app";
 import { useUsersStore } from "@/stores/users";
-import { emailRegex } from "@/mixins/utilities";
+import { usernameRegex, emailRegex } from "@/mixins/utilities";
 
 const app = useAppStore();
 const users = useUsersStore();
@@ -13,12 +13,11 @@ const nameError = computed(() => nameInput.value.length === 0);
 
 const usernameInput = ref("");
 const MIN_USERNAME_LENGTH = 3;
-const ALPHANUMERIC_UNDERSCORE = new RegExp("^[a-zA-Z0-9_]*$");
 const usernameMeetsLength = computed(
   () => usernameInput.value.length >= MIN_USERNAME_LENGTH
 );
 const usernameIsInvalid = computed(
-  () => !ALPHANUMERIC_UNDERSCORE.test(usernameInput.value)
+  () => !usernameRegex.test(usernameInput.value)
 );
 const isUsernameTaken = computed(
   () =>
@@ -53,6 +52,11 @@ const containsError = computed(
     emailError.value ||
     passError.value
 );
+
+const signUp = () => {
+  app.toggleModal();
+  app.signUp(false, nameInput.value, usernameInput.value);
+};
 
 // You can check if an email is in use by checking if fetchProvidersForEmail returns an empty array.
 // https://firebase.google.com/docs/reference/js/v8/firebase.auth.Auth#fetchsigninmethodsforemail
@@ -130,7 +134,12 @@ const containsError = computed(
         ]"
         minLength="6"
       />
-      <button class="make-account-btn" type="submit" :disabled="containsError">
+      <button
+        class="make-account-btn"
+        type="submit"
+        :disabled="containsError"
+        @click.prevent="signUp"
+      >
         Sign Up
       </button>
     </form>

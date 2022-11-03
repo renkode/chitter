@@ -33,8 +33,7 @@ onUnmounted(() => {
           <input type="search" placeholder="Search Chitter" />
         </div>
 
-        <!-- <div class="media-container" v-if="!app.currentUser"> -->
-        <div class="media-container">
+        <div class="media-container" v-if="!app.currentUser">
           <div class="media-header">New to Chitter?</div>
           <div class="media-body">
             <div class="gray-text">

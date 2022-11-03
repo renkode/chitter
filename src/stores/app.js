@@ -1,4 +1,5 @@
 import { defineStore } from "pinia";
+import { useUsersStore } from "./users";
 import router from "@/router/index.js";
 
 export const useAppStore = defineStore("app", {
@@ -39,6 +40,12 @@ export const useAppStore = defineStore("app", {
       await router.push("/home");
       this.currentUser = null;
       this.currentId = null;
+    },
+    async signUp(isAdmin, name, username) {
+      await router.push("/home");
+      const users = useUsersStore();
+      this.currentUser = users.createUser(isAdmin, name, username);
+      this.currentId = this.currentUser.id;
     },
     setProfileTab(tab) {
       if (this.profileTab === tab) return;

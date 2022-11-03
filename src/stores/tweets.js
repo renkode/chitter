@@ -215,7 +215,8 @@ export const useTweetStore = defineStore("tweets", {
       media = [],
       authorId,
       replyingToTweet = null,
-      replyingToUser = null
+      replyingToUser = null,
+      mentionedUsers = null
     ) {
       const timestamp = new Date().toISOString();
       const newTweet = {
@@ -229,8 +230,9 @@ export const useTweetStore = defineStore("tweets", {
         likeCount: 0,
         quoteCount: 0,
         timestamp,
-        replyingToTweet: replyingToTweet,
-        replyingToUser: replyingToUser,
+        replyingToTweet,
+        replyingToUser,
+        mentionedUsers,
         quoting: null,
         repliesFrom: [],
         retweetsFrom: [],
@@ -248,8 +250,16 @@ export const useTweetStore = defineStore("tweets", {
       users.addTweet(authorId, newTweet.id, type, containsMedia);
       users.addToLocalTimeline(authorId, newTweet.id, type, timestamp); // self
       users.addToAllFollowerTimelines(authorId, newTweet.id, type, timestamp); // followers
-      if (type === "reply" && replyingToUser !== authorId)
-        users.notify(replyingToUser, authorId, "reply", newTweet.id);
+      if (type === "reply" && replyingToUser !== authorId) {
+        users.notify(replyingToUser, authorId, type, newTweet.id);
+        return;
+      }
+      if (mentionedUsers && mentionedUsers.length > 0) {
+        newTweet.mentionedUsers.forEach((id) => {
+          if (users.getUser(id) && id !== authorId)
+            users.notify(id, authorId, "mention", newTweet.id);
+        });
+      }
     },
 
     removeTweet(id, userId) {

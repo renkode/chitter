@@ -6,7 +6,7 @@ import ModalHeader from "./ModalHeader.vue";
 import InputComponent from "../subcomponents/InputComponent.vue";
 import { useAppStore } from "@/stores/app.js";
 import { useUsersStore } from "@/stores/users";
-import { calendar } from "@/mixins/utilities.js";
+import { usernameRegex, calendar } from "@/mixins/utilities.js";
 
 const app = useAppStore();
 const users = useUsersStore();
@@ -25,13 +25,10 @@ const nameError = computed(() => nameInput.value.length === 0);
 
 // username validation
 const MIN_USERNAME_LENGTH = 3;
-const ALPHANUMERIC_UNDERSCORE = new RegExp("^[a-zA-Z0-9_]*$");
 const usernameMeetsLength = computed(
   () => usernameInput.value.length >= MIN_USERNAME_LENGTH
 );
-const validUsername = computed(() =>
-  ALPHANUMERIC_UNDERSCORE.test(usernameInput.value)
-);
+const validUsername = computed(() => usernameRegex.test(usernameInput.value));
 const isUsernameTaken = computed(
   () =>
     users.users.filter(

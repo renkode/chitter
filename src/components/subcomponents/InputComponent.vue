@@ -1,5 +1,5 @@
 <script setup>
-import { ref, defineProps, onMounted, watch } from "vue";
+import { ref, defineProps, watch } from "vue";
 // https://javascript.plainenglish.io/vue-js-tip-1-use-v-model-on-custom-components-be56401727e0
 const props = defineProps({
   inputValue: String,
