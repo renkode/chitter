@@ -36,6 +36,10 @@ export const useAppStore = defineStore("app", {
       this.currentUser = user || null;
       this.currentId = user.id;
     },
+    async logIn() {
+      await router.push("/home");
+      this.setCurrentUser("1");
+    },
     async logOut() {
       await router.push("/home");
       this.currentUser = null;
@@ -84,7 +88,7 @@ export const useAppStore = defineStore("app", {
     setModalReply(userId, tweetId) {
       this.modalReply = { userId, tweetId };
     },
-    toggleToast(text) {
+    toast(text) {
       this.showToast = !this.showToast;
       this.toastText = text;
     },

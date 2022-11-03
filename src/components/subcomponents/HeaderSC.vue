@@ -45,8 +45,6 @@ const canGoBack = computed(() => {
         app.routeName
       }}</span></span
     >
-
-    <button v-if="!app.currentId" class="sign-up-btn">Sign Up</button>
   </div>
 </template>
 
@@ -104,27 +102,5 @@ const canGoBack = computed(() => {
 .header-wrapper {
   display: flex;
   width: fit-content;
-}
-
-.sign-up-btn {
-  color: white;
-  cursor: pointer;
-  border: 0;
-  border-radius: 20px;
-  background-color: #1d9bf0;
-  font-size: 1rem;
-  height: 40px;
-  padding: 0.5rem 1rem;
-  transition: background-color 0.15s ease;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-.sign-up-btn:hover {
-  background-color: #1687d3;
-}
-
-@media screen and (max-width: 1000px) {
 }
 </style>

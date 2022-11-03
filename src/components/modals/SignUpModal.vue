@@ -8,6 +8,8 @@ import { usernameRegex, emailRegex } from "@/mixins/utilities";
 
 const app = useAppStore();
 const users = useUsersStore();
+
+const resolving = ref(false);
 const nameInput = ref("");
 const nameError = computed(() => nameInput.value.length === 0);
 
@@ -45,17 +47,39 @@ const passIsShort = computed(
 );
 const passError = computed(() => passIsBlank.value || passIsShort.value);
 
+const signUpCodeInput = ref("");
+
 const containsError = computed(
   () =>
     nameError.value ||
     usernameError.value ||
     emailError.value ||
-    passError.value
+    passError.value ||
+    signUpCodeInput.value.length === 0 ||
+    resolving.value
 );
 
-const signUp = () => {
+const signUp = async () => {
+  let data;
+  try {
+    resolving.value = true;
+    await fetch("https://jsonplaceholder.typicode.com/users/1")
+      .then((response) => response.json())
+      .then((json) => {
+        resolving.value = false;
+        data = json;
+      });
+    if (data.username !== signUpCodeInput.value) {
+      app.toast("Wrong code.");
+      return;
+    }
+  } catch {
+    app.toast("Something went wrong.");
+    return;
+  }
   app.toggleModal();
   app.signUp(false, nameInput.value, usernameInput.value);
+  app.toast("Success!");
 };
 
 // You can check if an email is in use by checking if fetchProvidersForEmail returns an empty array.
@@ -66,7 +90,7 @@ const signUp = () => {
   <ModalHeader text="Create your account" />
   <div class="form-wrapper">
     <form id="sign-up-form">
-      <div class="name-and-username">
+      <div class="input-wrapper">
         <InputComponent
           v-model:inputValue="nameInput"
           name="nameInput"
@@ -119,21 +143,31 @@ const signUp = () => {
         ]"
         minLength="1"
       />
-      <InputComponent
-        v-model:inputValue="passInput"
-        type="password"
-        name="passInput"
-        label="Password"
-        :startsBlank="true"
-        :validation="[
-          { errorText: `Password is required.`, hasError: passIsBlank },
-          {
-            errorText: 'Password must be at least 6 characters.',
-            hasError: passIsShort,
-          },
-        ]"
-        minLength="6"
-      />
+      <div class="input-wrapper">
+        <InputComponent
+          v-model:inputValue="passInput"
+          type="password"
+          name="passInput"
+          label="Password"
+          :startsBlank="true"
+          :validation="[
+            { errorText: `Password is required.`, hasError: passIsBlank },
+            {
+              errorText: 'Password must be at least 6 characters.',
+              hasError: passIsShort,
+            },
+          ]"
+          minLength="6"
+        />
+        <InputComponent
+          v-model:inputValue="signUpCodeInput"
+          name="signUpCodeInput"
+          label="Secret code"
+          :startsBlank="true"
+          :validation="[]"
+          minLength="1"
+        />
+      </div>
       <button
         class="make-account-btn"
         type="submit"
@@ -167,7 +201,7 @@ form {
   margin: 2rem 0;
 }
 
-.name-and-username {
+.input-wrapper {
   display: flex;
   flex-direction: row;
   justify-content: center;

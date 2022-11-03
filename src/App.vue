@@ -1,24 +1,35 @@
 <script setup>
-import { onMounted } from "vue";
+import { ref, onMounted, onBeforeUnmount } from "vue";
 import MenuSidebar from "./components/MenuSidebar.vue";
 import MediaSidebar from "./components/MediaSidebar.vue";
 import HeaderSC from "./components/subcomponents/HeaderSC.vue";
-import ComposeTweet from "./components/subcomponents/ComposeTweet.vue";
+import SignUpBanner from "./components/subcomponents/SignUpBanner.vue";
 import LoadSpinner from "./components/subcomponents/LoadSpinner.vue";
 import ModalComponent from "./components/modals/ModalComponent.vue";
 import ToastMessage from "./components/subcomponents/ToastMessage.vue";
 import { useAppStore } from "@/stores/app.js";
 import { useUsersStore } from "@/stores/users";
+
 const app = useAppStore();
 const users = useUsersStore();
+const width = ref(window.innerWidth);
+
+const onWidthChange = () => {
+  width.value = window.innerWidth;
+};
 
 onMounted(() => {
   app.setCurrentUser(users.getUser("1"));
+  window.addEventListener("resize", onWidthChange);
+});
+
+onBeforeUnmount(() => {
+  window.removeEventListener("resize");
 });
 </script>
 
 <template>
-  <MenuSidebar />
+  <MenuSidebar v-if="width > 500 || app.currentUser" />
 
   <div class="main-wrapper">
     <div class="timeline-wrapper">
@@ -34,7 +45,8 @@ onMounted(() => {
     </div>
   </div>
 
-  <MediaSidebar />
+  <MediaSidebar v-if="width >= 1005" />
+  <SignUpBanner v-if="!app.currentUser" />
 
   <Teleport to="body">
     <Transition> <ModalComponent v-if="app.showModal" /></Transition>

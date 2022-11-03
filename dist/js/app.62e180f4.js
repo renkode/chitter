@@ -1685,7 +1685,7 @@
             setModalReply(e, t) {
               this.modalReply = { userId: e, tweetId: t };
             },
-            toggleToast(e) {
+            toast(e) {
               (this.showToast = !this.showToast), (this.toastText = e);
             },
           },

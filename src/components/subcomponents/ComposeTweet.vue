@@ -44,6 +44,7 @@ const handleInput = () => {
 };
 
 const getInitialReplyUser = (str) => {
+  // e.g. "@username hello world" is a reply
   const firstWord = str.replace(/\r?\n/, " ").split(" ")[0];
   console.log(firstWord);
   if (
@@ -57,6 +58,7 @@ const getInitialReplyUser = (str) => {
 };
 
 const getMentions = (str) => {
+  // e.g. "hello world @username" is a mention
   if (
     str
       .replace(/\r?\n/, "")
@@ -84,10 +86,7 @@ const postTweet = () => {
       ? app.modalReply.userId
       : getInitialReplyUser(str.value);
   const mentionedUsers = getMentions(str.value);
-  let type = app.modalType === "reply" || replyingToUser ? "reply" : "status";
-  // console.log(
-  //   `type: ${type}, mentionedUsers: ${mentionedUsers}, replyingToUser: ${replyingToUser}`
-  // );
+  const type = app.modalType === "reply" || replyingToUser ? "reply" : "status";
   tweetStore.addTweet(
     type,
     str.value,

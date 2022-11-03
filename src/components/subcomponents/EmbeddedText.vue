@@ -1,5 +1,5 @@
 <script setup>
-import { ref, defineProps, onMounted, watch, onBeforeUnmount } from "vue";
+import { ref, defineProps, onMounted } from "vue";
 import { urlRegex, hashtagRegex, atRegex } from "@/mixins/utilities.js";
 import { useAppStore } from "@/stores/app";
 

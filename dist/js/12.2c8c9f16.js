@@ -499,7 +499,7 @@
                 V.toggleModal();
             },
             ce = () => {
-              V.toggleToast("Copied to clipboard"),
+              V.toast("Copied to clipboard"),
                 navigator.clipboard.writeText(
                   `${window.location.host}/status/${t.id}`
                 );
