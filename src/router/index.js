@@ -1,5 +1,6 @@
 import { createWebHistory, createRouter } from "vue-router";
 import { useAppStore } from "@/stores/app";
+import { useUsersStore } from "@/stores/users";
 const LocalTimeline = () => import("@/components/LocalTimeline.vue"); // lazy load routes
 const TimelineMain = () => import("@/components/TimelineMain.vue");
 const NotificationMain = () => import("@/components/NotificationMain.vue");
@@ -90,8 +91,9 @@ const router = createRouter({
 
 router.beforeEach((to, from, next) => {
   const app = useAppStore();
+  const users = useUsersStore();
   if (app.showModal) app.toggleModal();
-  if (to.meta.requiresAuth && !app.currentUser) {
+  if (to.meta.requiresAuth && !users.currentId) {
     return next("/explore");
   } else {
     return next();

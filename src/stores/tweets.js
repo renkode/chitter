@@ -123,9 +123,14 @@ export const useTweetStore = defineStore("tweets", {
   }),
   getters: {},
   actions: {
+    setTweets(arr) {
+      this.tweets = [...arr];
+    },
+
     getTweet(id) {
       return this.tweets.filter((t) => t.id == id)[0];
     },
+
     addLike(id, userId, isRetweet) {
       if (!userId) return;
       const tweet = this.getTweet(id);

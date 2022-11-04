@@ -11,9 +11,8 @@ import ComposeTweet from "./subcomponents/ComposeTweet.vue";
 const app = useAppStore();
 const tweets = useTweetStore();
 const users = useUsersStore();
-const currentUser = computed(() => users.getUser(app.currentId));
 const localTweets = computed(() =>
-  currentUser.value.localTimeline.map((localTweet) => {
+  users.currentUser.localTimeline.map((localTweet) => {
     if (tweets.getTweet(localTweet.id)) {
       const tweet = tweets.getTweet(localTweet.id);
       return {
@@ -33,7 +32,7 @@ const localTweets = computed(() =>
   <div>
     <ComposeTweet />
     <div class="tweet-list-container">
-      <TweetList v-if="currentUser" :tweets="localTweets" />
+      <TweetList v-if="users.currentUser" :tweets="localTweets" />
     </div>
   </div>
 </template>

@@ -8,17 +8,10 @@ const users = useUsersStore();
 const app = useAppStore();
 const isAccountMenuOpen = ref(false);
 const numNewNotifications = computed(
-  () => app.currentUser.newNotifications.length
+  () => users.currentUser.newNotifications.length
 );
 const toggleAccountMenu = () => {
   isAccountMenuOpen.value = !isAccountMenuOpen.value;
-};
-const toggleUser = () => {
-  if (app.currentId === "1") {
-    app.setCurrentUser(users.getUser("2"));
-  } else {
-    app.setCurrentUser(users.getUser("1"));
-  }
 };
 </script>
 
@@ -33,7 +26,7 @@ const toggleUser = () => {
             /></span></li
         ></router-link>
 
-        <router-link to="/home" v-if="app.currentUser">
+        <router-link to="/home" v-if="users.currentUser">
           <li class="nav-item">
             <span class="nav-icon"
               ><v-icon
@@ -52,13 +45,13 @@ const toggleUser = () => {
           </li></router-link
         >
 
-        <router-link to="/notifications" v-if="app.currentUser"
+        <router-link to="/notifications" v-if="users.currentUser"
           ><li class="nav-item">
             <span class="nav-icon notif-icon"
               ><v-icon name="bi-bell" scale="1.7" fill="#ffffff80" />
               <div
                 class="notification-dot"
-                v-if="app.currentUser && numNewNotifications > 0"
+                v-if="users.currentUser && numNewNotifications > 0"
               >
                 {{ numNewNotifications }}
               </div>
@@ -68,10 +61,10 @@ const toggleUser = () => {
         >
 
         <router-link
-          v-if="app.currentUser"
+          v-if="users.currentUser"
           :to="{
             name: 'Profile',
-            params: { username: app.currentUser.username },
+            params: { username: users.currentUser.username },
           }"
         >
           <li class="nav-item">
@@ -91,15 +84,15 @@ const toggleUser = () => {
 
       <li
         class="nav-user"
-        v-if="app.currentUser"
+        v-if="users.currentUser"
         @click.stop="toggleAccountMenu"
       >
         <div class="user-info-and-btn">
-          <ProfilePicture :url="app.currentUser.avatarUrl" :size="40" />
+          <ProfilePicture :url="users.currentUser.avatarUrl" :size="40" />
           <div class="user-info-wrapper">
-            <span class="display-name">{{ app.currentUser.name }}</span>
+            <span class="display-name">{{ users.currentUser.name }}</span>
             <span class="username gray-text"
-              >@{{ app.currentUser.username }}</span
+              >@{{ users.currentUser.username }}</span
             >
           </div>
         </div>
@@ -110,7 +103,7 @@ const toggleUser = () => {
         <div v-if="isAccountMenuOpen" class="tweet-menu-container">
           <ul class="tweet-menu-list">
             <li class="tweet-menu-item" @click="app.logOut">
-              Log out @{{ app.currentUser.username }}
+              Log out @{{ users.currentUser.username }}
             </li>
           </ul>
         </div>

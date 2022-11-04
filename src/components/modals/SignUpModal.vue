@@ -63,36 +63,22 @@ const containsError = computed(
 );
 
 const signUp = async () => {
-  try {
-    resolving.value = true;
-    const code = await getDoc(doc(db, "app", "signup-code"));
-    resolving.value = false;
-    if (!code.exists()) {
-      throw new Error("Failed to fetch signup code.");
-    }
-    if (code.data().value !== signUpCodeInput.value) {
-      app.toast("Wrong code.");
-      return;
-    }
-  } catch (err) {
-    console.log(err);
-    app.toast("Something went wrong.");
+  resolving.value = true;
+  const code = await getDoc(doc(db, "app", "signup-code"));
+  resolving.value = false;
+  if (!code.exists()) {
+    throw new Error("Failed to fetch signup code.");
+  }
+  if (code.data().value !== signUpCodeInput.value) {
+    app.toast("Wrong code.");
     return;
   }
-  app.toggleModal();
-  try {
-    app.signUp(
-      nameInput.value,
-      usernameInput.value,
-      emailInput.value,
-      passInput.value
-    );
-  } catch (err) {
-    console.log(err);
-    app.toast("Something went wrong.");
-    return;
-  }
-  app.toast("Success!");
+  await app.signUp(
+    nameInput.value,
+    usernameInput.value,
+    emailInput.value,
+    passInput.value
+  );
 };
 
 // You can check if an email is in use by checking if fetchProvidersForEmail returns an empty array.

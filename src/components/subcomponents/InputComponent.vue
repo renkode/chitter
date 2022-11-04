@@ -116,6 +116,7 @@ watch(
   border: rgba(255, 255, 255, 0.25) 1px solid;
   border-radius: 6px;
   padding: 8px;
+  padding-bottom: 0;
   position: relative;
   display: flex;
   justify-content: center;
@@ -131,6 +132,7 @@ watch(
   flex: 1;
   background-color: #262a2e;
   height: 3rem;
+  padding-bottom: 8px;
   color: white;
   border: 0;
   width: 100%;

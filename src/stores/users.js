@@ -4,119 +4,18 @@ import { collection, doc, setDoc, getDoc } from "firebase/firestore";
 
 export const useUsersStore = defineStore("users", {
   state: () => ({
-    users: {
-      currentId: auth.currentUser ? auth.currentUser.uid : null,
-      currentUser: auth.currentUser
-        ? getDoc(doc(db, "users", auth.currentUser.uid))
-        : null,
-      // {
-      //   id: "1",
-      //   isAdmin: true,
-      //   name: "🍆",
-      //   username: "renkode",
-      //   description: "lorem ipsum #cool",
-      //   location: "nowhere",
-      //   website: "https://github.com/renkode/",
-      //   birthday: "June 9",
-      //   avatarUrl:
-      //     "https://pbs.twimg.com/profile_images/1566523505155268608/AEzCad1D_400x400.png",
-      //   headerUrl:
-      //     "https://pbs.twimg.com/media/Fe8wtxmVQAAkipE?format=jpg&name=large",
-      //   followingCount: 0,
-      //   followerCount: 1,
-      //   tweetCount: 3,
-      //   timestamp: "2019-06-03T23:12:08.000Z",
-      //   tweets: [
-      //     {
-      //       id: "2",
-      //       type: "status",
-      //       containsMedia: true,
-      //     },
-      //     {
-      //       id: "3",
-      //       type: "status",
-      //       containsMedia: true,
-      //     },
-      //     {
-      //       id: "4",
-      //       type: "status",
-      //       containsMedia: true,
-      //     },
-      //     {
-      //       id: "5",
-      //       type: "reply",
-      //       timestamp: "2022-10-24T21:21:51.181Z",
-      //       fromUserId: "1",
-      //     },
-      //   ],
-      //   retweets: [],
-      //   likes: [],
-      //   following: [],
-      //   followers: ["2"],
-      //   localTimeline: [
-      //     {
-      //       id: "5",
-      //       type: "reply",
-      //       timestamp: "2022-10-24T21:21:51.181Z",
-      //       fromUserId: "1",
-      //     },
-      //     {
-      //       id: "2",
-      //       type: "status",
-      //       timestamp: "2022-10-24T21:21:54.735Z",
-      //       fromUserId: "1",
-      //     },
-      //     {
-      //       id: "3",
-      //       type: "status",
-      //       timestamp: "2022-10-24T21:21:53.427Z",
-      //       fromUserId: "1",
-      //     },
-      //     {
-      //       id: "4",
-      //       type: "status",
-      //       timestamp: "2022-10-24T21:21:51.181Z",
-      //       fromUserId: "1",
-      //     },
-      //   ],
-      //   newNotifications: [{ fromUser: "2", type: "follow", tweet: null }], // types: follow, like, retweet, reply
-      //   oldNotifications: [],
-      // },
-      // {
-      //   id: "2",
-      //   name: "← bearer of the curse",
-      //   username: "mikulover",
-      //   description: "Randomly just made some toast pyon★. I am a freak pyon★",
-      //   location: "h",
-      //   website: "",
-      //   birthday: "",
-      //   avatarUrl:
-      //     "https://pbs.twimg.com/profile_images/1584210745247600643/mQ9zmvni_400x400.jpg",
-      //   headerUrl:
-      //     "https://pbs.twimg.com/profile_banners/840764077681061889/1646410641/1500x500",
-      //   followingCount: 1,
-      //   followerCount: 0,
-      //   tweetCount: 1,
-      //   timestamp: "2020-02-03T23:12:08.000Z",
-      //   tweets: [
-      //     {
-      //       id: "1",
-      //       type: "reply",
-      //       containsMedia: true,
-      //     },
-      //   ],
-      //   retweets: [],
-      //   likes: [],
-      //   following: ["1"],
-      //   followers: [],
-      //   localTimeline: [],
-      //   newNotifications: [],
-      //   oldNotifications: [],
-      // },
-    },
+    currentUser: auth.currentUser
+      ? getDoc(doc(db, "users", auth.currentUser.uid))
+      : null,
+    currentId: auth.currentUser ? auth.currentUser.uid : null,
   }),
   getters: {}, // can't be async so
   actions: {
+    setCurrentUser(user, id) {
+      this.currentUser = user || null;
+      this.currentId = id || null;
+    },
+
     createUser(id, name, username) {
       const newUser = {
         id,
@@ -142,12 +41,16 @@ export const useUsersStore = defineStore("users", {
         newNotifications: [],
         oldNotifications: [],
       };
-      this.users.currentUser = newUser;
+      this.setCurrentUser(newUser, id);
       setDoc(doc(db, "users", id), newUser);
       return newUser;
     },
-    getUser(id) {
-      return this.users.filter((user) => user.id == id)[0];
+
+    async getUser(id) {
+      console.log(id);
+      const docRef = await getDoc(doc(db, "users", id));
+      if (docRef.exists()) return docRef.data();
+      return null;
     },
 
     getUsername(id) {

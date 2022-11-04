@@ -47,7 +47,7 @@ const fetchPreviousTweets = () => {
 };
 
 // refresh whenever current tweet or previous tweet change/get deleted
-watch([() => app.viewTweetId, previousTweet], () => {
+watch([() => previousTweet], () => {
   fetchPreviousTweets();
 });
 

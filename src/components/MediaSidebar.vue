@@ -1,7 +1,9 @@
 <script setup>
 import { useAppStore } from "@/stores/app";
+import { useUsersStore } from "@/stores/users";
 
 const app = useAppStore();
+const users = useUsersStore();
 </script>
 
 <template>
@@ -14,7 +16,7 @@ const app = useAppStore();
         <input type="search" placeholder="Search Chitter" />
       </div>
 
-      <div class="media-container" v-if="!app.currentUser">
+      <div class="media-container" v-if="!users.currentUser">
         <div class="media-header">New to Chitter?</div>
         <div class="media-body">
           <div class="gray-text">

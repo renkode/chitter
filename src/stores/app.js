@@ -1,8 +1,13 @@
 import { defineStore } from "pinia";
 import { useUsersStore } from "./users";
 import router from "@/router/index.js";
-import { auth } from "../firebase.js";
-import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
+import { auth, db } from "@/firebase.js";
+import {
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+  signOut,
+} from "firebase/auth";
+import { collection, doc, setDoc, getDoc } from "firebase/firestore";
 
 export const useAppStore = defineStore("app", {
   state: () => ({
@@ -11,8 +16,6 @@ export const useAppStore = defineStore("app", {
     path: "",
     view: "home", //  timeline (default) | profile | tweet | search
     previousViews: ["home"],
-    viewTweetId: null,
-    viewProfileId: null,
     profileTab: "tweets", // tweets (default) | tweets-and-replies | media | likes
     showModal: false,
     modalType: "status", // status | reply | edit-profile | retweet-list | like-list
@@ -37,38 +40,64 @@ export const useAppStore = defineStore("app", {
     async goTo(route) {
       await router.push(route);
     },
+
     setCurrentUser(user) {
       this.currentUser = user || null;
       this.currentId = user.id;
     },
-    async logIn(id) {
+
+    async logIn(email, password) {
       const users = useUsersStore();
-      this.setCurrentUser(users.getUser(id));
-      await router.push("/home");
-    },
-    async logOut() {
-      await router.push("/home");
-      this.currentUser = null;
-      this.currentId = null;
-    },
-    async signUp(name, username, email, password) {
-      let uid;
-      createUserWithEmailAndPassword(auth, email, password)
-        .then((userCredential) => {
+      return signInWithEmailAndPassword(auth, email, password)
+        .then(async (userCredential) => {
           // Signed in
           const user = userCredential.user;
-          uid = user.uid;
-          const users = useUsersStore();
-          this.currentUser = users.createUser(uid, name, username);
-          this.currentId = this.currentUser.id;
+          console.log(await users.getUser(user.uid));
+          users.setCurrentUser(await users.getUser(user.uid), user.uid);
+          this.toast("Success!");
           this.goTo("/home");
         })
         .catch((error) => {
           const errorCode = error.code;
           const errorMessage = error.message;
           console.log(errorMessage);
+          return errorCode;
         });
     },
+
+    logOut() {
+      const users = useUsersStore();
+      signOut(auth)
+        .then(() => {
+          users.setCurrentUser(null, null);
+          this.goTo("explore");
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    },
+
+    async signUp(name, username, email, password) {
+      return createUserWithEmailAndPassword(auth, email, password)
+        .then((userCredential) => {
+          // Signed in
+          const user = userCredential.user;
+          const users = useUsersStore();
+          users.setCurrentUser(
+            users.createUser(user.uid, name, username),
+            user.uid
+          );
+          this.toast("Success!");
+          this.goTo("/home");
+        })
+        .catch((error) => {
+          const errorCode = error.code;
+          const errorMessage = error.message;
+          console.log(errorMessage);
+          return errorCode;
+        });
+    },
+
     setProfileTab(tab) {
       if (this.profileTab === tab) return;
       const tabs = ["tweets", "tweets-and-replies", "media", "likes"];
@@ -77,13 +106,16 @@ export const useAppStore = defineStore("app", {
       }
       this.profileTab = tab;
     },
+
     setTweetContext(id) {
       if (window.getSelection().toString().length > 0) return; // don't trigger click while highlighting text
       router.push({ name: "Tweet", params: { id } });
     },
+
     viewUserProfile(username) {
       router.push({ name: "Profile", params: { username } });
     },
+
     setModalType(type) {
       const types = [
         "status",
@@ -99,14 +131,17 @@ export const useAppStore = defineStore("app", {
       }
       this.modalType = type;
     },
+
     toggleModal(type) {
       if (type) this.setModalType(type);
       this.showModal = !this.showModal;
       //if (!this.showModal) this.modalType = "status"; // FAIL SAFE
     },
+
     setModalReply(userId, tweetId) {
       this.modalReply = { userId, tweetId };
     },
+
     toast(text) {
       this.showToast = !this.showToast;
       this.toastText = text;

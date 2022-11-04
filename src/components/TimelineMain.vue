@@ -4,7 +4,6 @@ import { useAppStore } from "@/stores/app.js";
 import { useTweetStore } from "@/stores/tweets.js";
 import ComposeTweet from "./subcomponents/ComposeTweet.vue";
 import TweetList from "./lists/TweetList.vue";
-import db from "../firebase.js";
 import { collection, getDocs } from "firebase/firestore";
 
 const app = useAppStore();

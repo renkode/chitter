@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed } from "vue";
+import { ref, computed, watch } from "vue";
 import ModalHeader from "./ModalHeader.vue";
 import InputComponent from "../subcomponents/InputComponent.vue";
 import { useAppStore } from "@/stores/app";
@@ -10,6 +10,7 @@ const users = useUsersStore();
 const resolving = ref(false);
 const userInput = ref("");
 const passInput = ref("");
+const invalidInput = ref(false);
 const cannotLogIn = computed(
   () => userInput.value.length === 0 || passInput.value.length === 0
 );
@@ -19,27 +20,13 @@ const redirectToSignUp = () => {
 };
 
 const logIn = async () => {
-  // let data;
-  // try {
-  //   resolving.value = true;
-  //   await fetch("https://jsonplaceholder.typicode.com/users/1")
-  //     .then((response) => response.json())
-  //     .then((json) => {
-  //       resolving.value = false;
-  //       data = json;
-  //     });
-  //   if (data.username !== signUpCodeInput.value) {
-  //     app.toast("Wrong code.");
-  //     return;
-  //   }
-  // } catch {
-  //   app.toast("Something went wrong.");
-  //   return;
-  // }
-  app.toggleModal();
-  app.logIn("1");
-  //app.signUp(false, nameInput.value, usernameInput.value);
+  const error = await app.logIn(userInput.value, passInput.value);
+  invalidInput.value = error;
 };
+
+watch([userInput, passInput], () => {
+  invalidInput.value = false;
+});
 </script>
 
 <template>
@@ -64,7 +51,9 @@ const logIn = async () => {
         name="passInput"
         label="Password"
         :startsBlank="true"
-        :validation="[]"
+        :validation="[
+          { errorText: 'Wrong email or password.', hasError: invalidInput },
+        ]"
         minLength="1"
       />
       <button
@@ -109,7 +98,7 @@ form {
   display: flex;
   flex-direction: column;
   justify-content: center;
-  align-items: flex-start;
+  align-items: center;
   gap: 1rem;
   margin: 2rem 0;
 }
