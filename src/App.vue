@@ -19,7 +19,7 @@ const onWidthChange = () => {
 };
 
 onMounted(() => {
-  app.setCurrentUser(users.getUser("1"));
+  //app.setCurrentUser(users.getUser("1"));
   window.addEventListener("resize", onWidthChange);
 });
 

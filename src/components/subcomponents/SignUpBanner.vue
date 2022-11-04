@@ -5,8 +5,7 @@ const app = useAppStore();
 
 <template>
   <div class="banner-wrapper">
-    <div class="left-wrapper"></div>
-    <div class="right-wrapper">
+    <div class="container">
       <div class="text-wrapper">
         <div class="header-text">Don't miss what's happening</div>
         <div>People on Chitter are the first to know.</div>
@@ -29,6 +28,7 @@ const app = useAppStore();
   display: flex;
   flex-direction: row;
   align-items: center;
+  justify-content: center;
   position: fixed;
   bottom: 0;
   color: white;
@@ -36,18 +36,18 @@ const app = useAppStore();
   z-index: 10;
 }
 
-.left-wrapper {
-  min-width: 88px;
-  width: 30%;
-}
-
-.right-wrapper {
+.container {
   display: flex;
   flex-direction: row;
   align-items: center;
   justify-content: space-between;
+  max-width: 600px;
   width: 100%;
+  min-width: fit-content;
   height: 100%;
+  padding: 0 1rem;
+  position: relative;
+  left: -3.5vw;
 }
 
 .text-wrapper {
@@ -56,6 +56,7 @@ const app = useAppStore();
   justify-content: center;
   align-items: flex-start;
   height: 100%;
+  width: 100%;
 }
 
 .header-text {
@@ -68,7 +69,6 @@ const app = useAppStore();
   align-items: center;
   height: 100%;
   gap: 1rem;
-  padding-right: 1rem;
 }
 
 .login-btn,
@@ -97,26 +97,23 @@ const app = useAppStore();
   }
 }
 
-@media screen and (max-width: 1005px) {
-  .left-wrapper {
-    flex-shrink: 4;
+@media screen and (max-width: 700px) {
+  .container {
+    left: 0;
   }
 }
 
-@media screen and (max-width: 700px) {
+@media screen and (max-width: 500px), (max-height: 500px) {
   .banner-wrapper {
     background-color: #262a2e;
     border-top: 1px solid rgba(255, 255, 255, 0.25);
   }
-  .left-wrapper,
   .text-wrapper {
     display: none;
   }
-  .right-wrapper {
+  .container {
     padding: 1rem;
-  }
-  .left-wrapper {
-    width: 88px;
+    width: 100%;
   }
   .button-wrapper {
     width: 100%;
@@ -142,8 +139,5 @@ const app = useAppStore();
   .signup-btn:hover {
     background-color: #1687d3;
   }
-}
-
-@media screen and (max-width: 500px), (max-height: 500px) {
 }
 </style>

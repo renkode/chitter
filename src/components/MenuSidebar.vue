@@ -109,7 +109,7 @@ const toggleUser = () => {
         <div v-if="isAccountMenuOpen" class="overlay"></div>
         <div v-if="isAccountMenuOpen" class="tweet-menu-container">
           <ul class="tweet-menu-list">
-            <li class="tweet-menu-item" @click="toggleUser">
+            <li class="tweet-menu-item" @click="app.logOut">
               Log out @{{ app.currentUser.username }}
             </li>
           </ul>
