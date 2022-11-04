@@ -53,7 +53,7 @@
         "timestamp": "2019-06-03T23:12:08.000Z"
       },
       "tweetData": {
-        "authoredTweets": [
+        "tweets": [
           {
             "id": 1,
             "type": "status",

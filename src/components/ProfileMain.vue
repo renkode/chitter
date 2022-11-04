@@ -19,21 +19,31 @@ const setTab = (newTab) => {
   tab.value = newTab;
 };
 
+// const mapFromUserTweets = () => {
+//   return user.value.tweets.map((t) => ({
+//     data: tweetStore.getTweet(t.id),
+//     type: t.type,
+//     retweetedBy: null,
+//     containsMedia: t.containsMedia,
+//     timestamp: tweetStore.getTweet(t.id).timestamp,
+//   }));
+// };
+
+// const mapFromRetweets = () => {
+//   return user.value.retweets.map((t) => ({
+//     data: tweetStore.getTweet(t.id),
+//     type: "retweet",
+//     retweetedBy: user.value.name,
+//     timestamp: t.timestamp,
+//   }));
+// };
+
 const mapFromUserTweets = () => {
-  return user.value.authoredTweets.map((t) => ({
+  return user.value.tweets.map((t) => ({
     data: tweetStore.getTweet(t.id),
     type: t.type,
-    retweetedBy: null,
+    retweetedBy: t.type === "retweet" ? user.value.name : null,
     containsMedia: t.containsMedia,
-    timestamp: tweetStore.getTweet(t.id).timestamp,
-  }));
-};
-
-const mapFromRetweets = () => {
-  return user.value.retweets.map((t) => ({
-    data: tweetStore.getTweet(t.id),
-    type: "retweet",
-    retweetedBy: user.value.name,
     timestamp: t.timestamp,
   }));
 };
@@ -61,10 +71,10 @@ const tweets = computed(() => {
         .filter(
           (tweet) =>
             tweet.type === "status" ||
+            tweet.type === "retweet" ||
             (tweet.type === "reply" &&
               tweet.data.replyingToUser == tweet.data.authorId) // self reply
         )
-        .concat(mapFromRetweets())
         .sort((a, b) =>
           a.timestamp > b.timestamp ? -1 : a.timestamp < b.timestamp ? 1 : 0
         );

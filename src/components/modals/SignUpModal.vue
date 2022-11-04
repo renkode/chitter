@@ -79,7 +79,7 @@ const signUp = async () => {
     return;
   }
   app.toggleModal();
-  app.signUp(false, nameInput.value, usernameInput.value);
+  app.signUp(nameInput.value, usernameInput.value);
   app.toast("Success!");
 };
 

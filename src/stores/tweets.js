@@ -126,7 +126,6 @@ export const useTweetStore = defineStore("tweets", {
     getTweet(id) {
       return this.tweets.filter((t) => t.id == id)[0];
     },
-
     addLike(id, userId, isRetweet) {
       if (!userId) return;
       const tweet = this.getTweet(id);
@@ -154,13 +153,20 @@ export const useTweetStore = defineStore("tweets", {
       users.removeLike(userId, id);
     },
 
+    removeAllLikesFromTweet(id) {
+      const tweet = this.getTweet(id);
+      if (!tweet) throw new Error(`tweet id ${id} does not exist`);
+      const users = useUsersStore();
+      tweet.likesFrom.forEach((user) => users.removeLike(user, id));
+    },
+
     hasLiked(id, userId) {
       const tweet = this.getTweet(id);
       if (!tweet) return false;
       return tweet.likesFrom.includes(userId);
     },
 
-    addRetweet(id, userId, isRetweet) {
+    addRetweet(id, userId, isRetweetofRetweet) {
       if (!userId) return;
       const tweet = this.getTweet(id);
       if (!tweet) throw new Error(`tweet id ${id} does not exist`);
@@ -184,7 +190,7 @@ export const useTweetStore = defineStore("tweets", {
         userId
       );
       if (tweet.authorId !== userId) {
-        isRetweet
+        isRetweetofRetweet
           ? users.notify(tweet.authorId, userId, "retweet-retweet", id)
           : users.notify(tweet.authorId, userId, "retweet-origin", id);
       }
@@ -193,7 +199,7 @@ export const useTweetStore = defineStore("tweets", {
     removeRetweet(id, userId) {
       if (!userId) return;
       const tweet = this.getTweet(id);
-      if (!tweet) throw new Error("no such tweet");
+      if (!tweet) throw new Error(`tweet id ${id} does not exist`);
       tweet.retweetCount--;
       tweet.retweetsFrom.splice(tweet.retweetsFrom.indexOf(userId), 1);
 
@@ -201,6 +207,13 @@ export const useTweetStore = defineStore("tweets", {
       users.removeRetweet(userId, id);
       users.removeFromLocalTimeline(userId, id); // self
       users.removeFromAllFollowerTimelines(userId, id); // followers
+    },
+
+    removeAllRetweetsFromTweet(id) {
+      const tweet = this.getTweet(id);
+      if (!tweet) throw new Error(`tweet id ${id} does not exist`);
+      const users = useUsersStore();
+      tweet.retweetsFrom.forEach((user) => users.removeRetweet(user, id));
     },
 
     hasRetweeted(id, userId) {
@@ -247,7 +260,7 @@ export const useTweetStore = defineStore("tweets", {
 
       const users = useUsersStore();
       const containsMedia = media.length > 0 ? true : false;
-      users.addTweet(authorId, newTweet.id, type, containsMedia);
+      users.addTweet(authorId, newTweet.id, type, containsMedia, timestamp);
       users.addToLocalTimeline(authorId, newTweet.id, type, timestamp); // self
       users.addToAllFollowerTimelines(authorId, newTweet.id, type, timestamp); // followers
       if (type === "reply" && replyingToUser !== authorId) {
@@ -263,23 +276,25 @@ export const useTweetStore = defineStore("tweets", {
     },
 
     removeTweet(id, userId) {
+      const tweet = this.getTweet(id);
       const index = this.tweets.findIndex((t) => t.id === id);
-      if (index < 0) throw new Error("no such tweet");
-      const replyingToTweet = this.getTweet(this.tweets[index].replyingToTweet);
+      if (!tweet || index < 0) throw new Error(`tweet id ${id} does not exist`);
+      const replyingToTweet = this.getTweet(tweet.replyingToTweet);
+      // remove from other tweet's replies
       if (replyingToTweet)
         replyingToTweet.repliesFrom = replyingToTweet.repliesFrom.filter(
           (replyId) => replyId !== id
         );
+      this.removeAllLikesFromTweet(id);
+      this.removeAllRetweetsFromTweet(id);
       this.tweets.splice(index, 1);
 
       const users = useUsersStore();
       users.removeTweet(userId, id);
-      users.removeLike(userId, id);
-      users.removeRetweet(userId, id);
       users.removeFromLocalTimeline(userId, id); // self
       users.removeFromAllFollowerTimelines(userId, id); // followers
-      if (this.tweets[index].replyingToUser)
-        users.deleteReplyNotification(this.tweets[index].replyingToUser, id);
+      if (tweet.replyingToUser)
+        users.deleteReplyNotification(tweet.replyingToUser, id);
     },
   },
 });

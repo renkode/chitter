@@ -7,7 +7,7 @@ import formatDateMixin from "@/mixins/formatDateMixin.js";
 import { useAppStore } from "@/stores/app.js";
 import { useUsersStore } from "@/stores/users.js";
 
-const store = useAppStore();
+const app = useAppStore();
 const users = useUsersStore();
 const props = defineProps({ user: Object, tab: String, setTab: Function });
 const shortURL = computed(() =>
@@ -16,11 +16,6 @@ const shortURL = computed(() =>
 const joinDate = computed(() =>
   formatDateMixin.formatJoinDate(props.user.timestamp)
 );
-
-const openModal = () => {
-  store.setModalType("edit-profile");
-  store.toggleModal();
-};
 </script>
 
 <template>
@@ -32,12 +27,12 @@ const openModal = () => {
         <ProfilePicture :url="props.user.avatarUrl" :size="135" />
         <button
           class="edit-profile-btn"
-          v-if="store.currentId == props.user.id"
-          @click="openModal"
+          v-if="app.currentId == props.user.id"
+          @click="app.toggleModal('edit-profile')"
         >
           Edit Profile
         </button>
-        <FollowButton v-else-if="store.currentUser" :userId="props.user.id" />
+        <FollowButton v-else-if="app.currentUser" :userId="props.user.id" />
       </div>
       <div class="user-info-wrapper">
         <span class="display-name">{{ props.user.name }}</span>
@@ -45,8 +40,8 @@ const openModal = () => {
           <span class="username gray-text"> @{{ props.user.username }} </span>
           <div
             v-if="
-              store.currentId &&
-              users.isFollowingUser(props.user.id, store.currentId)
+              app.currentId &&
+              users.isFollowingUser(props.user.id, app.currentId)
             "
             class="follows-you gray-text"
           >

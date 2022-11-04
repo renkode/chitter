@@ -22,7 +22,7 @@ export const useUsersStore = defineStore("users", {
         followerCount: 1,
         tweetCount: 3,
         timestamp: "2019-06-03T23:12:08.000Z",
-        authoredTweets: [
+        tweets: [
           {
             id: "2",
             type: "status",
@@ -94,7 +94,7 @@ export const useUsersStore = defineStore("users", {
         followerCount: 0,
         tweetCount: 1,
         timestamp: "2020-02-03T23:12:08.000Z",
-        authoredTweets: [
+        tweets: [
           {
             id: "1",
             type: "reply",
@@ -113,10 +113,10 @@ export const useUsersStore = defineStore("users", {
   }),
   getters: {}, // can't be async so
   actions: {
-    createUser(isAdmin, name, username) {
+    createUser(name, username) {
       const newUser = {
         id: uid(),
-        isAdmin,
+        isAdmin: false,
         isPrivate: false,
         name,
         username,
@@ -130,8 +130,7 @@ export const useUsersStore = defineStore("users", {
         followerCount: 0,
         tweetCount: 0,
         timestamp: new Date().toISOString(),
-        authoredTweets: [],
-        retweets: [],
+        tweets: [],
         likes: [],
         following: [],
         followers: [],
@@ -180,30 +179,37 @@ export const useUsersStore = defineStore("users", {
       Object.assign(this.users[index], user);
     },
 
-    addTweet(userId, tweetId, type = "status", containsMedia = false) {
+    addTweet(
+      userId,
+      tweetId,
+      type = "status",
+      containsMedia = false,
+      timestamp
+    ) {
       const user = this.getUser(userId);
-      user.authoredTweets.unshift({
+      user.tweets.unshift({
         id: tweetId,
         type,
         containsMedia,
+        timestamp,
       });
     },
 
     removeTweet(userId, tweetId) {
       const user = this.getUser(userId);
-      const tweetIndex = user.authoredTweets.findIndex((t) => t.id == tweetId);
-      user.authoredTweets.splice(tweetIndex, 1);
+      user.tweets = user.tweets.filter((t) => t.id !== tweetId);
     },
 
     addRetweet(userId, tweetId) {
-      const user = this.getUser(userId);
-      user.retweets.push({ id: tweetId, timestamp: new Date().toISOString() });
+      this.addTweet(userId, tweetId, "retweet", null, new Date().toISOString());
     },
 
     removeRetweet(userId, tweetId) {
       const user = this.getUser(userId);
-      const tweetIndex = user.retweets.findIndex((t) => t.id == tweetId);
-      user.retweets.splice(tweetIndex, 1);
+      const tweetIndex = user.tweets.findIndex(
+        (t) => t.id == tweetId && t.type === "retweet"
+      );
+      if (tweetIndex >= 0) user.tweets.splice(tweetIndex, 1);
     },
 
     addLike(userId, tweetId) {
@@ -253,8 +259,7 @@ export const useUsersStore = defineStore("users", {
 
     removeFromLocalTimeline(userId, tweetId) {
       const user = this.getUser(userId);
-      const tweetIndex = user.localTimeline.findIndex((t) => t.id == tweetId);
-      user.localTimeline.splice(tweetIndex, 1);
+      user.localTimeline = user.localTimeline.filter((t) => t.id !== tweetId);
     },
 
     removeFromAllFollowerTimelines(currentUserId, tweetId) {

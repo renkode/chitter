@@ -84,7 +84,7 @@ const userObj = {
     timestamp: DATE,
   },
   tweetData: {
-    authoredTweets: [
+    tweets: [
       {
         id: STRING,
         type: STRING, // status | reply | quote

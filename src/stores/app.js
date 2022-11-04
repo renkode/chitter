@@ -46,10 +46,10 @@ export const useAppStore = defineStore("app", {
       this.currentUser = null;
       this.currentId = null;
     },
-    async signUp(isAdmin, name, username) {
+    async signUp(name, username) {
       await router.push("/home");
       const users = useUsersStore();
-      this.currentUser = users.createUser(isAdmin, name, username);
+      this.currentUser = users.createUser(name, username);
       this.currentId = this.currentUser.id;
     },
     setProfileTab(tab) {
@@ -67,10 +67,6 @@ export const useAppStore = defineStore("app", {
     viewUserProfile(username) {
       router.push({ name: "Profile", params: { username } });
     },
-    toggleModal() {
-      this.showModal = !this.showModal;
-      if (!this.showModal) this.modalType = "status"; // FAIL SAFE
-    },
     setModalType(type) {
       const types = [
         "status",
@@ -85,6 +81,11 @@ export const useAppStore = defineStore("app", {
         throw Error("wrong modal type");
       }
       this.modalType = type;
+    },
+    toggleModal(type) {
+      if (type) this.setModalType(type);
+      this.showModal = !this.showModal;
+      //if (!this.showModal) this.modalType = "status"; // FAIL SAFE
     },
     setModalReply(userId, tweetId) {
       this.modalReply = { userId, tweetId };

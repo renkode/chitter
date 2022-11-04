@@ -1,13 +1,7 @@
 <script setup>
-import { defineProps } from "vue";
 import { useAppStore } from "@/stores/app";
 
 const app = useAppStore();
-
-const setSignUpModal = () => {
-  app.setModalType("signup");
-  app.toggleModal();
-};
 </script>
 
 <template>
@@ -26,7 +20,7 @@ const setSignUpModal = () => {
           <div class="gray-text">
             Sign up now to get your own personalized timeline!
           </div>
-          <button class="sign-up-btn" @click="setSignUpModal">
+          <button class="sign-up-btn" @click="app.toggleModal('signup')">
             Sign up with email
           </button>
           <div class="gray-text">

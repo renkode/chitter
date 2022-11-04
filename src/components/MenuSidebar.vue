@@ -10,10 +10,6 @@ const isAccountMenuOpen = ref(false);
 const numNewNotifications = computed(
   () => app.currentUser.newNotifications.length
 );
-const showComposeTweet = () => {
-  app.setModalType("status");
-  app.toggleModal();
-};
 const toggleAccountMenu = () => {
   isAccountMenuOpen.value = !isAccountMenuOpen.value;
 };
@@ -86,7 +82,7 @@ const toggleUser = () => {
         >
       </ul>
 
-      <button class="new-tweet-btn" @click="showComposeTweet">
+      <button class="new-tweet-btn" @click="app.toggleModal('status')">
         <span class="new-tweet-btn-feather"
           ><v-icon name="gi-feather" scale="1.8"
         /></span>
@@ -113,7 +109,7 @@ const toggleUser = () => {
         <div v-if="isAccountMenuOpen" class="overlay"></div>
         <div v-if="isAccountMenuOpen" class="tweet-menu-container">
           <ul class="tweet-menu-list">
-            <li class="tweet-menu-item" @click="app.logOut">
+            <li class="tweet-menu-item" @click="toggleUser">
               Log out @{{ app.currentUser.username }}
             </li>
           </ul>

@@ -1,16 +1,6 @@
 <script setup>
 import { useAppStore } from "@/stores/app";
 const app = useAppStore();
-
-const goToSignUp = () => {
-  app.setModalType("signup");
-  app.toggleModal();
-};
-
-const goToLogin = () => {
-  app.setModalType("login");
-  app.toggleModal();
-};
 </script>
 
 <template>
@@ -22,8 +12,11 @@ const goToLogin = () => {
         <div>People on Chitter are the first to know.</div>
       </div>
       <div class="button-wrapper">
-        <button class="login-btn" @click="goToLogin">Log in</button
-        ><button class="signup-btn" @click="goToSignUp">Sign up</button>
+        <button class="login-btn" @click="app.toggleModal('login')">
+          Log in</button
+        ><button class="signup-btn" @click="app.toggleModal('signup')">
+          Sign up
+        </button>
       </div>
     </div>
   </div>

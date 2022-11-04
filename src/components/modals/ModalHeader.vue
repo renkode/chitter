@@ -9,7 +9,7 @@ const app = useAppStore();
 <template>
   <div class="modal-header">
     <span class="header-item-wrapper">
-      <span class="exit-modal-btn" @click="app.toggleModal"
+      <span class="exit-modal-btn" @click="app.toggleModal()"
         ><v-icon name="bi-x" scale="1.6" fill="white"
       /></span>
       <span class="header-text"

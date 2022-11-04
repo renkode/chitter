@@ -28,11 +28,6 @@ const isRetweeted = computed(() =>
   tweets.hasRetweeted(props.tweet.id, app.currentId)
 );
 
-const toggleModal = (type) => {
-  app.setModalType(type);
-  app.toggleModal();
-};
-
 const toggleTweetMenu = () => {
   if (!app.currentUser) return;
   isTweetMenuOpen.value = !isTweetMenuOpen.value;
@@ -200,14 +195,14 @@ const shareTweet = () => {
         <span
           class="tweet-metric"
           v-if="props.tweet.retweetCount > 0"
-          @click="toggleModal('retweet-list')"
+          @click="app.toggleModal('retweet-list')"
           ><strong>{{ props.tweet.retweetCount }}</strong>
           <span class="gray-text"> Retweets</span></span
         >
         <span
           class="tweet-metric"
           v-if="props.tweet.likeCount > 0"
-          @click="toggleModal('like-list')"
+          @click="app.toggleModal('like-list')"
           ><strong>{{ props.tweet.likeCount }}</strong>
           <span class="gray-text"> Likes</span></span
         >
