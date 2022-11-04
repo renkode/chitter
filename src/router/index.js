@@ -30,6 +30,7 @@ const routes = [
     path: "/home",
     name: "Home",
     component: LocalTimeline,
+    meta: { requiresAuth: true },
   },
   {
     path: "/explore",
@@ -40,6 +41,7 @@ const routes = [
     path: "/notifications",
     name: "Notifications",
     component: NotificationMain,
+    meta: { requiresAuth: true },
   },
   {
     path: "/:username",
@@ -86,9 +88,14 @@ const router = createRouter({
   routes,
 });
 
-router.beforeEach((to, from) => {
+router.beforeEach((to, from, next) => {
   const app = useAppStore();
   if (app.showModal) app.toggleModal();
+  if (to.meta.requiresAuth && !app.currentUser) {
+    return next("/explore");
+  } else {
+    return next();
+  }
   // https://router.vuejs.org/guide/advanced/navigation-guards.html#global-before-guards
 });
 
