@@ -37,7 +37,7 @@ const logIn = async () => {
   //   return;
   // }
   app.toggleModal();
-  app.logIn();
+  app.logIn("1");
   //app.signUp(false, nameInput.value, usernameInput.value);
 };
 </script>
@@ -45,10 +45,10 @@ const logIn = async () => {
 <template>
   <ModalHeader
     ><span class="logo"
-      ><v-icon name="bi-twitter" scale="1.0" fill="#1d9bf0" /></span
+      ><v-icon name="bi-twitter" scale="1.5" fill="#1d9bf0" /></span
   ></ModalHeader>
   <div class="form-wrapper">
-    <form id="sign-up-form">
+    <form id="sign-in-form">
       <div class="sign-in-text">Sign in to Chitter</div>
       <InputComponent
         v-model:inputValue="userInput"
@@ -76,7 +76,7 @@ const logIn = async () => {
         Sign In
       </button>
       <div>
-        <span class="gray-text">Don't have an account?</span>
+        <span class="gray-text">Don't have an account? </span>
         <a class="blue-link" @click="redirectToSignUp">Sign up</a>
       </div>
     </form>
@@ -92,6 +92,16 @@ const logIn = async () => {
   width: 100%;
   height: fit-content;
   padding: 1rem;
+  background-color: #262a2e;
+}
+
+.logo {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding-right: 10%;
 }
 
 form {

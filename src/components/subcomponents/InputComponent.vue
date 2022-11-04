@@ -87,7 +87,7 @@ watch(
         :ref="inputRef"
       />
       <span class="label-wrapper"
-        ><label class="gray-text" for="props.name">{{ props.label }}</label
+        ><label class="gray-text" :for="props.name">{{ props.label }}</label
         ><span class="text-limit gray-text" v-if="props.maxLength"
           >{{ inputValue.length }} / {{ props.maxLength }}</span
         ></span
@@ -95,9 +95,9 @@ watch(
     </div>
     <template v-for="(v, index) in validation">
       <span
-        class="error-input red-text"
-        :key="index"
         v-if="v.hasError && !didNotType"
+        :key="index"
+        class="error-input red-text"
         >{{ v.errorText }}</span
       >
     </template>
@@ -150,6 +150,7 @@ watch(
 
 .input-wrapper:focus label {
   color: #1d9bf0;
+  width: 100%;
 }
 
 .input-wrapper.blue-border {
@@ -177,6 +178,11 @@ textarea:focus {
   justify-content: space-between;
   align-items: center;
   flex-wrap: no-wrap;
+}
+
+label {
+  flex: 1;
+  align-self: stretch;
 }
 
 .error-input {

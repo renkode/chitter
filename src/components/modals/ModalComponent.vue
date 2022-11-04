@@ -38,7 +38,7 @@ const app = useAppStore();
   bottom: 0;
   right: 0;
   background-color: rgba(255, 255, 255, 0.164);
-  z-index: 10;
+  z-index: 20;
 }
 
 .modal-container {

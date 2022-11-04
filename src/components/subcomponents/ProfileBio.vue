@@ -113,7 +113,7 @@ const openModal = () => {
           >Tweets
           <span
             class="tab-indicator"
-            v-if="props.tab === 'tweets'"
+            v-show="props.tab === 'tweets'"
           ></span> </span
       ></span>
       <span
@@ -124,7 +124,7 @@ const openModal = () => {
           >Tweets & replies
           <span
             class="tab-indicator"
-            v-if="props.tab === 'tweets-and-replies'"
+            v-show="props.tab === 'tweets-and-replies'"
           ></span> </span
       ></span>
       <span
@@ -135,7 +135,7 @@ const openModal = () => {
           >Media
           <span
             class="tab-indicator"
-            v-if="props.tab === 'media'"
+            v-show="props.tab === 'media'"
           ></span> </span
       ></span>
       <span
@@ -146,7 +146,7 @@ const openModal = () => {
           >Likes
           <span
             class="tab-indicator"
-            v-if="props.tab === 'likes'"
+            v-show="props.tab === 'likes'"
           ></span> </span
       ></span>
     </div>

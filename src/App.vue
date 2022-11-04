@@ -29,7 +29,7 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <MenuSidebar v-if="width > 500 || app.currentUser" />
+  <MenuSidebar v-show="width > 500 || app.currentUser" />
 
   <div class="main-wrapper">
     <div class="timeline-wrapper">
@@ -45,13 +45,13 @@ onBeforeUnmount(() => {
     </div>
   </div>
 
-  <MediaSidebar v-if="width >= 1005" />
+  <MediaSidebar v-show="width >= 1005" />
   <SignUpBanner v-if="!app.currentUser" />
 
   <Teleport to="body">
-    <Transition> <ModalComponent v-if="app.showModal" /></Transition>
+    <Transition> <ModalComponent v-show="app.showModal" /></Transition>
     <Transition>
-      <ToastMessage v-if="app.showToast" :duration="1500" />
+      <ToastMessage v-show="app.showToast" :duration="1500" />
     </Transition>
   </Teleport>
 </template>

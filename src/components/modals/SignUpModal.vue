@@ -73,7 +73,8 @@ const signUp = async () => {
       app.toast("Wrong code.");
       return;
     }
-  } catch {
+  } catch (err) {
+    console.log(err);
     app.toast("Something went wrong.");
     return;
   }
@@ -162,7 +163,7 @@ const signUp = async () => {
         <InputComponent
           v-model:inputValue="signUpCodeInput"
           name="signUpCodeInput"
-          label="Secret code"
+          label="Sign-up code"
           :startsBlank="true"
           :validation="[]"
           minLength="1"
@@ -189,6 +190,7 @@ const signUp = async () => {
   width: 100%;
   height: fit-content;
   padding: 1rem;
+  background-color: #262a2e;
 }
 
 form {

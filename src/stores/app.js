@@ -36,9 +36,10 @@ export const useAppStore = defineStore("app", {
       this.currentUser = user || null;
       this.currentId = user.id;
     },
-    async logIn() {
+    async logIn(id) {
+      const users = useUsersStore();
+      this.setCurrentUser(users.getUser(id));
       await router.push("/home");
-      this.setCurrentUser("1");
     },
     async logOut() {
       await router.push("/home");

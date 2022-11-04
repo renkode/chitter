@@ -128,17 +128,6 @@ onMounted(() => {
     </div>
     <div class="compose-tweet-body">
       <div class="compose-tweet-content">
-        <!-- <div
-          class="replying-to"
-          v-if="app.modalReply.userId && app.modalReply.tweetId"
-        >
-          <span class="gray-text">Replying to </span>
-          <a
-            class="blue-link"
-            @click.stop="app.viewUserProfile(props.replyingToUserId)"
-            >@{{ replyingTo }}</a
-          >
-        </div> -->
         <textarea
           ref="textArea"
           placeholder="What's happening?"
@@ -149,7 +138,7 @@ onMounted(() => {
         <div
           class="tweet-media"
           :class="[getMediaClass(images)]"
-          v-if="images.length > 0"
+          v-show="images.length > 0"
         >
           <div
             class="image-preview-wrapper"
@@ -186,7 +175,7 @@ onMounted(() => {
               <span
                 class="character-limit"
                 :class="{ 'red-text': isRedRange }"
-                v-if="isYellowRange"
+                v-show="isYellowRange"
                 >{{ charactersLeft }}</span
               >
             </div></span
