@@ -5,6 +5,8 @@ import InputComponent from "../subcomponents/InputComponent.vue";
 import { useAppStore } from "@/stores/app";
 import { useUsersStore } from "@/stores/users";
 import { usernameRegex, emailRegex } from "@/mixins/utilities";
+import { db } from "@/firebase.js";
+import { doc, getDoc } from "firebase/firestore";
 
 const app = useAppStore();
 const users = useUsersStore();
@@ -23,8 +25,9 @@ const usernameIsInvalid = computed(
 );
 const isUsernameTaken = computed(
   () =>
-    users.users.filter((user) => user.username == usernameInput.value).length >
-    0
+    // users.users.filter((user) => user.username == usernameInput.value).length >
+    // 0
+    false
 );
 const usernameError = computed(
   () =>
@@ -60,16 +63,14 @@ const containsError = computed(
 );
 
 const signUp = async () => {
-  let data;
   try {
     resolving.value = true;
-    await fetch("https://jsonplaceholder.typicode.com/users/1")
-      .then((response) => response.json())
-      .then((json) => {
-        resolving.value = false;
-        data = json;
-      });
-    if (data.username !== signUpCodeInput.value) {
+    const code = await getDoc(doc(db, "app", "signup-code"));
+    resolving.value = false;
+    if (!code.exists()) {
+      throw new Error("Failed to fetch signup code.");
+    }
+    if (code.data().value !== signUpCodeInput.value) {
       app.toast("Wrong code.");
       return;
     }
@@ -79,7 +80,18 @@ const signUp = async () => {
     return;
   }
   app.toggleModal();
-  app.signUp(nameInput.value, usernameInput.value);
+  try {
+    app.signUp(
+      nameInput.value,
+      usernameInput.value,
+      emailInput.value,
+      passInput.value
+    );
+  } catch (err) {
+    console.log(err);
+    app.toast("Something went wrong.");
+    return;
+  }
   app.toast("Success!");
 };
 

@@ -1,6 +1,8 @@
 import { defineStore } from "pinia";
 import { useUsersStore } from "./users";
 import router from "@/router/index.js";
+import { auth } from "../firebase.js";
+import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
 
 export const useAppStore = defineStore("app", {
   state: () => ({
@@ -32,6 +34,9 @@ export const useAppStore = defineStore("app", {
     },
   },
   actions: {
+    async goTo(route) {
+      await router.push(route);
+    },
     setCurrentUser(user) {
       this.currentUser = user || null;
       this.currentId = user.id;
@@ -46,11 +51,23 @@ export const useAppStore = defineStore("app", {
       this.currentUser = null;
       this.currentId = null;
     },
-    async signUp(name, username) {
-      await router.push("/home");
-      const users = useUsersStore();
-      this.currentUser = users.createUser(name, username);
-      this.currentId = this.currentUser.id;
+    async signUp(name, username, email, password) {
+      let uid;
+      createUserWithEmailAndPassword(auth, email, password)
+        .then((userCredential) => {
+          // Signed in
+          const user = userCredential.user;
+          uid = user.uid;
+          const users = useUsersStore();
+          this.currentUser = users.createUser(uid, name, username);
+          this.currentId = this.currentUser.id;
+          this.goTo("/home");
+        })
+        .catch((error) => {
+          const errorCode = error.code;
+          const errorMessage = error.message;
+          console.log(errorMessage);
+        });
     },
     setProfileTab(tab) {
       if (this.profileTab === tab) return;

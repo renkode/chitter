@@ -1,12 +1,12 @@
 <script setup>
-import { onMounted, onUnmounted, computed } from "vue";
+import { computed } from "vue";
 import { useAppStore } from "@/stores/app.js";
 import { useTweetStore } from "@/stores/tweets.js";
 import { useUsersStore } from "@/stores/users.js";
 import TweetList from "./lists/TweetList.vue";
 import ComposeTweet from "./subcomponents/ComposeTweet.vue";
-import db from "../firebase.js";
-import { collection, getDocs } from "firebase/firestore";
+//import db from "../firebase.js";
+//import { collection, getDocs } from "firebase/firestore";
 
 const app = useAppStore();
 const tweets = useTweetStore();

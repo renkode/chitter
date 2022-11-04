@@ -9,6 +9,8 @@ import ModalComponent from "./components/modals/ModalComponent.vue";
 import ToastMessage from "./components/subcomponents/ToastMessage.vue";
 import { useAppStore } from "@/stores/app.js";
 import { useUsersStore } from "@/stores/users";
+import { db } from "@/firebase.js";
+import { collection, doc, getDoc } from "firebase/firestore";
 
 const app = useAppStore();
 const users = useUsersStore();
@@ -18,9 +20,14 @@ const onWidthChange = () => {
   width.value = window.innerWidth;
 };
 
+const firebaseTest = async () => {
+  //users.createUser("pseudoId", "ren", "renkode");
+};
+
 onMounted(() => {
   //app.setCurrentUser(users.getUser("1"));
   window.addEventListener("resize", onWidthChange);
+  firebaseTest();
 });
 
 onBeforeUnmount(() => {
@@ -51,7 +58,7 @@ onBeforeUnmount(() => {
   <Teleport to="body">
     <Transition> <ModalComponent v-if="app.showModal" /></Transition>
     <Transition>
-      <ToastMessage v-show="app.showToast" :duration="1500" />
+      <ToastMessage v-if="app.showToast" :duration="1500" />
     </Transition>
   </Teleport>
 </template>
