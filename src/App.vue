@@ -49,7 +49,7 @@ onBeforeUnmount(() => {
   <SignUpBanner v-if="!app.currentUser" />
 
   <Teleport to="body">
-    <Transition> <ModalComponent v-show="app.showModal" /></Transition>
+    <Transition> <ModalComponent v-if="app.showModal" /></Transition>
     <Transition>
       <ToastMessage v-show="app.showToast" :duration="1500" />
     </Transition>

@@ -286,6 +286,11 @@ const shareTweet = () => {
   justify-content: center;
 }
 
+.display-name,
+.username {
+  cursor: pointer;
+}
+
 .tweet-content {
   display: flex;
   flex-direction: column;

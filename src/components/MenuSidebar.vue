@@ -33,7 +33,7 @@ const toggleUser = () => {
             /></span></li
         ></router-link>
 
-        <router-link to="/home">
+        <router-link to="/home" v-if="app.currentUser">
           <li class="nav-item">
             <span class="nav-icon"
               ><v-icon
@@ -201,6 +201,10 @@ li .nav-icon {
   justify-content: center;
   margin-left: 4px;
   margin-right: 18px;
+}
+
+.nav-logo .nav-icon {
+  margin: 4px;
 }
 
 .nav-icon.notif-icon {
