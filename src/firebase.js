@@ -6,6 +6,7 @@ import {
   setPersistence,
   browserLocalPersistence,
 } from "firebase/auth";
+import { useAppStore } from "./stores/app";
 import { useUsersStore } from "./stores/users";
 
 // TODO: Add SDKs for Firebase products that you want to use
@@ -29,15 +30,5 @@ const db = getFirestore();
 
 const auth = getAuth();
 setPersistence(auth, browserLocalPersistence);
-
-// persist data
-auth.onAuthStateChanged((user) => {
-  const users = useUsersStore();
-  if (user) {
-    users.syncCurrentUserToAuth(user.uid);
-  } else {
-    users.setCurrentUser(null, null);
-  }
-});
 
 export { db, auth };

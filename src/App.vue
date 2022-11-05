@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted, onBeforeUnmount, watch } from "vue";
+import { ref, onMounted, onBeforeMount, onBeforeUnmount, watch } from "vue";
 import MenuSidebar from "./components/MenuSidebar.vue";
 import MediaSidebar from "./components/MediaSidebar.vue";
 import HeaderSC from "./components/subcomponents/HeaderSC.vue";
@@ -15,6 +15,7 @@ import { collection, doc, getDoc } from "firebase/firestore";
 const app = useAppStore();
 const users = useUsersStore();
 const width = ref(window.innerWidth);
+const fetching = ref(true);
 
 const onWidthChange = () => {
   width.value = window.innerWidth;
@@ -24,12 +25,17 @@ const firebaseTest = async () => {
   console.log(auth.currentUser);
 };
 
-watch(
-  () => auth.currentUser,
-  () => {
-    firebaseTest();
-  }
-);
+// persist data
+onBeforeMount(() => {
+  auth.onAuthStateChanged(async (user) => {
+    if (user) {
+      await users.syncCurrentUserToAuth(user.uid);
+    } else {
+      users.setCurrentUser(null, null);
+    }
+    fetching.value = false;
+  });
+});
 
 onMounted(() => {
   window.addEventListener("resize", onWidthChange);
@@ -41,24 +47,28 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <MenuSidebar v-show="width > 500 || users.currentUser" />
+  <template v-if="!fetching">
+    <MenuSidebar v-show="width > 500 || users.currentUser" />
 
-  <div class="main-wrapper">
-    <div class="timeline-wrapper">
-      <HeaderSC />
-      <router-view v-slot="{ Component }">
-        <Transition name="fade" mode="out-in">
-          <Suspense>
-            <template #default> <component :is="Component" /> </template>
-            <template #fallback> <LoadSpinner /> </template>
-          </Suspense>
-        </Transition>
-      </router-view>
+    <div class="main-wrapper">
+      <div class="timeline-wrapper">
+        <HeaderSC />
+        <router-view v-slot="{ Component }">
+          <Transition name="fade" mode="out-in">
+            <Suspense timeout="0">
+              <template #default> <component :is="Component" /> </template>
+              <template #fallback> <LoadSpinner /> </template>
+            </Suspense>
+          </Transition>
+        </router-view>
+      </div>
     </div>
-  </div>
 
-  <MediaSidebar v-show="width >= 1005" />
-  <SignUpBanner v-if="!users.currentUser" />
+    <MediaSidebar v-show="width >= 1005" />
+    <SignUpBanner v-if="!users.currentUser" />
+  </template>
+
+  <template v-else><LoadSpinner /></template>
 
   <Teleport to="body">
     <Transition> <ModalComponent v-if="app.showModal" /></Transition>
