@@ -1,5 +1,5 @@
 <script setup>
-import { computed } from "vue";
+import { ref, computed } from "vue";
 import { useAppStore } from "@/stores/app.js";
 import { useUsersStore } from "@/stores/users.js";
 import router from "@/router/index.js";
@@ -7,7 +7,11 @@ import router from "@/router/index.js";
 const app = useAppStore();
 const users = useUsersStore();
 
-const user = computed(() => users.getUserByUsername(app.routeUsername));
+const user = ref(
+  app.routeUsername === users.currentUser.username
+    ? users.currentUser
+    : await users.getUserByUsername(app.routeUsername)
+);
 const canGoBack = computed(() => {
   const routes = [
     "Tweet",

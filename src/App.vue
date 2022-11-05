@@ -3,6 +3,7 @@ import { ref, onMounted, onBeforeMount, onBeforeUnmount, watch } from "vue";
 import MenuSidebar from "./components/MenuSidebar.vue";
 import MediaSidebar from "./components/MediaSidebar.vue";
 import HeaderSC from "./components/subcomponents/HeaderSC.vue";
+import HeaderPlaceholder from "./components/subcomponents/HeaderPlaceholder.vue";
 import SignUpBanner from "./components/subcomponents/SignUpBanner.vue";
 import LoadSpinner from "./components/subcomponents/LoadSpinner.vue";
 import ModalComponent from "./components/modals/ModalComponent.vue";
@@ -52,7 +53,10 @@ onBeforeUnmount(() => {
 
     <div class="main-wrapper">
       <div class="timeline-wrapper">
-        <HeaderSC />
+        <Suspense timeout="0"
+          ><template #default> <HeaderSC /></template
+          ><template #fallback><HeaderPlaceholder /></template>
+        </Suspense>
         <router-view v-slot="{ Component }">
           <Transition name="fade" mode="out-in">
             <Suspense timeout="0">

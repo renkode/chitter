@@ -1,6 +1,16 @@
 import { defineStore } from "pinia";
-import { auth, db } from "@/firebase.js";
-import { collection, doc, setDoc, getDoc } from "firebase/firestore";
+import { auth, db, storage } from "@/firebase.js";
+import {
+  collection,
+  doc,
+  setDoc,
+  getDoc,
+  getDocs,
+  updateDoc,
+  query,
+  where,
+} from "firebase/firestore";
+import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 
 export const useUsersStore = defineStore("users", {
   state: () => ({
@@ -56,17 +66,31 @@ export const useUsersStore = defineStore("users", {
       return newUser;
     },
 
-    getUsername(id) {
-      if (this.users.filter((user) => user.id == id)[0])
-        return this.users.filter((user) => user.id == id)[0].username;
-      return null;
+    async getUsername(id) {
+      const user = await this.getUser(id);
+      return user ? user.username : "";
     },
 
-    getUserByUsername(username) {
-      return this.users.filter((user) => user.username == username)[0];
+    async getUserByUsername(username) {
+      let id = null;
+      const users = collection(db, "users");
+      const q = query(users, where("username", "==", username));
+      const querySnapshot = await getDocs(q);
+      querySnapshot.forEach((doc) => {
+        id = doc.id;
+      });
+      return await this.getUser(id);
     },
 
-    updateProfile(
+    async uploadProfileImage(id, file, type) {
+      if (!file) return "";
+      const imgRef = ref(storage, `${type}/${id}`);
+      await uploadBytes(imgRef, file);
+      const url = await getDownloadURL(imgRef);
+      return url;
+    },
+
+    async updateProfile(
       id,
       name,
       username,
@@ -74,20 +98,27 @@ export const useUsersStore = defineStore("users", {
       location,
       website,
       birthday,
-      avatarUrl,
-      headerUrl
+      avatarFile,
+      headerFile
     ) {
-      const user = this.users.filter((user) => user.id == id)[0];
-      const index = this.users.findIndex((user) => user.id == id);
-      user.name = name;
-      user.username = username;
-      user.description = description;
-      user.location = location;
-      user.website = website;
-      user.birthday = birthday;
-      user.avatarUrl = avatarUrl;
-      user.headerUrl = headerUrl;
-      Object.assign(this.users[index], user);
+      let avatarUrl = this.currentUser.avatarUrl;
+      let headerUrl = this.currentUser.headerUrl;
+      if (avatarFile)
+        avatarUrl = await this.uploadProfileImage(id, avatarFile, "avatar");
+      if (headerFile)
+        headerUrl = await this.uploadProfileImage(id, headerFile, "header");
+      const newInfo = {
+        name,
+        username,
+        description,
+        location,
+        website,
+        birthday,
+        avatarUrl,
+        headerUrl,
+      };
+      Object.assign(this.currentUser, newInfo);
+      await updateDoc(doc(db, "users", id), newInfo);
     },
 
     addTweet(
@@ -209,14 +240,14 @@ export const useUsersStore = defineStore("users", {
       return user.following.includes(targetId);
     },
 
-    canFollow(currentUser, targetId) {
-      if (currentUser.id == targetId) return false;
-      return !currentUser.following.includes(targetId);
+    canFollow(targetId) {
+      if (this.currentUser.id == targetId) return false;
+      return !this.currentUser.following.includes(targetId);
     },
 
-    canUnfollow(currentUser, targetId) {
-      if (currentUser.id == targetId) return false;
-      return currentUser.following.includes(targetId);
+    canUnfollow(targetId) {
+      if (this.currentUser.id == targetId) return false;
+      return this.currentUser.following.includes(targetId);
     },
 
     notify(toUserId, fromUserId, type, tweetId = null) {
@@ -276,14 +307,14 @@ export const useUsersStore = defineStore("users", {
       }
     },
 
-    hasNewNotifications(userId) {
-      const currentUser = this.getUser(userId);
+    async hasNewNotifications(userId) {
+      const currentUser = await this.getUser(userId);
       if (!currentUser) throw new Error("user not found");
       return currentUser.newNotifications.length > 0;
     },
 
-    getAllNotifications(userId) {
-      const currentUser = this.getUser(userId);
+    async getAllNotifications(userId) {
+      const currentUser = await this.getUser(userId);
       if (!currentUser) throw new Error("user not found");
       return [...currentUser.newNotifications, ...currentUser.oldNotifications];
     },

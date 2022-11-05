@@ -54,7 +54,7 @@ export const useAppStore = defineStore("app", {
           const user = userCredential.user;
           console.log(await users.getUser(user.uid));
           users.syncCurrentUserToAuth(user.uid);
-          this.toast("Success!");
+          this.toast("Welcome!");
           this.goTo("/home");
         })
         .catch((error) => {
@@ -87,7 +87,7 @@ export const useAppStore = defineStore("app", {
             users.createUser(user.uid, name, username),
             user.uid
           );
-          this.toast("Success!");
+          this.toast("Welcome!");
           this.goTo("/home");
         })
         .catch((error) => {

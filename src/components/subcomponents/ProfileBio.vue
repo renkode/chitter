@@ -27,12 +27,12 @@ const joinDate = computed(() =>
         <ProfilePicture :url="props.user.avatarUrl" :size="135" />
         <button
           class="edit-profile-btn"
-          v-if="app.currentId == props.user.id"
+          v-if="users.currentId == props.user.id"
           @click="app.toggleModal('edit-profile')"
         >
           Edit Profile
         </button>
-        <FollowButton v-else-if="app.currentUser" :userId="props.user.id" />
+        <FollowButton v-else-if="users.currentUser" :userId="props.user.id" />
       </div>
       <div class="user-info-wrapper">
         <span class="display-name">{{ props.user.name }}</span>

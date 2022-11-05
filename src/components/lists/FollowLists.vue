@@ -1,6 +1,6 @@
 <script setup>
 import UserList from "./UserList.vue";
-import { defineProps, computed } from "vue";
+import { ref, defineProps, computed } from "vue";
 import { useAppStore } from "@/stores/app.js";
 import { useUsersStore } from "@/stores/users.js";
 import router from "@/router/index.js";
@@ -9,7 +9,7 @@ const app = useAppStore();
 const users = useUsersStore();
 const props = defineProps(["username"]);
 
-const user = computed(() => users.getUserByUsername(props.username));
+const user = ref(await users.getUserByUsername(props.username));
 const userFollowing = computed(() =>
   user.value.following.map((id) => users.getUser(id))
 );

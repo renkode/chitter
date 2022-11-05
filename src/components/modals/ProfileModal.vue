@@ -1,5 +1,5 @@
 <script setup>
-import { ref, watch, computed, onMounted } from "vue";
+import { ref, computed, onMounted } from "vue";
 import HeaderPicture from "../subcomponents/HeaderPicture.vue";
 import ProfilePicture from "../subcomponents/ProfilePicture.vue";
 import ModalHeader from "./ModalHeader.vue";
@@ -10,13 +10,16 @@ import { usernameRegex, calendar } from "@/mixins/utilities.js";
 
 const app = useAppStore();
 const users = useUsersStore();
-const headerUrl = ref(app.currentUser.headerUrl);
-const avatarUrl = ref(app.currentUser.avatarUrl);
-const nameInput = ref(app.currentUser.name);
-const usernameInput = ref(app.currentUser.username);
-const bioInput = ref(app.currentUser.description);
-const locationInput = ref(app.currentUser.location);
-const websiteInput = ref(app.currentUser.website);
+
+const headerFile = ref(null);
+const tempHeaderUrl = ref(users.currentUser.headerUrl);
+const avatarFile = ref(null);
+const tempAvatarUrl = ref(users.currentUser.avatarUrl);
+const nameInput = ref(users.currentUser.name);
+const usernameInput = ref(users.currentUser.username);
+const bioInput = ref(users.currentUser.description);
+const locationInput = ref(users.currentUser.location);
+const websiteInput = ref(users.currentUser.website);
 const monthInput = ref(null);
 const dayInput = ref(null);
 
@@ -31,10 +34,11 @@ const usernameMeetsLength = computed(
 const validUsername = computed(() => usernameRegex.test(usernameInput.value));
 const isUsernameTaken = computed(
   () =>
-    users.users.filter(
-      (user) =>
-        app.currentId !== user.id && user.username == usernameInput.value
-    ).length > 0
+    // users.users.filter(
+    //   (user) =>
+    //     app.currentId !== user.id && user.username == usernameInput.value
+    // ).length > 0
+    false
 );
 const usernameError = computed(
   () =>
@@ -55,20 +59,23 @@ const containsError = computed(
 
 // edit avatar and header
 const setAvatar = (e) => {
-  avatarUrl.value = URL.createObjectURL(e.currentTarget.files[0]);
+  avatarFile.value = e.currentTarget.files[0];
+  tempAvatarUrl.value = URL.createObjectURL(e.currentTarget.files[0]);
 };
 const setHeader = (e) => {
-  headerUrl.value = URL.createObjectURL(e.currentTarget.files[0]);
+  headerFile.value = e.currentTarget.files[0];
+  tempHeaderUrl.value = URL.createObjectURL(e.currentTarget.files[0]);
 };
 const clearHeader = () => {
-  headerUrl.value = "";
+  headerFile.value = null;
+  tempHeaderUrl.value = "";
 };
 
 // programmatically add month and day options to select
 const populateMonths = () => {
   calendar.forEach((month) => {
     var opt = document.createElement("option");
-    if (app.currentUser.birthday.split(" ")[0] === month.month)
+    if (users.currentUser.birthday.split(" ")[0] === month.month)
       opt.selected = true;
     opt.value = month.month;
     opt.textContent = month.month;
@@ -80,7 +87,7 @@ const populateDays = () => {
   if (monthInput.value.value === "") return;
   const days = calendar.filter((c) => c.month === monthInput.value.value)[0]
     .days;
-  const [birthMonth, birthDate] = app.currentUser.birthday.split(" "); //destructure
+  const [birthMonth, birthDate] = users.currentUser.birthday.split(" "); //destructure
   for (let i = 1; i <= days; i++) {
     var opt = document.createElement("option");
     if (birthMonth === monthInput.value.value && birthDate == i)
@@ -95,18 +102,18 @@ const populateDays = () => {
 const updateProfile = () => {
   const newBirthDate = `${monthInput.value.value} ${dayInput.value.value}`;
   users.updateProfile(
-    app.currentId,
+    users.currentId,
     nameInput.value,
     usernameInput.value,
     bioInput.value,
     locationInput.value,
     websiteInput.value,
     newBirthDate,
-    avatarUrl.value,
-    headerUrl.value
+    avatarFile.value,
+    headerFile.value
   );
   app.toggleModal();
-  app.viewUserProfile(app.currentUser.username);
+  app.viewUserProfile(users.currentUser.username);
 };
 
 // on mount
@@ -131,7 +138,7 @@ onMounted(() => {
     </ModalHeader>
 
     <div class="header-wrapper">
-      <HeaderPicture :url="headerUrl" />
+      <HeaderPicture :url="tempHeaderUrl" />
       <span class="image-actions">
         <span class="set-image-btn">
           <input
@@ -151,7 +158,7 @@ onMounted(() => {
 
     <div class="modal-content">
       <div class="avatar-wrapper">
-        <ProfilePicture :url="avatarUrl" :size="112">
+        <ProfilePicture :url="tempAvatarUrl" :size="112">
           <span class="image-actions">
             <span class="set-image-btn">
               <input

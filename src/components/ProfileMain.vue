@@ -10,8 +10,10 @@ const users = useUsersStore();
 
 const props = defineProps(["username"]);
 
-const user = computed(
-  () => users.getUserByUsername(props.username) // even if i use a regular function, this.$route won't work so...
+const user = ref(
+  props.username === users.currentUser.username
+    ? users.currentUser
+    : await users.getUserByUsername(props.username)
 );
 const tab = ref("tweets"); // tweets-and-replies | media | likes
 

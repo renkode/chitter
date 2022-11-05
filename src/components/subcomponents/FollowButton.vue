@@ -1,9 +1,7 @@
 <script setup>
 import { defineProps } from "vue";
-import { useAppStore } from "@/stores/app";
 import { useUsersStore } from "@/stores/users";
 
-const app = useAppStore();
 const users = useUsersStore();
 const props = defineProps(["userId"]);
 </script>
@@ -11,13 +9,13 @@ const props = defineProps(["userId"]);
 <template>
   <button
     class="following-btn"
-    v-if="users.canUnfollow(app.currentUser, props.userId)"
-    @click.stop="users.unfollowUser(app.currentId, props.userId)"
+    v-if="users.canUnfollow(props.userId)"
+    @click.stop="users.unfollowUser(props.userId)"
   ></button>
   <button
     class="follow-btn"
-    v-else-if="users.canFollow(app.currentUser, props.userId)"
-    @click.stop="users.followUser(app.currentId, props.userId)"
+    v-else-if="users.canFollow(props.userId)"
+    @click.stop="users.followUser(props.userId)"
   >
     Follow
   </button>
