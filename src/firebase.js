@@ -1,7 +1,12 @@
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app";
 import { getFirestore } from "firebase/firestore"; // collection
-import { getAuth } from "firebase/auth";
+import {
+  getAuth,
+  setPersistence,
+  browserLocalPersistence,
+} from "firebase/auth";
+import { useUsersStore } from "./stores/users";
 
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
@@ -20,5 +25,19 @@ const config = {
 
 const app = initializeApp(config);
 
-export const auth = getAuth(app);
-export const db = getFirestore();
+const db = getFirestore();
+
+const auth = getAuth();
+setPersistence(auth, browserLocalPersistence);
+
+// persist data
+auth.onAuthStateChanged((user) => {
+  const users = useUsersStore();
+  if (user) {
+    users.syncCurrentUserToAuth(user.uid);
+  } else {
+    users.setCurrentUser(null, null);
+  }
+});
+
+export { db, auth };

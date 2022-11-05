@@ -11,9 +11,19 @@ export const useUsersStore = defineStore("users", {
   }),
   getters: {}, // can't be async so
   actions: {
+    async getUser(id) {
+      const docRef = await getDoc(doc(db, "users", id));
+      if (docRef.exists()) return docRef.data();
+      return null;
+    },
+
     setCurrentUser(user, id) {
       this.currentUser = user || null;
       this.currentId = id || null;
+    },
+
+    async syncCurrentUserToAuth(id) {
+      this.setCurrentUser(await this.getUser(id), id);
     },
 
     createUser(id, name, username) {
@@ -44,13 +54,6 @@ export const useUsersStore = defineStore("users", {
       this.setCurrentUser(newUser, id);
       setDoc(doc(db, "users", id), newUser);
       return newUser;
-    },
-
-    async getUser(id) {
-      console.log(id);
-      const docRef = await getDoc(doc(db, "users", id));
-      if (docRef.exists()) return docRef.data();
-      return null;
     },
 
     getUsername(id) {

@@ -53,7 +53,7 @@ export const useAppStore = defineStore("app", {
           // Signed in
           const user = userCredential.user;
           console.log(await users.getUser(user.uid));
-          users.setCurrentUser(await users.getUser(user.uid), user.uid);
+          users.syncCurrentUserToAuth(user.uid);
           this.toast("Success!");
           this.goTo("/home");
         })

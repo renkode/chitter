@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted, onBeforeUnmount } from "vue";
+import { ref, onMounted, onBeforeUnmount, watch } from "vue";
 import MenuSidebar from "./components/MenuSidebar.vue";
 import MediaSidebar from "./components/MediaSidebar.vue";
 import HeaderSC from "./components/subcomponents/HeaderSC.vue";
@@ -9,7 +9,7 @@ import ModalComponent from "./components/modals/ModalComponent.vue";
 import ToastMessage from "./components/subcomponents/ToastMessage.vue";
 import { useAppStore } from "@/stores/app.js";
 import { useUsersStore } from "@/stores/users";
-import { db } from "@/firebase.js";
+import { db, auth } from "@/firebase.js";
 import { collection, doc, getDoc } from "firebase/firestore";
 
 const app = useAppStore();
@@ -21,13 +21,18 @@ const onWidthChange = () => {
 };
 
 const firebaseTest = async () => {
-  //users.createUser("pseudoId", "ren", "renkode");
+  console.log(auth.currentUser);
 };
 
+watch(
+  () => auth.currentUser,
+  () => {
+    firebaseTest();
+  }
+);
+
 onMounted(() => {
-  //app.setCurrentUser(users.getUser("1"));
   window.addEventListener("resize", onWidthChange);
-  firebaseTest();
 });
 
 onBeforeUnmount(() => {
