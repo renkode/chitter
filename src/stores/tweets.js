@@ -11,6 +11,7 @@ import {
   query,
   arrayRemove,
   increment,
+  arrayUnion,
 } from "firebase/firestore";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import ShortUniqueId from "short-unique-id";
@@ -22,9 +23,15 @@ var uid = new ShortUniqueId();
 export const useTweetStore = defineStore("tweets", {
   state: () => ({
     tweets: [],
+    lastDocTimestamp: null,
+    fetchLimit: 4,
   }),
   getters: {},
   actions: {
+    setTweets(arr) {
+      this.tweets = [...arr];
+    },
+
     async updateTweet(id, obj) {
       await updateDoc(doc(db, "tweets", id), obj);
     },
@@ -39,15 +46,31 @@ export const useTweetStore = defineStore("tweets", {
       const tweet = await this.getTweet(id);
       if (!tweet[field])
         throw new Error(`Tweet ${id}: '${field}' does not exist.`);
-      const arr = tweet[field];
-      arr.unshift(element);
-      await this.updateUser(id, { [field]: arr });
+      await updateDoc(doc(db, "tweets", id), {
+        [field]: arrayUnion(element),
+      });
     },
 
     async removeFromFieldArray(id, field, element) {
       // WARNING: SIMPLE ARRAYS ONLY
       await updateDoc(doc(db, "tweets", id), {
         [field]: arrayRemove(element),
+      });
+    },
+
+    async getTimeline(id) {
+      const docRef = await getDoc(doc(db, "timeline", id));
+      if (docRef.exists()) return docRef.data();
+      return null;
+    },
+
+    async updateTimeline(id, arr) {
+      await updateDoc(doc(db, "timelines", id), { tweets: arr });
+    },
+
+    async addToTimeline(id, element) {
+      await updateDoc(doc(db, "timelines", id), {
+        tweets: arrayUnion(element),
       });
     },
 

@@ -13,17 +13,12 @@ export const useAppStore = defineStore("app", {
   state: () => ({
     currentId: null, // initialized on mount
     currentUser: null, // initialized on mount
-    path: "",
-    view: "home", //  timeline (default) | profile | tweet | search
-    previousViews: ["home"],
     profileTab: "tweets", // tweets (default) | tweets-and-replies | media | likes
     showModal: false,
     modalType: "status", // status | reply | edit-profile | retweet-list | like-list
     modalReply: { userId: null, tweetId: null },
     showToast: false,
     toastText: "",
-    NUM_INITIAL_TWEETS: 5,
-    NUM_LOAD_OLDER_TWEETS: 3,
   }),
   getters: {
     routeName: () => {

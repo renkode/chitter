@@ -14,6 +14,7 @@ import {
   increment,
 } from "firebase/firestore";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import { useTweetStore } from "./tweets";
 
 export const useUsersStore = defineStore("users", {
   state: () => ({
@@ -38,9 +39,6 @@ export const useUsersStore = defineStore("users", {
       const user = await this.getUser(id);
       if (!user[field])
         throw new Error(`User ${id}: '${field}' does not exist.`);
-      // const arr = user[field];
-      // arr.unshift(element);
-      //await this.updateUser(id, { [field]: arr });
       await updateDoc(doc(db, "users", id), {
         [field]: arrayUnion(element),
       });
@@ -89,7 +87,6 @@ export const useUsersStore = defineStore("users", {
         likes: [],
         following: [],
         followers: [],
-        localTimeline: [],
         newNotifications: [],
         oldNotifications: [],
       };
@@ -221,7 +218,8 @@ export const useUsersStore = defineStore("users", {
           .length > 0
       )
         return; // no repeats
-      await this.addToFieldArray(userId, "localTimeline", {
+      const store = useTweetStore();
+      await store.addToTimeline(userId, "localTimeline", {
         id: tweetId,
         type,
         timestamp,
@@ -237,30 +235,34 @@ export const useUsersStore = defineStore("users", {
       retweetedBy
     ) {
       const user = await this.getUser(targetUserId);
-      for (const follower of user.followers) {
-        await this.addToLocalTimeline(
-          follower,
-          tweetId,
-          type,
-          timestamp,
-          retweetedBy
-        );
-      }
+      Promise.all(
+        user.followers.map((follower) =>
+          this.addToLocalTimeline(
+            follower,
+            tweetId,
+            type,
+            timestamp,
+            retweetedBy
+          )
+        )
+      );
     },
 
     async removeFromLocalTimeline(userId, tweetId) {
-      const user = await this.getUser(userId);
-      const newLocalTimeline = user.localTimeline.filter(
-        (t) => t.id !== tweetId
-      );
-      await this.updateUser(userId, "localTimeline", newLocalTimeline);
+      const store = useTweetStore();
+      const tweets = await store.getTimeline(userId);
+      if (!tweets) return;
+      const newTimeline = tweets.filter((tweet) => tweet.id !== tweetId);
+      store.updateTimeline(userId, newTimeline);
     },
 
     async removeFromAllFollowerTimelines(targetUserId, tweetId) {
       const user = await this.getUser(targetUserId);
-      for (const follower of user.followers) {
-        await this.removeFromLocalTimeline(follower, tweetId);
-      }
+      Promise.all(
+        user.followers.map((follower) =>
+          this.removeFromLocalTimeline(follower, tweetId)
+        )
+      );
     },
 
     async followUser(targetId) {
@@ -278,11 +280,13 @@ export const useUsersStore = defineStore("users", {
       this.removeFromFieldArray(targetId, "followers", this.currentId);
       this.notify(targetId, this.currentId, "follow");
       // remove unfollowed user from your local timeline
-      const currentUser = await this.getUser(this.currentId);
-      const localTimeline = currentUser.localTimeline.filter(
-        (tl) => tl.fromUserId !== targetId
+      const store = useTweetStore();
+      const tweets = await store.getTimeline(this.currentId);
+      if (!tweets) return;
+      const newTimeline = tweets.filter(
+        (tweet) => tweet.fromUserId !== targetId
       );
-      await this.updateUser(this.currentId, { localTimeline });
+      store.updateTimeline(this.currentId, newTimeline);
     },
 
     async isFollowingUser(userId, targetId) {
