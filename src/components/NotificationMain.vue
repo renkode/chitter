@@ -1,10 +1,10 @@
 <script setup>
-import { ref, onMounted, onUnmounted } from "vue";
+import { computed, onMounted, onUnmounted } from "vue";
 import { useUsersStore } from "@/stores/users.js";
 import NotificationList from "./lists/NotificationList.vue";
 
 const users = useUsersStore();
-const notifs = ref(await users.getAllNotifications(users.currentId));
+const notifs = computed(() => users.getAllNotifications());
 
 onUnmounted(() => {
   users.clearNotifications();

@@ -7,9 +7,7 @@ import ProfilePicture from "./subcomponents/ProfilePicture.vue";
 const users = useUsersStore();
 const app = useAppStore();
 const isAccountMenuOpen = ref(false);
-const numNewNotifications = computed(
-  () => users.currentUser.newNotifications.length
-);
+const numNewNotifications = computed(() => users.notifications.new.length);
 const toggleAccountMenu = () => {
   isAccountMenuOpen.value = !isAccountMenuOpen.value;
 };
@@ -208,13 +206,14 @@ li .nav-icon {
 .notification-dot {
   border-radius: 100%;
   font-size: 0.7rem;
-  width: 1rem;
-  height: 1rem;
+  width: 14px;
+  height: 14px;
   color: white;
   background-color: #1d9bf0;
   position: absolute;
-  top: 0;
-  right: 0;
+  top: -4px;
+  right: -4px;
+  font-weight: bold;
   display: flex;
   justify-content: center;
   align-items: center;

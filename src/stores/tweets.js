@@ -64,6 +64,8 @@ export const useTweetStore = defineStore("tweets", {
       return null;
     },
 
+    //TO DO: queryTimeline
+
     async updateTimeline(id, arr) {
       await updateDoc(doc(db, "timelines", id), { tweets: arr });
     },

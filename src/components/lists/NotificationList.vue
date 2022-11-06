@@ -22,10 +22,7 @@ const notifs = ref(
             avatarUrl: user.avatarUrl,
           },
           tweet,
-          isNotification: await users.tweetIsNewNotification(
-            users.currentId,
-            notif.tweetId
-          ),
+          isNotification: users.tweetIsNewNotification(notif.tweetId),
         };
       } else {
         return {
@@ -36,7 +33,7 @@ const notifs = ref(
           avatarUrl: user.avatarUrl,
           tweetText: tweet ? tweet.text : null,
           containsMedia: tweet ? tweet.media.length > 0 : null,
-          isNew: await users.isNewNotification(users.currentId, notif),
+          isNew: users.isNewNotification(notif),
         };
       }
     })

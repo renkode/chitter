@@ -29,14 +29,23 @@ const firebaseTest = async () => {
 // persist data
 onBeforeMount(() => {
   auth.onAuthStateChanged(async (user) => {
-    let unsub;
+    let userUnsub;
+    let notifUnsub;
     if (user) {
       await users.syncCurrentUserToAuth(user.uid);
-      unsub = onSnapshot(doc(db, "users", auth.currentUser.uid), (doc) => {
+      // real-time user and notif updates
+      userUnsub = onSnapshot(doc(db, "users", auth.currentUser.uid), (doc) => {
         users.syncCurrentUserToAuth(user.uid);
       });
+      notifUnsub = onSnapshot(
+        doc(db, "notifications", auth.currentUser.uid),
+        (doc) => {
+          users.syncNotifications(user.uid);
+        }
+      );
     } else {
-      if (unsub) unsub();
+      if (userUnsub) userUnsub();
+      if (notifUnsub) notifUnsub();
       users.setCurrentUser(null, null);
     }
     fetching.value = false;

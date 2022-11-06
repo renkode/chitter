@@ -18,10 +18,11 @@ import { useTweetStore } from "./tweets";
 
 export const useUsersStore = defineStore("users", {
   state: () => ({
-    currentUser: auth.currentUser
-      ? getDoc(doc(db, "users", auth.currentUser.uid))
-      : null,
-    currentId: auth.currentUser ? auth.currentUser.uid : null,
+    currentUser: null,
+    currentId: null,
+    notifications: { new: [], old: [] },
+    lastDocTimestamp: null,
+    fetchLimit: 4,
   }),
   getters: {}, // can't be async so
   actions: {
@@ -300,90 +301,100 @@ export const useUsersStore = defineStore("users", {
       return !this.currentUser.following.includes(targetId);
     },
 
-    async notify(toUserId, fromUserId, type, tweetId = null) {
-      const targetUser = await this.getUser(toUserId);
-      if (!targetUser) return;
+    async getNotificationsDoc(id) {
+      const docRef = await getDoc(doc(db, "notifications", id));
+      if (docRef.exists()) return docRef.data();
+      return null;
+      //TO-DO: use query instead
+    },
+
+    async syncNotifications(id) {
+      this.notifications = await this.getNotificationsDoc(id);
+    },
+
+    async updateNotifications(id, obj) {
+      await updateDoc(doc(db, "notifications", id), obj);
+    },
+
+    async addToNotifications(id, field, element) {
+      await updateDoc(doc(db, "notifications", id), {
+        [field]: arrayUnion(element),
+      });
+    },
+
+    async removeFromNotifications(id, field, element) {
+      await updateDoc(doc(db, "notifications", id), {
+        [field]: arrayRemove(element),
+      });
+    },
+
+    async notify(targetId, fromUserId, type, tweetId = null) {
+      const targetNotifs = await this.getNotificationsDoc(targetId);
+      if (!targetNotifs) return;
+      // don't spam the same notif (idk a cleaner way to do that sorry)
       const newNotif = { fromUser: fromUserId, type, tweetId };
       if (
-        targetUser.newNotifications.filter(
+        targetNotifs.new.filter(
           (n) =>
             n.fromUser === newNotif.fromUser &&
             n.type === newNotif.type &&
             n.tweetId === newNotif.tweetId
         ).length === 0 &&
-        targetUser.oldNotifications.filter(
+        targetNotifs.old.filter(
           (n) =>
             n.fromUser === newNotif.fromUser &&
             n.type === newNotif.type &&
             n.tweetId === newNotif.tweetId
         ).length === 0
       ) {
-        // don't spam the same notif (idk a cleaner way to do that sorry)
-        const newNotifications = targetUser.newNotifications;
-        newNotifications.unshift(newNotif);
-        await this.updateUser(toUserId, { newNotifications });
+        this.addToNotifications(targetId, "new", newNotif);
       }
     },
 
     async clearNotifications() {
-      if (!this.currentUser || this.currentUser.newNotifications.length === 0)
-        return;
       const notifs = {
-        oldNotifications: [
-          ...this.currentUser.newNotifications,
+        old: [
           ...this.currentUser.oldNotifications,
+          ...this.currentUser.newNotifications,
         ],
-        newNotifications: [],
+        new: [],
       };
-      await this.updateUser(this.currentId, notifs);
+      await this.updateNotifications(this.currentId, notifs);
     },
 
     async deleteReplyNotification(userId, tweetId) {
-      const user = await this.getUser(userId);
-      if (!user) return;
+      const notifs = await this.getNotificationsDoc(userId);
+      if (!notifs) return;
       // remove reply from new notif array
-      if (
-        user.newNotifications.filter((n) => n.tweetId === tweetId).length > 0
-      ) {
-        const newNotifications = user.newNotifications.filter(
-          (n) => n.tweetId !== tweetId
-        );
-        await this.updateUser(userId, newNotifications);
+      if (notifs.filter((n) => n.tweetId === tweetId).length > 0) {
+        const newNotifications = notifs.filter((n) => n.tweetId !== tweetId);
+        this.updateNotifications(userId, { new: newNotifications });
       }
       // remove reply from old notif array
-      if (
-        user.oldNotifications.filter((n) => n.tweetId === tweetId).length > 0
-      ) {
-        const oldNotifications = user.oldNotifications.filter(
-          (n) => n.tweetId !== tweetId
-        );
-        await this.updateUser(userId, { oldNotifications });
+      if (notifs.filter((n) => n.tweetId === tweetId).length > 0) {
+        const oldNotifications = notifs.filter((n) => n.tweetId !== tweetId);
+        this.updateNotifications(userId, { old: oldNotifications });
       }
     },
 
-    async hasNewNotifications(userId) {
-      const user = await this.getUser(userId);
-      if (!user) throw new Error(`User ${userId} not found.`);
-      return user.newNotifications.length > 0;
+    hasNewNotifications() {
+      return this.notifications.new.length > 0;
     },
 
-    async getAllNotifications(userId) {
-      const user = await this.getUser(userId);
-      if (!user) throw new Error(`User ${userId} not found.`);
-      return [...user.newNotifications, ...user.oldNotifications];
+    getAllNotifications() {
+      return [
+        ...this.notifications.new.reverse(),
+        ...this.notifications.old.reverse(),
+      ];
     },
 
-    async isNewNotification(userId, notif) {
-      const user = await this.getUser(userId);
-      if (!user) throw new Error(`User ${userId} not found.`);
-      return user.newNotifications.filter((n) => n === notif).length > 0;
+    isNewNotification(notif) {
+      return this.notifications.new.filter((n) => n === notif).length > 0;
     },
 
-    async tweetIsNewNotification(userId, tweetId) {
-      const user = await this.getUser(userId);
-      if (!user) throw new Error(`User ${userId} not found.`);
+    tweetIsNewNotification(tweetId) {
       return (
-        user.newNotifications.filter((n) => n.tweetId === tweetId).length > 0
+        this.notifications.new.filter((n) => n.tweetId === tweetId).length > 0
       );
     },
   },

@@ -12,7 +12,7 @@ const app = useAppStore();
 const tweets = useTweetStore();
 const users = useUsersStore();
 const localTweets = computed(() =>
-  users.currentUser.localTimeline.map((localTweet) => {
+  tweets.tweets.map((localTweet) => {
     if (tweets.getTweet(localTweet.id)) {
       const tweet = tweets.getTweet(localTweet.id);
       return {
