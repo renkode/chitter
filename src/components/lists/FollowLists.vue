@@ -10,11 +10,15 @@ const users = useUsersStore();
 const props = defineProps(["username"]);
 
 const user = ref(await users.getUserByUsername(props.username));
-const userFollowing = computed(() =>
-  user.value.following.map((id) => users.getUser(id))
+const userFollowing = ref(
+  await Promise.all(
+    user.value.following.map(async (id) => await users.getUser(id))
+  )
 );
-const userFollowers = computed(() =>
-  user.value.followers.map((id) => users.getUser(id))
+const userFollowers = ref(
+  await Promise.all(
+    user.value.followers.map(async (id) => await users.getUser(id))
+  )
 );
 </script>
 

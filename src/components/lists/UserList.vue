@@ -7,7 +7,7 @@ const props = defineProps(["users"]);
 
 <template>
   <div class="user-list">
-    <TransitionGroup name="fade-down" v-if="users.length > 0">
+    <TransitionGroup name="fade" v-if="users.length > 0">
       <UserCard
         v-for="user in users"
         :key="user.id"
@@ -23,19 +23,13 @@ const props = defineProps(["users"]);
 </template>
 
 <style scoped>
-.fade-down-enter-active,
-.fade-down-leave-active {
-  transition: all 0.12s ease;
+.fade-enter-active {
+  transition: opacity 0.1s ease;
 }
 
-.fade-down-enter-from,
-.fade-down-leave-to {
-  transform: translateY(-15px);
+.fade-enter-from,
+.fade-leave-to {
   opacity: 0;
-}
-
-.fade-down-leave-from {
-  opacity: 1;
 }
 
 .user-list {

@@ -15,12 +15,14 @@ const props = defineProps([
   "description",
 ]);
 const isFollowing = ref(
-  await users.isFollowingUser(props.user.id, users.currentId)
+  users.currentId
+    ? await users.isFollowingUser(props.id, users.currentId)
+    : false
 );
 
 function goToProfile() {
   app.viewUserProfile(props.username);
-  if (app.showModal) app.toggleModal();
+  // if (app.showModal) app.toggleModal();
 }
 </script>
 
@@ -41,10 +43,7 @@ function goToProfile() {
           >
           <span class="username-wrapper">
             <span class="username gray-text"> @{{ props.username }} </span>
-            <div
-              v-if="users.currentId && isFollowing"
-              class="follows-you gray-text"
-            >
+            <div v-if="isFollowing" class="follows-you gray-text">
               Follows you
             </div>
           </span>

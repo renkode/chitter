@@ -46,8 +46,8 @@ const props = defineProps(["userId"]);
   background-color: #262a2e00;
   color: white;
   border: #ffffff80 solid 1px;
-  min-width: 95px;
-  width: 95px;
+  min-width: 100px;
+  width: 100px;
   transition-duration: 0.1s;
 }
 

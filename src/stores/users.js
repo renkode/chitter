@@ -60,6 +60,11 @@ export const useUsersStore = defineStore("users", {
       this.currentId = id || null;
     },
 
+    async refreshCurrentUser() {
+      if (!this.currentUser) return;
+      this.currentUser = await this.getUser(this.currentId);
+    },
+
     async syncCurrentUserToAuth(id) {
       this.setCurrentUser(await this.getUser(id), id);
     },
@@ -114,6 +119,8 @@ export const useUsersStore = defineStore("users", {
 
     async isUsernameTaken(username) {
       if (!username) return;
+      if (this.currentUser && this.currentUser.username === username)
+        return false;
       let id = null;
       const users = collection(db, "users");
       const q = query(users, where("username", "==", username));
@@ -259,25 +266,27 @@ export const useUsersStore = defineStore("users", {
     },
 
     async followUser(targetId) {
-      await this.increment(this.currentId, "followingCount", 1);
-      await this.increment(targetId, "followerCount", 1);
+      this.increment(this.currentId, "followingCount", 1);
+      this.increment(targetId, "followerCount", 1);
       await this.addToFieldArray(this.currentId, "following", targetId);
-      await this.addToFieldArray(targetId, "followers", this.currentId);
-      await this.notify(targetId, this.currentId, "follow");
+      this.addToFieldArray(targetId, "followers", this.currentId);
+      this.notify(targetId, this.currentId, "follow");
+      this.refreshCurrentUser();
     },
 
     async unfollowUser(targetId) {
-      await this.increment(this.currentId, "followingCount", -1);
-      await this.increment(targetId, "followerCount", -1);
+      this.increment(this.currentId, "followingCount", -1);
+      this.increment(targetId, "followerCount", -1);
       await this.removeFromFieldArray(this.currentId, "following", targetId);
-      await this.removeFromFieldArray(targetId, "followers", this.currentId);
-      await this.notify(targetId, this.currentId, "follow");
+      this.removeFromFieldArray(targetId, "followers", this.currentId);
+      this.notify(targetId, this.currentId, "follow");
       // remove unfollowed user from your local timeline
       const currentUser = await this.getUser(this.currentId);
-      const newLocalTimeline = currentUser.localTimeline.filter(
+      const localTimeline = currentUser.localTimeline.filter(
         (tl) => tl.fromUserId !== targetId
       );
-      await this.updateUser(this.currentId, newLocalTimeline);
+      await this.updateUser(this.currentId, { localTimeline });
+      this.refreshCurrentUser();
     },
 
     async isFollowingUser(userId, targetId) {
@@ -310,23 +319,23 @@ export const useUsersStore = defineStore("users", {
         ).length === 0
       ) {
         // don't spam the same notif (idk a cleaner way to do that sorry)
-        const newNotifs = targetUser.newNotifications;
-        newNotifs.unshift(newNotif);
-        await this.updateUser(toUserId, newNotifs);
+        const newNotifications = targetUser.newNotifications;
+        newNotifications.unshift(newNotif);
+        await this.updateUser(toUserId, { newNotifications });
       }
     },
 
     async clearNotifications() {
       if (!this.currentUser || this.currentUser.newNotifications.length === 0)
         return;
-      const newNotifs = {
+      const notifs = {
         oldNotifications: [
           ...this.currentUser.newNotifications,
           ...this.currentUser.oldNotifications,
         ],
         newNotifications: [],
       };
-      await this.updateUser(this.currentId, newNotifs);
+      await this.updateUser(this.currentId, notifs);
     },
 
     async deleteReplyNotification(userId, tweetId) {
@@ -336,19 +345,19 @@ export const useUsersStore = defineStore("users", {
       if (
         user.newNotifications.filter((n) => n.tweetId === tweetId).length > 0
       ) {
-        const newNotifs = user.newNotifications.filter(
+        const newNotifications = user.newNotifications.filter(
           (n) => n.tweetId !== tweetId
         );
-        await this.updateUser(userId, newNotifs);
+        await this.updateUser(userId, newNotifications);
       }
       // remove reply from old notif array
       if (
         user.oldNotifications.filter((n) => n.tweetId === tweetId).length > 0
       ) {
-        const oldNotifs = user.oldNotifications.filter(
+        const oldNotifications = user.oldNotifications.filter(
           (n) => n.tweetId !== tweetId
         );
-        await this.updateUser(userId, oldNotifs);
+        await this.updateUser(userId, { oldNotifications });
       }
     },
 
