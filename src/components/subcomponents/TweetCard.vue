@@ -352,6 +352,7 @@ onBeforeUnmount(() => {
 
 .display-name a {
   color: white;
+  font-weight: bold;
 }
 
 .tweet-time {

@@ -129,6 +129,7 @@ a:visited {
 
 a.router-link-active {
   color: white;
+  font-weight: bold;
 }
 
 a.router-link-active svg {
@@ -270,6 +271,7 @@ li.nav-item.nav-logo .nav-icon {
 
 .display-name {
   max-width: 80%;
+  font-weight: bold;
 }
 
 .username {

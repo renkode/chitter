@@ -8,7 +8,7 @@ const app = useAppStore();
 const users = useUsersStore();
 
 const user = ref(
-  app.routeUsername === users.currentUser.username
+  app.routeUsername && app.routeUsername === users.currentUser.username
     ? users.currentUser
     : await users.getUserByUsername(app.routeUsername)
 );

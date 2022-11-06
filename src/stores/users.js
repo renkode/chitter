@@ -9,6 +9,8 @@ import {
   updateDoc,
   query,
   where,
+  arrayRemove,
+  increment,
 } from "firebase/firestore";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 
@@ -21,6 +23,32 @@ export const useUsersStore = defineStore("users", {
   }),
   getters: {}, // can't be async so
   actions: {
+    async updateUser(id, obj) {
+      await updateDoc(doc(db, "users", id), obj);
+    },
+
+    async increment(id, field, amount) {
+      await updateDoc(doc(db, "users", id), {
+        [field]: increment(amount),
+      });
+    },
+
+    async addToFieldArray(id, field, element) {
+      const user = await this.getUser(id);
+      if (!user[field])
+        throw new Error(`User ${id}: '${field}' does not exist.`);
+      const arr = user[field];
+      arr.unshift(element);
+      await this.updateUser(id, { [field]: arr });
+    },
+
+    async removeFromFieldArray(id, field, element) {
+      // WARNING: SIMPLE ARRAYS ONLY
+      await updateDoc(doc(db, "users", id), {
+        [field]: arrayRemove(element),
+      });
+    },
+
     async getUser(id) {
       const docRef = await getDoc(doc(db, "users", id));
       if (docRef.exists()) return docRef.data();
@@ -86,8 +114,7 @@ export const useUsersStore = defineStore("users", {
       if (!file) return "";
       const imgRef = ref(storage, `${type}/${id}`);
       await uploadBytes(imgRef, file);
-      const url = await getDownloadURL(imgRef);
-      return url;
+      return await getDownloadURL(imgRef);
     },
 
     async updateProfile(
@@ -118,18 +145,17 @@ export const useUsersStore = defineStore("users", {
         headerUrl,
       };
       Object.assign(this.currentUser, newInfo);
-      await updateDoc(doc(db, "users", id), newInfo);
+      await this.updateUser(id, newInfo);
     },
 
-    addTweet(
+    async addTweet(
       userId,
       tweetId,
       type = "status",
       containsMedia = false,
       timestamp
     ) {
-      const user = this.getUser(userId);
-      user.tweets.unshift({
+      await this.addToFieldArray(userId, "tweets", {
         id: tweetId,
         type,
         containsMedia,
@@ -137,42 +163,46 @@ export const useUsersStore = defineStore("users", {
       });
     },
 
-    removeTweet(userId, tweetId) {
-      const user = this.getUser(userId);
-      user.tweets = user.tweets.filter((t) => t.id !== tweetId);
+    async removeTweet(userId, tweetId) {
+      const user = await this.getUser(userId);
+      const newTweets = user.tweets.filter((t) => t.id !== tweetId);
+      await this.updateUser(userId, newTweets);
     },
 
-    addRetweet(userId, tweetId) {
-      this.addTweet(userId, tweetId, "retweet", null, new Date().toISOString());
-    },
-
-    removeRetweet(userId, tweetId) {
-      const user = this.getUser(userId);
-      const tweetIndex = user.tweets.findIndex(
-        (t) => t.id == tweetId && t.type === "retweet"
+    async addRetweet(userId, tweetId) {
+      await this.addTweet(
+        userId,
+        tweetId,
+        "retweet",
+        null,
+        new Date().toISOString()
       );
-      if (tweetIndex >= 0) user.tweets.splice(tweetIndex, 1);
     },
 
-    addLike(userId, tweetId) {
-      const user = this.getUser(userId);
-      user.likes.push(tweetId);
+    async removeRetweet(userId, tweetId) {
+      const user = await this.getUser(userId);
+      const newTweets = user.tweets.filter(
+        (t) => t.id !== tweetId || t.type !== "retweet"
+      );
+      await this.updateUser(userId, newTweets);
     },
 
-    removeLike(userId, tweetId) {
-      const user = this.getUser(userId);
-      const tweetIndex = user.likes.indexOf(tweetId);
-      user.likes.splice(tweetIndex, 1);
+    async addLike(userId, tweetId) {
+      await this.addToFieldArray(userId, "likes", tweetId);
     },
 
-    addToLocalTimeline(userId, tweetId, type, timestamp, retweetedBy) {
-      const user = this.getUser(userId);
+    async removeLike(userId, tweetId) {
+      await this.removeFromFieldArray(userId, "likes", tweetId);
+    },
+
+    async addToLocalTimeline(userId, tweetId, type, timestamp, retweetedBy) {
+      const user = await this.getUser(userId);
       if (
         user.localTimeline.filter((t) => t.id === tweetId && t.type === type)
           .length > 0
       )
         return; // no repeats
-      user.localTimeline.unshift({
+      await this.addToFieldArray(userId, "localTimeline", {
         id: tweetId,
         type,
         timestamp,
@@ -180,88 +210,89 @@ export const useUsersStore = defineStore("users", {
       });
     },
 
-    addToAllFollowerTimelines(
-      currentUserId,
+    async addToAllFollowerTimelines(
+      targetUserId,
       tweetId,
       type,
       timestamp,
       retweetedBy
     ) {
-      const user = this.getUser(currentUserId);
-      user.followers.forEach((follower) => {
-        this.addToLocalTimeline(
+      const user = await this.getUser(targetUserId);
+      for (const follower of user.followers) {
+        await this.addToLocalTimeline(
           follower,
           tweetId,
           type,
           timestamp,
           retweetedBy
         );
-      });
+      }
     },
 
-    removeFromLocalTimeline(userId, tweetId) {
-      const user = this.getUser(userId);
-      user.localTimeline = user.localTimeline.filter((t) => t.id !== tweetId);
-    },
-
-    removeFromAllFollowerTimelines(currentUserId, tweetId) {
-      const user = this.getUser(currentUserId);
-      user.followers.forEach((follower) => {
-        this.removeFromLocalTimeline(follower, tweetId);
-      });
-    },
-
-    followUser(currentUserId, targetId) {
-      const currentUser = this.getUser(currentUserId);
-      const otherUser = this.getUser(targetId);
-      if (!otherUser) throw new Error("user not found");
-      currentUser.followingCount++;
-      currentUser.following.unshift(targetId);
-      otherUser.followerCount++;
-      otherUser.followers.unshift(currentUserId);
-      this.notify(targetId, currentUserId, "follow");
-    },
-
-    unfollowUser(currentUserId, targetId) {
-      const currentUser = this.getUser(currentUserId);
-      const otherUser = this.getUser(targetId);
-      if (!otherUser) throw new Error("user not found");
-      currentUser.followingCount--;
-      currentUser.following.splice(currentUser.following.indexOf(targetId, 1));
-      otherUser.followerCount--;
-      otherUser.followers.splice(otherUser.followers.indexOf(currentUserId, 1));
-      currentUser.localTimeline = currentUser.localTimeline.filter(
-        (lt) => lt.fromUserId !== targetId
+    async removeFromLocalTimeline(userId, tweetId) {
+      const user = await this.getUser(userId);
+      const newLocalTimeline = user.localTimeline.filter(
+        (t) => t.id !== tweetId
       );
+      await this.updateUser(userId, "localTimeline", newLocalTimeline);
     },
 
-    isFollowingUser(userId, targetId) {
-      const user = this.getUser(userId);
+    async removeFromAllFollowerTimelines(targetUserId, tweetId) {
+      const user = await this.getUser(targetUserId);
+      for (const follower of user.followers) {
+        await this.removeFromLocalTimeline(follower, tweetId);
+      }
+    },
+
+    async followUser(targetId) {
+      await this.increment(this.currentId, "followingCount", 1);
+      await this.increment(targetId, "followerCount", 1);
+      await this.addToFieldArray(this.currentId, "following", targetId);
+      await this.addToFieldArray(targetId, "followers", this.currentId);
+      await this.notify(targetId, this.currentId, "follow");
+    },
+
+    async unfollowUser(targetId) {
+      await this.increment(this.currentId, "followingCount", -1);
+      await this.increment(targetId, "followerCount", -1);
+      await this.removeFromFieldArray(this.currentId, "following", targetId);
+      await this.removeFromFieldArray(targetId, "followers", this.currentId);
+      await this.notify(targetId, this.currentId, "follow");
+      // remove unfollowed user from your local timeline
+      const currentUser = await this.getUser(this.currentId);
+      const newLocalTimeline = currentUser.localTimeline.filter(
+        (tl) => tl.fromUserId !== targetId
+      );
+      await this.updateUser(this.currentId, newLocalTimeline);
+    },
+
+    async isFollowingUser(userId, targetId) {
+      const user = await this.getUser(userId);
       return user.following.includes(targetId);
     },
 
     canFollow(targetId) {
-      if (this.currentUser.id == targetId) return false;
+      if (this.currentUser.id === targetId) return false;
       return !this.currentUser.following.includes(targetId);
     },
 
     canUnfollow(targetId) {
-      if (this.currentUser.id == targetId) return false;
+      if (this.currentUser.id === targetId) return false;
       return this.currentUser.following.includes(targetId);
     },
 
-    notify(toUserId, fromUserId, type, tweetId = null) {
-      const currentUser = this.getUser(toUserId);
-      if (!currentUser) throw new Error("user not found");
+    async notify(toUserId, fromUserId, type, tweetId = null) {
+      const targetUser = await this.getUser(toUserId);
+      if (!targetUser) return;
       const newNotif = { fromUser: fromUserId, type, tweetId };
       if (
-        currentUser.newNotifications.filter(
+        targetUser.newNotifications.filter(
           (n) =>
             n.fromUser === newNotif.fromUser &&
             n.type === newNotif.type &&
             n.tweetId === newNotif.tweetId
         ).length === 0 &&
-        currentUser.oldNotifications.filter(
+        targetUser.oldNotifications.filter(
           (n) =>
             n.fromUser === newNotif.fromUser &&
             n.type === newNotif.type &&
@@ -269,68 +300,71 @@ export const useUsersStore = defineStore("users", {
         ).length === 0
       ) {
         // don't spam the same notif (idk a cleaner way to do that sorry)
-        currentUser.newNotifications.unshift(newNotif);
+        const newNotifs = targetUser.newNotifications;
+        newNotifs.unshift(newNotif);
+        await this.updateUser(toUserId, newNotifs);
       }
     },
 
-    clearNotifications(userId) {
-      const currentUser = this.getUser(userId);
-      if (!currentUser) throw new Error("user not found");
-      if (currentUser.newNotifications.length === 0) return;
-      currentUser.oldNotifications = [
-        ...currentUser.newNotifications,
-        ...currentUser.oldNotifications,
-      ];
-      currentUser.newNotifications = [];
+    async clearNotifications() {
+      if (!this.currentUser || this.currentUser.newNotifications.length === 0)
+        return;
+      const newNotifs = {
+        oldNotifications: [
+          ...this.currentUser.newNotifications,
+          ...this.currentUser.oldNotifications,
+        ],
+        newNotifications: [],
+      };
+      await this.updateUser(this.currentId, newNotifs);
     },
 
-    deleteReplyNotification(userId, tweetId) {
-      const currentUser = this.getUser(userId);
-      if (!currentUser) throw new Error("user not found");
+    async deleteReplyNotification(userId, tweetId) {
+      const user = await this.getUser(userId);
+      if (!user) return;
+      // remove reply from new notif array
       if (
-        currentUser.newNotifications.filter((n) => n.tweetId === tweetId)
-          .length > 0
+        user.newNotifications.filter((n) => n.tweetId === tweetId).length > 0
       ) {
-        const index = currentUser.newNotifications.findIndex(
-          (n) => n.tweetId === tweetId
+        const newNotifs = user.newNotifications.filter(
+          (n) => n.tweetId !== tweetId
         );
-        currentUser.newNotifications.splice(index, 1);
+        await this.updateUser(userId, newNotifs);
       }
+      // remove reply from old notif array
       if (
-        currentUser.oldNotifications.filter((n) => n.tweetId === tweetId)
-          .length > 0
+        user.oldNotifications.filter((n) => n.tweetId === tweetId).length > 0
       ) {
-        const index = currentUser.oldNotifications.findIndex(
-          (n) => n.tweetId === tweetId
+        const oldNotifs = user.oldNotifications.filter(
+          (n) => n.tweetId !== tweetId
         );
-        currentUser.oldNotifications.splice(index, 1);
+        await this.updateUser(userId, oldNotifs);
       }
     },
 
     async hasNewNotifications(userId) {
-      const currentUser = await this.getUser(userId);
-      if (!currentUser) throw new Error("user not found");
-      return currentUser.newNotifications.length > 0;
+      const user = await this.getUser(userId);
+      if (!user) throw new Error(`User ${userId} not found.`);
+      return user.newNotifications.length > 0;
     },
 
     async getAllNotifications(userId) {
-      const currentUser = await this.getUser(userId);
-      if (!currentUser) throw new Error("user not found");
-      return [...currentUser.newNotifications, ...currentUser.oldNotifications];
+      const user = await this.getUser(userId);
+      if (!user) throw new Error(`User ${userId} not found.`);
+      return [...user.newNotifications, ...user.oldNotifications];
     },
 
-    isNewNotification(userId, notif) {
-      const currentUser = this.getUser(userId);
-      if (!currentUser) throw new Error("user not found");
-      return currentUser.newNotifications.filter((n) => n === notif).length > 0;
+    async isNewNotification(userId, notif) {
+      const user = await this.getUser(userId);
+      if (!user) throw new Error(`User ${userId} not found.`);
+      return user.newNotifications.filter((n) => n === notif).length > 0;
     },
 
-    tweetIsNewNotification(userId, tweetId) {
-      const currentUser = this.getUser(userId);
-      if (!currentUser) throw new Error("user not found");
+    async tweetIsNewNotification(userId, tweetId) {
+      const user = await this.getUser(userId);
+      if (!user) throw new Error(`User ${userId} not found.`);
       return (
-        currentUser.newNotifications.filter((n) => n.tweetId === tweetId)
-          .length > 0
+        user.newNotifications.filter((n) => n.tweetId === tweetId).length > 0
       );
     },
   },

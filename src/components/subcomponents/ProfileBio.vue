@@ -219,6 +219,10 @@ a.follow-metric:visited {
   width: 100%;
 }
 
+.display-name {
+  font-weight: bold;
+}
+
 .follows-you {
   border-radius: 5px;
   background-color: rgba(255, 255, 255, 0.12);
@@ -296,6 +300,11 @@ a.follow-metric:visited {
   transition: background-color 0.15s ease;
   flex-wrap: nowrap;
   width: fit-content;
+  text-shadow: 1px 0px 0px white;
+}
+
+.profile-tab.gray-text {
+  text-shadow: none;
 }
 
 .profile-tab:hover {

@@ -25,7 +25,7 @@ const userFollowers = computed(() =>
         class="profile-tab"
         :class="{ 'gray-text': app.routeName !== 'Following' }"
         @click="
-          router.push({
+          router.replace({
             name: 'Following',
             params: { username: props.username },
           })
@@ -41,7 +41,7 @@ const userFollowers = computed(() =>
         class="profile-tab"
         :class="{ 'gray-text': app.routeName !== 'Followers' }"
         @click="
-          router.push({
+          router.replace({
             name: 'Followers',
             params: { username: props.username },
           })
@@ -83,6 +83,11 @@ const userFollowers = computed(() =>
   transition: background-color 0.15s ease;
   flex-wrap: nowrap;
   width: fit-content;
+  text-shadow: 1px 0px 0px white;
+}
+
+.profile-tab.gray-text {
+  text-shadow: none;
 }
 
 .profile-tab:hover {
