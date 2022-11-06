@@ -9,7 +9,7 @@ const props = defineProps(["userId"]);
 <template>
   <button
     class="following-btn"
-    v-if="users.canUnfollow(props.userId)"
+    v-if="!users.canFollow(props.userId)"
     @click.stop="users.unfollowUser(props.userId)"
   ></button>
   <button

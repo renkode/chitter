@@ -28,9 +28,9 @@ const props = defineProps({ notifs: Array }); // { fromUser, type, tweetId }
             }"
             :tweet="tweets.getTweet(notif.tweetId)"
             :type="'reply'"
-            :replyingTo="app.currentUser.username"
+            :replyingTo="users.currentUser.username"
             :isNotification="
-              users.tweetIsNewNotification(app.currentId, notif.tweetId)
+              users.tweetIsNewNotification(users.currentId, notif.tweetId)
             "
           />
         </template>
@@ -48,7 +48,7 @@ const props = defineProps({ notifs: Array }); // { fromUser, type, tweetId }
             :tweet="tweets.getTweet(notif.tweetId)"
             :type="'status'"
             :isNotification="
-              users.tweetIsNewNotification(app.currentId, notif.tweetId)
+              users.tweetIsNewNotification(users.currentId, notif.tweetId)
             "
           />
         </template>
@@ -63,7 +63,7 @@ const props = defineProps({ notifs: Array }); // { fromUser, type, tweetId }
             :username="users.getUser(notif.fromUser).username"
             :tweetText="tweets.getTweet(notif.tweetId).text"
             :containsMedia="tweets.getTweet(notif.tweetId).media.length > 0"
-            :isNew="users.isNewNotification(app.currentId, notif)"
+            :isNew="users.isNewNotification(users.currentId, notif)"
           />
         </template>
 
@@ -75,7 +75,7 @@ const props = defineProps({ notifs: Array }); // { fromUser, type, tweetId }
             :iconUrl="users.getUser(notif.fromUser).avatarUrl"
             :name="users.getUser(notif.fromUser).name"
             :username="users.getUser(notif.fromUser).username"
-            :isNew="users.isNewNotification(app.currentId, notif)"
+            :isNew="users.isNewNotification(users.currentId, notif)"
           />
         </template>
       </template>

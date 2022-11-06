@@ -1,5 +1,5 @@
 <script setup>
-import { defineProps, computed } from "vue";
+import { ref, defineProps, computed } from "vue";
 import ProfilePicture from "./ProfilePicture.vue";
 import HeaderPicture from "./HeaderPicture.vue";
 import FollowButton from "./FollowButton.vue";
@@ -15,6 +15,9 @@ const shortURL = computed(() =>
 );
 const joinDate = computed(() =>
   formatDateMixin.formatJoinDate(props.user.timestamp)
+);
+const isFollowing = ref(
+  await users.isFollowingUser(props.user.id, users.currentId)
 );
 </script>
 
@@ -39,10 +42,7 @@ const joinDate = computed(() =>
         <span class="username-wrapper">
           <span class="username gray-text"> @{{ props.user.username }} </span>
           <div
-            v-if="
-              app.currentId &&
-              users.isFollowingUser(props.user.id, app.currentId)
-            "
+            v-if="users.currentId && isFollowing"
             class="follows-you gray-text"
           >
             Follows you

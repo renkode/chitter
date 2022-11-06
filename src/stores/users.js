@@ -100,6 +100,7 @@ export const useUsersStore = defineStore("users", {
     },
 
     async getUserByUsername(username) {
+      if (!username) return;
       let id = null;
       const users = collection(db, "users");
       const q = query(users, where("username", "==", username));
@@ -107,7 +108,20 @@ export const useUsersStore = defineStore("users", {
       querySnapshot.forEach((doc) => {
         id = doc.id;
       });
+      if (!id) return null;
       return await this.getUser(id);
+    },
+
+    async isUsernameTaken(username) {
+      if (!username) return;
+      let id = null;
+      const users = collection(db, "users");
+      const q = query(users, where("username", "==", username));
+      const querySnapshot = await getDocs(q);
+      querySnapshot.forEach((doc) => {
+        id = doc.id;
+      });
+      return id ? true : false;
     },
 
     async uploadProfileImage(id, file, type) {
@@ -267,6 +281,7 @@ export const useUsersStore = defineStore("users", {
     },
 
     async isFollowingUser(userId, targetId) {
+      if (userId === targetId) return false;
       const user = await this.getUser(userId);
       return user.following.includes(targetId);
     },
@@ -274,11 +289,6 @@ export const useUsersStore = defineStore("users", {
     canFollow(targetId) {
       if (this.currentUser.id === targetId) return false;
       return !this.currentUser.following.includes(targetId);
-    },
-
-    canUnfollow(targetId) {
-      if (this.currentUser.id === targetId) return false;
-      return this.currentUser.following.includes(targetId);
     },
 
     async notify(toUserId, fromUserId, type, tweetId = null) {

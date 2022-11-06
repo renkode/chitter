@@ -1,5 +1,5 @@
 <script setup>
-import { defineProps } from "vue";
+import { ref, defineProps } from "vue";
 import ProfilePicture from "./ProfilePicture.vue";
 import FollowButton from "./FollowButton.vue";
 import { useAppStore } from "@/stores/app";
@@ -14,6 +14,9 @@ const props = defineProps([
   "avatarUrl",
   "description",
 ]);
+const isFollowing = ref(
+  await users.isFollowingUser(props.user.id, users.currentId)
+);
 
 function goToProfile() {
   app.viewUserProfile(props.username);
@@ -39,16 +42,14 @@ function goToProfile() {
           <span class="username-wrapper">
             <span class="username gray-text"> @{{ props.username }} </span>
             <div
-              v-if="
-                app.currentId && users.isFollowingUser(props.id, app.currentId)
-              "
+              v-if="users.currentId && isFollowing"
               class="follows-you gray-text"
             >
               Follows you
             </div>
           </span>
         </div>
-        <FollowButton v-if="app.currentId" :userId="props.id" />
+        <FollowButton v-if="users.currentId" :userId="props.id" />
       </div>
       <div class="description">{{ props.description }}</div>
     </div>

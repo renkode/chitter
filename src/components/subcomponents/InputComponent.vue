@@ -1,5 +1,5 @@
 <script setup>
-import { ref, defineProps, watch } from "vue";
+import { ref, computed, defineProps, watch } from "vue";
 // https://javascript.plainenglish.io/vue-js-tip-1-use-v-model-on-custom-components-be56401727e0
 const props = defineProps({
   inputValue: String,
@@ -15,8 +15,8 @@ const props = defineProps({
   rows: String,
 });
 const wrapperRef = ref(null);
-const inputRef = ref(null);
 const didNotType = ref(props.startsBlank ? true : false);
+const errors = computed(() => props.validation.map((v) => v.hasError));
 
 const setFocus = (e) => {
   if (
@@ -41,19 +41,24 @@ const setFocus = (e) => {
 watch(
   () => props.inputValue,
   () => {
-    if (props.validation && props.validation.length === 0) {
-      return;
-    }
     if (didNotType.value) didNotType.value = false;
-    if (props.validation.some((v) => v.hasError === true)) {
-      wrapperRef.value.className = "input-wrapper red-border";
-      wrapperRef.value.querySelector("label").className = "red-text";
-    } else {
-      wrapperRef.value.className = "input-wrapper blue-border";
-      wrapperRef.value.querySelector("label").className = "blue-text";
-    }
   }
 );
+
+watch([errors, didNotType], () => {
+  if ((errors.value && errors.value.length === 0) || didNotType.value) {
+    return;
+  }
+  if (errors.value.some((err) => err)) {
+    wrapperRef.value.className = "input-wrapper red-border";
+    wrapperRef.value.querySelector("label").className = "red-text";
+  } else if (
+    document.activeElement === document.querySelector(`#${props.name}`)
+  ) {
+    wrapperRef.value.className = "input-wrapper blue-border";
+    wrapperRef.value.querySelector("label").className = "blue-text";
+  }
+});
 </script>
 
 <template>
@@ -71,7 +76,6 @@ watch(
         :minLength="props.minLength"
         :maxlength="props.maxLength"
         :rows="props.rows"
-        :ref="inputRef"
       ></textarea>
       <input
         v-else
@@ -84,7 +88,6 @@ watch(
         @focusout="setFocus"
         :minLength="props.minLength"
         :maxlength="props.maxLength"
-        :ref="inputRef"
       />
       <span class="label-wrapper"
         ><label class="gray-text" :for="props.name">{{ props.label }}</label

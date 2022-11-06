@@ -32,13 +32,15 @@ const currentTime = ref(dayjs().toISOString());
 const getTimeSinceCreation = ref(
   formatDateMixin.formatTweetDate(props.tweet.timestamp, currentTime.value)
 );
-const isLiked = computed(() => tweets.hasLiked(props.tweet.id, app.currentId));
+const isLiked = computed(() =>
+  tweets.hasLiked(props.tweet.id, users.currentId)
+);
 const isRetweeted = computed(() =>
-  tweets.hasRetweeted(props.tweet.id, app.currentId)
+  tweets.hasRetweeted(props.tweet.id, users.currentId)
 );
 
 const toggleTweetMenu = () => {
-  if (!app.currentUser) return;
+  if (!users.currentUser) return;
   isTweetMenuOpen.value = !isTweetMenuOpen.value;
 };
 
@@ -48,16 +50,16 @@ const deleteTweet = () => {
 
 const toggleLike = () => {
   if (!isLiked.value) {
-    tweets.addLike(props.id, app.currentId, props.retweetedBy);
+    tweets.addLike(props.id, users.currentId, props.retweetedBy);
   } else {
-    tweets.removeLike(props.id, app.currentId);
+    tweets.removeLike(props.id, users.currentId);
   }
 };
 const toggleRetweet = () => {
   if (!isRetweeted.value) {
-    tweets.addRetweet(props.id, app.currentId, props.retweetedBy);
+    tweets.addRetweet(props.id, users.currentId, props.retweetedBy);
   } else {
-    tweets.removeRetweet(props.id, app.currentId);
+    tweets.removeRetweet(props.id, users.currentId);
   }
 };
 const setReply = () => {
@@ -141,7 +143,8 @@ onBeforeUnmount(() => {
                 <li
                   class="tweet-menu-item delete-tweet"
                   v-if="
-                    app.currentId == props.user.id || app.currentUser.isAdmin
+                    users.currentId == props.user.id ||
+                    users.currentUser.isAdmin
                   "
                   @click="deleteTweet"
                 >
@@ -151,8 +154,8 @@ onBeforeUnmount(() => {
                 </li>
                 <li
                   class="tweet-menu-item"
-                  v-if="users.canFollow(app.currentUser, props.user.id)"
-                  @click="users.followUser(app.currentId, props.user.id)"
+                  v-if="users.canFollow(users.currentUser, props.user.id)"
+                  @click="users.followUser(users.currentId, props.user.id)"
                 >
                   <span class="tweet-menu-icon"
                     ><v-icon
@@ -163,8 +166,8 @@ onBeforeUnmount(() => {
                 </li>
                 <li
                   class="tweet-menu-item"
-                  v-if="users.canUnfollow(app.currentUser, props.user.id)"
-                  @click="users.unfollowUser(app.currentId, props.user.id)"
+                  v-if="users.canUnfollow(users.currentUser, props.user.id)"
+                  @click="users.unfollowUser(users.currentId, props.user.id)"
                 >
                   <span class="tweet-menu-icon"
                     ><v-icon

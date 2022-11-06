@@ -1,12 +1,12 @@
 <script setup>
-import { onMounted, onUnmounted, computed } from "vue";
+import { ref, onMounted, onUnmounted, computed } from "vue";
 import { useAppStore } from "@/stores/app.js";
 import { useUsersStore } from "@/stores/users.js";
 import NotificationList from "./lists/NotificationList.vue";
 
 const app = useAppStore();
 const users = useUsersStore();
-const notifs = computed(() => users.getAllNotifications(app.currentId));
+const notifs = ref(await users.getAllNotifications(users.currentId));
 
 async function delay(time) {
   await new Promise((res) => {
@@ -21,7 +21,7 @@ onMounted(() => {
 });
 
 onUnmounted(() => {
-  users.clearNotifications(app.currentId);
+  users.clearNotifications();
 });
 </script>
 

@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed, onMounted } from "vue";
+import { ref, computed, onMounted, watch } from "vue";
 import HeaderPicture from "../subcomponents/HeaderPicture.vue";
 import ProfilePicture from "../subcomponents/ProfilePicture.vue";
 import ModalHeader from "./ModalHeader.vue";
@@ -32,14 +32,7 @@ const usernameMeetsLength = computed(
   () => usernameInput.value.length >= MIN_USERNAME_LENGTH
 );
 const validUsername = computed(() => usernameRegex.test(usernameInput.value));
-const isUsernameTaken = computed(
-  () =>
-    // users.users.filter(
-    //   (user) =>
-    //     app.currentId !== user.id && user.username == usernameInput.value
-    // ).length > 0
-    false
-);
+const isUsernameTaken = ref(false);
 const usernameError = computed(
   () =>
     !usernameMeetsLength.value || !validUsername.value || isUsernameTaken.value
@@ -115,6 +108,11 @@ const updateProfile = () => {
   app.toggleModal();
   app.viewUserProfile(users.currentUser.username);
 };
+
+watch(usernameInput, async () => {
+  if (usernameInput.value.length === 0) return;
+  isUsernameTaken.value = await users.isUsernameTaken(usernameInput.value);
+});
 
 // on mount
 onMounted(() => {

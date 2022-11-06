@@ -7,11 +7,15 @@ import router from "@/router/index.js";
 const app = useAppStore();
 const users = useUsersStore();
 
+// have to check app.routeUsername or firebase gets mad
 const user = ref(
-  app.routeUsername && app.routeUsername === users.currentUser.username
+  users.currentUser && app.routeUsername === users.currentUser.username
     ? users.currentUser
-    : await users.getUserByUsername(app.routeUsername)
+    : app.routeUsername
+    ? await users.getUserByUsername(app.routeUsername)
+    : null
 );
+
 const canGoBack = computed(() => {
   const routes = [
     "Tweet",

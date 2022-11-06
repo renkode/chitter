@@ -17,7 +17,7 @@ const circle = ref(null);
 const images = ref([]);
 const str = ref("");
 
-const user = computed(() => app.currentUser);
+const user = computed(() => users.currentUser);
 const noContent = computed(
   () => str.value.length === 0 && images.value.length === 0
 );

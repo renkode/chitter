@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed } from "vue";
+import { ref, computed, watch } from "vue";
 import ModalHeader from "./ModalHeader.vue";
 import InputComponent from "../subcomponents/InputComponent.vue";
 import { useAppStore } from "@/stores/app";
@@ -23,12 +23,8 @@ const usernameMeetsLength = computed(
 const usernameIsInvalid = computed(
   () => !usernameRegex.test(usernameInput.value)
 );
-const isUsernameTaken = computed(
-  () =>
-    // users.users.filter((user) => user.username == usernameInput.value).length >
-    // 0
-    false
-);
+const isUsernameTaken = ref(false);
+
 const usernameError = computed(
   () =>
     !usernameMeetsLength.value ||
@@ -51,6 +47,7 @@ const passIsShort = computed(
 const passError = computed(() => passIsBlank.value || passIsShort.value);
 
 const signUpCodeInput = ref("");
+const wrongSignUpCode = ref(false);
 
 const containsError = computed(
   () =>
@@ -70,7 +67,7 @@ const signUp = async () => {
     throw new Error("Failed to fetch signup code.");
   }
   if (code.data().value !== signUpCodeInput.value) {
-    app.toast("Wrong code.");
+    wrongSignUpCode.value = true;
     return;
   }
   await app.signUp(
@@ -81,6 +78,14 @@ const signUp = async () => {
   );
 };
 
+watch(usernameInput, async () => {
+  if (usernameInput.value.length === 0) return;
+  isUsernameTaken.value = await users.isUsernameTaken(usernameInput.value);
+});
+
+watch(signUpCodeInput, () => {
+  wrongSignUpCode.value = false;
+});
 // You can check if an email is in use by checking if fetchProvidersForEmail returns an empty array.
 // https://firebase.google.com/docs/reference/js/v8/firebase.auth.Auth#fetchsigninmethodsforemail
 </script>
@@ -163,7 +168,9 @@ const signUp = async () => {
           name="signUpCodeInput"
           label="Sign-up code"
           :startsBlank="true"
-          :validation="[]"
+          :validation="[
+            { errorText: 'Incorrect signup code.', hasError: wrongSignUpCode },
+          ]"
           minLength="1"
         />
       </div>

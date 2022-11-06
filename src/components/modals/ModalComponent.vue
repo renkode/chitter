@@ -12,14 +12,23 @@ const app = useAppStore();
 <template>
   <div class="modal-overlay" @click.stop.self="app.toggleModal()">
     <div class="modal-container">
-      <ProfileModal v-if="app.modalType === 'edit-profile'" />
+      <Suspense>
+        <template #default>
+          <ProfileModal v-if="app.modalType === 'edit-profile'"
+        /></template>
+      </Suspense>
+
       <UserListModal
         v-if="app.modalType === 'retweet-list' || app.modalType === 'like-list'"
       />
       <ComposeTweetModal
         v-if="app.modalType === 'status' || app.modalType === 'reply'"
       />
-      <SignUpModal v-if="app.modalType === 'signup'" />
+      <Suspense>
+        <template #default
+          ><SignUpModal v-if="app.modalType === 'signup'"
+        /></template>
+      </Suspense>
       <LogInModal v-if="app.modalType === 'login'" />
     </div>
   </div>
