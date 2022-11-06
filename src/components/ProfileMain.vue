@@ -1,5 +1,5 @@
 <script setup>
-import { defineProps, ref, computed } from "vue";
+import { defineProps, ref, computed, watch } from "vue";
 import ProfileBio from "./subcomponents/ProfileBio.vue";
 import TweetList from "./lists/TweetList.vue";
 import { useUsersStore } from "@/stores/users.js";
@@ -10,11 +10,13 @@ const users = useUsersStore();
 
 const props = defineProps(["username"]);
 
+// initialize
 const user = ref(
   props.username === users.currentUser.username
-    ? users.currentUser
+    ? computed(() => users.currentUser)
     : await users.getUserByUsername(props.username)
 );
+
 const tab = ref("tweets"); // tweets-and-replies | media | likes
 
 const setTab = (newTab) => {
@@ -62,6 +64,17 @@ const tweets = computed(() => {
     // );
   }
 });
+
+// update profile if it's not dismounted
+watch(
+  () => props.username,
+  async () => {
+    user.value =
+      props.username === users.currentUser.username
+        ? computed(() => users.currentUser).value
+        : await users.getUserByUsername(props.username);
+  }
+);
 </script>
 
 <template>

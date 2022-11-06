@@ -9,6 +9,7 @@ import {
   updateDoc,
   query,
   where,
+  arrayUnion,
   arrayRemove,
   increment,
 } from "firebase/firestore";
@@ -37,9 +38,12 @@ export const useUsersStore = defineStore("users", {
       const user = await this.getUser(id);
       if (!user[field])
         throw new Error(`User ${id}: '${field}' does not exist.`);
-      const arr = user[field];
-      arr.unshift(element);
-      await this.updateUser(id, { [field]: arr });
+      // const arr = user[field];
+      // arr.unshift(element);
+      //await this.updateUser(id, { [field]: arr });
+      await updateDoc(doc(db, "users", id), {
+        [field]: arrayUnion(element),
+      });
     },
 
     async removeFromFieldArray(id, field, element) {
@@ -58,11 +62,6 @@ export const useUsersStore = defineStore("users", {
     setCurrentUser(user, id) {
       this.currentUser = user || null;
       this.currentId = id || null;
-    },
-
-    async refreshCurrentUser() {
-      if (!this.currentUser) return;
-      this.currentUser = await this.getUser(this.currentId);
     },
 
     async syncCurrentUserToAuth(id) {
@@ -165,7 +164,6 @@ export const useUsersStore = defineStore("users", {
         avatarUrl,
         headerUrl,
       };
-      Object.assign(this.currentUser, newInfo);
       await this.updateUser(id, newInfo);
     },
 
@@ -271,7 +269,6 @@ export const useUsersStore = defineStore("users", {
       await this.addToFieldArray(this.currentId, "following", targetId);
       this.addToFieldArray(targetId, "followers", this.currentId);
       this.notify(targetId, this.currentId, "follow");
-      this.refreshCurrentUser();
     },
 
     async unfollowUser(targetId) {
@@ -286,7 +283,6 @@ export const useUsersStore = defineStore("users", {
         (tl) => tl.fromUserId !== targetId
       );
       await this.updateUser(this.currentId, { localTimeline });
-      this.refreshCurrentUser();
     },
 
     async isFollowingUser(userId, targetId) {
@@ -336,7 +332,6 @@ export const useUsersStore = defineStore("users", {
         newNotifications: [],
       };
       await this.updateUser(this.currentId, notifs);
-      this.refreshCurrentUser();
     },
 
     async deleteReplyNotification(userId, tweetId) {

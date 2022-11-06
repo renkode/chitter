@@ -10,7 +10,7 @@ const users = useUsersStore();
 // have to check app.routeUsername or firebase gets mad
 const user = ref(
   users.currentUser && app.routeUsername === users.currentUser.username
-    ? users.currentUser
+    ? computed(() => users.currentUser)
     : app.routeUsername
     ? await users.getUserByUsername(app.routeUsername)
     : null
@@ -38,7 +38,11 @@ const canGoBack = computed(() => {
 
         <div
           class="user-info-wrapper"
-          v-if="user && app.view !== 'tweet' && app.view !== 'notifications'"
+          v-if="
+            user &&
+            app.routeName !== 'Tweet' &&
+            app.routeName !== 'Notifications'
+          "
         >
           <span class="display-name">{{ user.name }}</span>
           <span class="total-tweet-count gray-text"

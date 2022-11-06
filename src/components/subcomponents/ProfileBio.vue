@@ -221,6 +221,7 @@ a.follow-metric:visited {
 
 .display-name {
   font-weight: bold;
+  line-height: 1.3rem;
 }
 
 .follows-you {

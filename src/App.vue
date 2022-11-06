@@ -11,7 +11,7 @@ import ToastMessage from "./components/subcomponents/ToastMessage.vue";
 import { useAppStore } from "@/stores/app.js";
 import { useUsersStore } from "@/stores/users";
 import { db, auth } from "@/firebase.js";
-import { collection, doc, getDoc } from "firebase/firestore";
+import { doc, onSnapshot } from "firebase/firestore";
 
 const app = useAppStore();
 const users = useUsersStore();
@@ -29,9 +29,14 @@ const firebaseTest = async () => {
 // persist data
 onBeforeMount(() => {
   auth.onAuthStateChanged(async (user) => {
+    let unsub;
     if (user) {
       await users.syncCurrentUserToAuth(user.uid);
+      unsub = onSnapshot(doc(db, "users", auth.currentUser.uid), (doc) => {
+        users.syncCurrentUserToAuth(user.uid);
+      });
     } else {
+      if (unsub) unsub();
       users.setCurrentUser(null, null);
     }
     fetching.value = false;
