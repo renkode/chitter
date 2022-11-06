@@ -336,6 +336,7 @@ export const useUsersStore = defineStore("users", {
         newNotifications: [],
       };
       await this.updateUser(this.currentId, notifs);
+      this.refreshCurrentUser();
     },
 
     async deleteReplyNotification(userId, tweetId) {

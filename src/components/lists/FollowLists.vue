@@ -1,6 +1,6 @@
 <script setup>
 import UserList from "./UserList.vue";
-import { ref, defineProps, computed } from "vue";
+import { ref, defineProps } from "vue";
 import { useAppStore } from "@/stores/app.js";
 import { useUsersStore } from "@/stores/users.js";
 import router from "@/router/index.js";

@@ -52,7 +52,6 @@ export const useAppStore = defineStore("app", {
         .then(async (userCredential) => {
           // Signed in
           const user = userCredential.user;
-          console.log(await users.getUser(user.uid));
           users.syncCurrentUserToAuth(user.uid);
           this.toast("Welcome!");
           this.goTo("/home");

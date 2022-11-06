@@ -7,7 +7,6 @@ const app = useAppStore();
 const props = defineProps({
   type: String,
   id: String,
-  userId: String,
   iconUrl: String,
   name: String,
   username: String,
