@@ -107,9 +107,7 @@ export const useUsersStore = defineStore("users", {
       const users = collection(db, "users");
       const q = query(users, where("username", "==", username));
       const querySnapshot = await getDocs(q);
-      querySnapshot.forEach((doc) => {
-        id = doc.id;
-      });
+      if (querySnapshot[0]) id = querySnapshot[0].id;
       if (!id) return null;
       return this.getUser(id);
     },
@@ -230,7 +228,7 @@ export const useUsersStore = defineStore("users", {
       retweetedBy
     ) {
       const user = await this.getUser(targetUserId);
-      Promise.all(
+      return Promise.all(
         user.followers.map((follower) =>
           this.addToLocalTimeline(
             follower,
@@ -253,7 +251,7 @@ export const useUsersStore = defineStore("users", {
 
     async removeFromAllFollowerTimelines(targetUserId, tweetId) {
       const user = await this.getUser(targetUserId);
-      Promise.all(
+      return Promise.all(
         user.followers.map((follower) =>
           this.removeFromLocalTimeline(follower, tweetId)
         )

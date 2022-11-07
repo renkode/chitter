@@ -8,16 +8,20 @@ import {
   getDoc,
   getDocs,
   updateDoc,
+  deleteDoc,
   query,
   arrayRemove,
   increment,
   arrayUnion,
 } from "firebase/firestore";
-import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import {
+  ref,
+  uploadBytes,
+  getDownloadURL,
+  deleteObject,
+} from "firebase/storage";
 import ShortUniqueId from "short-unique-id";
 
-const date = new Date();
-const iso = date.toISOString();
 var uid = new ShortUniqueId();
 
 export const useTweetStore = defineStore("tweets", {
@@ -25,19 +29,27 @@ export const useTweetStore = defineStore("tweets", {
     tweets: [],
     lastDocTimestamp: null,
     fetchLimit: 4,
+    isUploading: false,
   }),
   getters: {},
   actions: {
+    async getTweet(id) {
+      const docRef = await getDoc(doc(db, "tweets", id));
+      if (docRef.exists()) return docRef.data();
+      console.log(`Tweet ${id} does not exist.`);
+      return null;
+    },
+
     setTweets(arr) {
       this.tweets = [...arr];
     },
 
-    async updateTweet(id, obj) {
-      await updateDoc(doc(db, "tweets", id), obj);
+    updateTweet(id, obj) {
+      updateDoc(doc(db, "tweets", id), obj);
     },
 
-    async increment(id, field, amount) {
-      await updateDoc(doc(db, "tweets", id), {
+    increment(id, field, amount) {
+      updateDoc(doc(db, "tweets", id), {
         [field]: increment(amount),
       });
     },
@@ -46,14 +58,14 @@ export const useTweetStore = defineStore("tweets", {
       const tweet = await this.getTweet(id);
       if (!tweet[field])
         throw new Error(`Tweet ${id}: '${field}' does not exist.`);
-      await updateDoc(doc(db, "tweets", id), {
+      updateDoc(doc(db, "tweets", id), {
         [field]: arrayUnion(element),
       });
     },
 
     async removeFromFieldArray(id, field, element) {
       // WARNING: SIMPLE ARRAYS ONLY
-      await updateDoc(doc(db, "tweets", id), {
+      return updateDoc(doc(db, "tweets", id), {
         [field]: arrayRemove(element),
       });
     },
@@ -64,34 +76,28 @@ export const useTweetStore = defineStore("tweets", {
       return null;
     },
 
-    //TO DO: queryTimeline
-
-    async updateTimeline(id, arr) {
-      await updateDoc(doc(db, "timelines", id), { tweets: arr });
+    async queryTimeline() {
+      //TO-DO
     },
 
-    async addToTimeline(id, element) {
-      await updateDoc(doc(db, "timelines", id), {
+    updateTimeline(id, arr) {
+      updateDoc(doc(db, "timelines", id), { tweets: arr });
+    },
+
+    addToTimeline(id, element) {
+      updateDoc(doc(db, "timelines", id), {
         tweets: arrayUnion(element),
       });
     },
 
-    async getTweet(id) {
-      const docRef = await getDoc(doc(db, "tweets", id));
-      if (docRef.exists()) return docRef.data();
-      return null;
-    },
-
-    addLike(id, userId, isRetweet) {
-      if (!userId) return;
-      const tweet = this.getTweet(id);
-      if (!tweet) throw new Error(`tweet id ${id} does not exist`);
-      tweet.likeCount++;
-      tweet.likesFrom.push(userId);
+    async addLike(id, userId, isRetweet) {
+      this.increment(id, "likeCount", 1);
+      this.addToFieldArray(id, "likesFrom", userId);
 
       const users = useUsersStore();
       users.addLike(userId, id);
-      if (tweet.authorId !== userId) {
+      const tweet = await this.getTweet(id);
+      if (tweet && tweet.authorId !== userId) {
         isRetweet
           ? users.notify(tweet.authorId, userId, "like-retweet", id)
           : users.notify(tweet.authorId, userId, "like-origin", id);
@@ -99,35 +105,27 @@ export const useTweetStore = defineStore("tweets", {
     },
 
     removeLike(id, userId) {
-      if (!userId) return;
-      const tweet = this.getTweet(id);
-      if (!tweet) throw new Error(`tweet id ${id} does not exist`);
-      tweet.likeCount--;
-      tweet.likesFrom.splice(tweet.likesFrom.indexOf(userId), 1);
+      this.increment(id, "likeCount", -1);
+      this.removeFromFieldArray(id, "likesFrom", userId);
 
       const users = useUsersStore();
       users.removeLike(userId, id);
     },
 
-    removeAllLikesFromTweet(id) {
-      const tweet = this.getTweet(id);
-      if (!tweet) throw new Error(`tweet id ${id} does not exist`);
+    removeAllLikes(arr) {
       const users = useUsersStore();
-      tweet.likesFrom.forEach((user) => users.removeLike(user, id));
+      Promise.all(arr.map((user) => users.removeLike(user, id)));
     },
 
-    hasLiked(id, userId) {
-      const tweet = this.getTweet(id);
+    async hasLiked(id, userId) {
+      const tweet = await this.getTweet(id);
       if (!tweet) return false;
       return tweet.likesFrom.includes(userId);
     },
 
-    addRetweet(id, userId, isRetweetofRetweet) {
-      if (!userId) return;
-      const tweet = this.getTweet(id);
-      if (!tweet) throw new Error(`tweet id ${id} does not exist`);
-      tweet.retweetCount++;
-      tweet.retweetsFrom.push(userId);
+    async addRetweet(id, userId, isRetweetofRetweet) {
+      this.increment(id, "retweetCount", 1);
+      this.addToFieldArray(id, "retweetsFrom", userId);
 
       const users = useUsersStore();
       users.addRetweet(userId, id);
@@ -137,7 +135,7 @@ export const useTweetStore = defineStore("tweets", {
         "retweet",
         new Date().toISOString(),
         userId
-      ); // self
+      );
       users.addToAllFollowerTimelines(
         userId,
         id,
@@ -145,6 +143,7 @@ export const useTweetStore = defineStore("tweets", {
         new Date().toISOString(),
         userId
       );
+      const tweet = await this.getTweet(id);
       if (tweet.authorId !== userId) {
         isRetweetofRetweet
           ? users.notify(tweet.authorId, userId, "retweet-retweet", id)
@@ -153,11 +152,8 @@ export const useTweetStore = defineStore("tweets", {
     },
 
     removeRetweet(id, userId) {
-      if (!userId) return;
-      const tweet = this.getTweet(id);
-      if (!tweet) throw new Error(`tweet id ${id} does not exist`);
-      tweet.retweetCount--;
-      tweet.retweetsFrom.splice(tweet.retweetsFrom.indexOf(userId), 1);
+      this.increment(id, "retweetCount", -1);
+      this.removeFromFieldArray(id, "retweetsFrom", userId);
 
       const users = useUsersStore();
       users.removeRetweet(userId, id);
@@ -165,34 +161,50 @@ export const useTweetStore = defineStore("tweets", {
       users.removeFromAllFollowerTimelines(userId, id); // followers
     },
 
-    removeAllRetweetsFromTweet(id) {
-      const tweet = this.getTweet(id);
-      if (!tweet) throw new Error(`tweet id ${id} does not exist`);
+    removeAllRetweets(arr) {
       const users = useUsersStore();
-      tweet.retweetsFrom.forEach((user) => users.removeRetweet(user, id));
+      Promise.all(arr.map((user) => users.removeRetweet(user, id)));
     },
 
-    hasRetweeted(id, userId) {
-      const tweet = this.getTweet(id);
+    async hasRetweeted(id, userId) {
+      const tweet = await this.getTweet(id);
       if (!tweet) return false;
       return tweet.retweetsFrom.includes(userId);
     },
 
-    addTweet(
+    async uploadImage(id, file, index = null) {
+      if (!file) return "";
+      const imgRef = ref(storage, `tweet/${id}${index ? `-${index}` : ""}`);
+      await uploadBytes(imgRef, file);
+      return getDownloadURL(imgRef);
+    },
+
+    async addTweet(
       type = "status",
       text = "",
-      media = [],
+      mediaFiles = [],
       authorId,
       replyingToTweet = null,
       replyingToUser = null,
       mentionedUsers = null
     ) {
+      const tweetId = uid();
       const timestamp = new Date().toISOString();
+      let media = [];
+      if (mediaFiles.length > 0) {
+        await Promise.all(
+          mediaFiles.map((file, index) =>
+            this.uploadImage(tweetId, file, index)
+          )
+        )
+          .then((urls) => (media = [...urls]))
+          .catch((e) => console.log(e));
+      }
       const newTweet = {
-        id: uid(),
+        id: tweetId,
         type,
         text,
-        media: [...media],
+        media,
         authorId: authorId,
         replyCount: 0,
         retweetCount: 0,
@@ -209,48 +221,54 @@ export const useTweetStore = defineStore("tweets", {
         likesFrom: [],
       };
       this.tweets.unshift(newTweet);
-
+      await setDoc(doc(db, "tweets", id), newTweet);
       if (type === "reply" && replyingToTweet) {
-        this.getTweet(replyingToTweet).repliesFrom.push(newTweet.id);
+        replyOrigin.addToFieldArray(replyingToTweet, "repliesFrom", tweetId);
       }
-
+      // update timelines and notify if tweet is a reply/mentions other users
       const users = useUsersStore();
       const containsMedia = media.length > 0 ? true : false;
-      users.addTweet(authorId, newTweet.id, type, containsMedia, timestamp);
-      users.addToLocalTimeline(authorId, newTweet.id, type, timestamp); // self
-      users.addToAllFollowerTimelines(authorId, newTweet.id, type, timestamp); // followers
+      users.addTweet(authorId, tweetId, type, containsMedia, timestamp);
+      users.addToLocalTimeline(authorId, tweetId, type, timestamp); // self
+      users.addToAllFollowerTimelines(authorId, tweetId, type, timestamp); // followers
       if (type === "reply" && replyingToUser !== authorId) {
-        users.notify(replyingToUser, authorId, type, newTweet.id);
-        return;
+        users.notify(replyingToUser, authorId, type, tweetId);
       }
       if (mentionedUsers && mentionedUsers.length > 0) {
-        newTweet.mentionedUsers.forEach((id) => {
-          if (users.getUser(id) && id !== authorId)
-            users.notify(id, authorId, "mention", newTweet.id);
+        Promise.all(
+          newTweet.mentionedUsers.map((id) => {
+            if (id !== authorId) users.notify(id, authorId, "mention", tweetId);
+          })
+        );
+      }
+    },
+
+    async deleteMedia(id, length) {
+      for (const index of Array.from(length)) {
+        const imgRef = ref(storage, `tweets/${id}-${index}`);
+        deleteObject(imgRef).catch((e) => {
+          console.log(e);
         });
       }
     },
 
-    removeTweet(id, userId) {
-      const tweet = this.getTweet(id);
-      const index = this.tweets.findIndex((t) => t.id === id);
-      if (!tweet || index < 0) throw new Error(`tweet id ${id} does not exist`);
-      const replyingToTweet = this.getTweet(tweet.replyingToTweet);
-      // remove from other tweet's replies
-      if (replyingToTweet)
-        replyingToTweet.repliesFrom = replyingToTweet.repliesFrom.filter(
-          (replyId) => replyId !== id
-        );
-      this.removeAllLikesFromTweet(id);
-      this.removeAllRetweetsFromTweet(id);
-      this.tweets.splice(index, 1);
+    async removeTweet(id, userId) {
+      const tweet = await this.getTweet(id);
+      if (!tweet) return;
+      this.setTweets(this.tweets.filter((t) => t.id !== id));
+      if (tweet.replyingToTweet)
+        this.removeFromFieldArray(id, "repliesFrom", id);
 
       const users = useUsersStore();
       users.removeTweet(userId, id);
       users.removeFromLocalTimeline(userId, id); // self
       users.removeFromAllFollowerTimelines(userId, id); // followers
+      this.removeAllLikesFromTweet([...tweet.likesFrom]);
+      this.removeAllRetweetsFromTweet([...tweet.retweetsFrom]);
+      if (tweet.media.length > 0) this.deleteMedia(id, tweet.media.length);
       if (tweet.replyingToUser)
         users.deleteReplyNotification(tweet.replyingToUser, id);
+      return tweet.deleteDoc(doc(db, "tweets", id));
     },
   },
 });
