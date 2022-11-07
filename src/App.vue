@@ -34,14 +34,12 @@ onBeforeMount(() => {
     if (user) {
       await users.syncCurrentUserToAuth(user.uid);
       // real-time user and notif updates
-      userUnsub = onSnapshot(doc(db, "users", auth.currentUser.uid), (doc) => {
-        users.syncCurrentUserToAuth(user.uid);
-      });
+      userUnsub = onSnapshot(doc(db, "users", auth.currentUser.uid), () =>
+        users.syncCurrentUserToAuth(user.uid)
+      );
       notifUnsub = onSnapshot(
         doc(db, "notifications", auth.currentUser.uid),
-        (doc) => {
-          users.syncNotifications(user.uid);
-        }
+        () => users.syncNotifications(user.uid)
       );
     } else {
       if (userUnsub) userUnsub();

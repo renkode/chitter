@@ -1,21 +1,32 @@
 <script setup>
-import { defineProps } from "vue";
+import { defineProps, defineEmits } from "vue";
 import { useUsersStore } from "@/stores/users";
 
 const users = useUsersStore();
 const props = defineProps(["userId"]);
+const emit = defineEmits(["increment"]);
+
+const follow = () => {
+  users.followUser(props.userId);
+  emit("increment", 1);
+};
+
+const unfollow = () => {
+  users.unfollowUser(props.userId);
+  emit("increment", -1);
+};
 </script>
 
 <template>
   <button
     class="following-btn"
     v-if="!users.canFollow(props.userId)"
-    @click.stop="users.unfollowUser(props.userId)"
+    @click.stop="unfollow"
   ></button>
   <button
     class="follow-btn"
     v-else-if="users.canFollow(props.userId)"
-    @click.stop="users.followUser(props.userId)"
+    @click.stop="follow"
   >
     Follow
   </button>

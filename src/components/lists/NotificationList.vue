@@ -13,6 +13,7 @@ const notifs = ref(
     props.notifs.map(async (notif) => {
       const user = await users.getUser(notif.fromUser);
       const tweet = notif.tweetId ? await tweets.getTweet(notif.tweetId) : null;
+      // map to TweetCard
       if (notif.type === "reply" || notif.type === "mention") {
         return {
           user: {
@@ -24,7 +25,8 @@ const notifs = ref(
           tweet,
           isNotification: users.tweetIsNewNotification(notif.tweetId),
         };
-      } else {
+      } // map to NotificationCard
+      else {
         return {
           id: tweet ? notif.tweetId : null,
           type: notif.type,

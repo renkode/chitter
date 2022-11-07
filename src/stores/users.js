@@ -26,12 +26,18 @@ export const useUsersStore = defineStore("users", {
   }),
   getters: {}, // can't be async so
   actions: {
-    async updateUser(id, obj) {
-      await updateDoc(doc(db, "users", id), obj);
+    async getUser(id) {
+      const docRef = await getDoc(doc(db, "users", id));
+      if (docRef.exists()) return docRef.data();
+      return null;
     },
 
-    async increment(id, field, amount) {
-      await updateDoc(doc(db, "users", id), {
+    updateUser(id, obj) {
+      updateDoc(doc(db, "users", id), obj);
+    },
+
+    increment(id, field, amount) {
+      updateDoc(doc(db, "users", id), {
         [field]: increment(amount),
       });
     },
@@ -40,22 +46,16 @@ export const useUsersStore = defineStore("users", {
       const user = await this.getUser(id);
       if (!user[field])
         throw new Error(`User ${id}: '${field}' does not exist.`);
-      await updateDoc(doc(db, "users", id), {
+      updateDoc(doc(db, "users", id), {
         [field]: arrayUnion(element),
       });
     },
 
     async removeFromFieldArray(id, field, element) {
       // WARNING: SIMPLE ARRAYS ONLY
-      await updateDoc(doc(db, "users", id), {
+      return updateDoc(doc(db, "users", id), {
         [field]: arrayRemove(element),
       });
-    },
-
-    async getUser(id) {
-      const docRef = await getDoc(doc(db, "users", id));
-      if (docRef.exists()) return docRef.data();
-      return null;
     },
 
     setCurrentUser(user, id) {
@@ -111,7 +111,7 @@ export const useUsersStore = defineStore("users", {
         id = doc.id;
       });
       if (!id) return null;
-      return await this.getUser(id);
+      return this.getUser(id);
     },
 
     async isUsernameTaken(username) {
@@ -132,7 +132,7 @@ export const useUsersStore = defineStore("users", {
       if (!file) return "";
       const imgRef = ref(storage, `${type}/${id}`);
       await uploadBytes(imgRef, file);
-      return await getDownloadURL(imgRef);
+      return getDownloadURL(imgRef);
     },
 
     async updateProfile(
@@ -162,17 +162,17 @@ export const useUsersStore = defineStore("users", {
         avatarUrl,
         headerUrl,
       };
-      await this.updateUser(id, newInfo);
+      this.updateUser(id, newInfo);
     },
 
-    async addTweet(
+    addTweet(
       userId,
       tweetId,
       type = "status",
       containsMedia = false,
       timestamp
     ) {
-      await this.addToFieldArray(userId, "tweets", {
+      this.addToFieldArray(userId, "tweets", {
         id: tweetId,
         type,
         containsMedia,
@@ -183,17 +183,11 @@ export const useUsersStore = defineStore("users", {
     async removeTweet(userId, tweetId) {
       const user = await this.getUser(userId);
       const newTweets = user.tweets.filter((t) => t.id !== tweetId);
-      await this.updateUser(userId, newTweets);
+      this.updateUser(userId, newTweets);
     },
 
-    async addRetweet(userId, tweetId) {
-      await this.addTweet(
-        userId,
-        tweetId,
-        "retweet",
-        null,
-        new Date().toISOString()
-      );
+    addRetweet(userId, tweetId) {
+      this.addTweet(userId, tweetId, "retweet", null, new Date().toISOString());
     },
 
     async removeRetweet(userId, tweetId) {
@@ -201,15 +195,15 @@ export const useUsersStore = defineStore("users", {
       const newTweets = user.tweets.filter(
         (t) => t.id !== tweetId || t.type !== "retweet"
       );
-      await this.updateUser(userId, newTweets);
+      this.updateUser(userId, newTweets);
     },
 
-    async addLike(userId, tweetId) {
-      await this.addToFieldArray(userId, "likes", tweetId);
+    addLike(userId, tweetId) {
+      this.addToFieldArray(userId, "likes", tweetId);
     },
 
-    async removeLike(userId, tweetId) {
-      await this.removeFromFieldArray(userId, "likes", tweetId);
+    removeLike(userId, tweetId) {
+      this.removeFromFieldArray(userId, "likes", tweetId);
     },
 
     async addToLocalTimeline(userId, tweetId, type, timestamp, retweetedBy) {
@@ -220,7 +214,7 @@ export const useUsersStore = defineStore("users", {
       )
         return; // no repeats
       const store = useTweetStore();
-      await store.addToTimeline(userId, "localTimeline", {
+      store.addToTimeline(userId, "localTimeline", {
         id: tweetId,
         type,
         timestamp,
@@ -266,10 +260,10 @@ export const useUsersStore = defineStore("users", {
       );
     },
 
-    async followUser(targetId) {
+    followUser(targetId) {
       this.increment(this.currentId, "followingCount", 1);
       this.increment(targetId, "followerCount", 1);
-      await this.addToFieldArray(this.currentId, "following", targetId);
+      this.addToFieldArray(this.currentId, "following", targetId);
       this.addToFieldArray(targetId, "followers", this.currentId);
       this.notify(targetId, this.currentId, "follow");
     },
@@ -277,7 +271,7 @@ export const useUsersStore = defineStore("users", {
     async unfollowUser(targetId) {
       this.increment(this.currentId, "followingCount", -1);
       this.increment(targetId, "followerCount", -1);
-      await this.removeFromFieldArray(this.currentId, "following", targetId);
+      this.removeFromFieldArray(this.currentId, "following", targetId);
       this.removeFromFieldArray(targetId, "followers", this.currentId);
       this.notify(targetId, this.currentId, "follow");
       // remove unfollowed user from your local timeline
@@ -305,25 +299,24 @@ export const useUsersStore = defineStore("users", {
       const docRef = await getDoc(doc(db, "notifications", id));
       if (docRef.exists()) return docRef.data();
       return null;
-      //TO-DO: use query instead
     },
 
     async syncNotifications(id) {
       this.notifications = await this.getNotificationsDoc(id);
     },
 
-    async updateNotifications(id, obj) {
-      await updateDoc(doc(db, "notifications", id), obj);
+    updateNotifications(id, obj) {
+      updateDoc(doc(db, "notifications", id), obj);
     },
 
-    async addToNotifications(id, field, element) {
-      await updateDoc(doc(db, "notifications", id), {
+    addToNotifications(id, field, element) {
+      updateDoc(doc(db, "notifications", id), {
         [field]: arrayUnion(element),
       });
     },
 
-    async removeFromNotifications(id, field, element) {
-      await updateDoc(doc(db, "notifications", id), {
+    removeFromNotifications(id, field, element) {
+      updateDoc(doc(db, "notifications", id), {
         [field]: arrayRemove(element),
       });
     },
@@ -359,7 +352,7 @@ export const useUsersStore = defineStore("users", {
         ],
         new: [],
       };
-      await this.updateNotifications(this.currentId, notifs);
+      this.updateNotifications(this.currentId, notifs);
     },
 
     async deleteReplyNotification(userId, tweetId) {

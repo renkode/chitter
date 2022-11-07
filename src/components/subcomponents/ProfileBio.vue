@@ -10,6 +10,7 @@ import { useUsersStore } from "@/stores/users.js";
 const app = useAppStore();
 const users = useUsersStore();
 const props = defineProps({ user: Object, tab: String, setTab: Function });
+const followerCount = ref(props.user.followerCount);
 const shortURL = computed(() =>
   props.user.website.replace(/https?:\/\/(www\.)?/gi, "").replace(/\/+$/, "")
 );
@@ -35,7 +36,11 @@ const isFollowing = ref(
         >
           Edit Profile
         </button>
-        <FollowButton v-else-if="users.currentUser" :userId="props.user.id" />
+        <FollowButton
+          v-else-if="users.currentUser"
+          :userId="props.user.id"
+          @increment="(n) => (followerCount += n)"
+        />
       </div>
       <div class="user-info-wrapper">
         <span class="display-name">{{ props.user.name }}</span>
@@ -93,7 +98,7 @@ const isFollowing = ref(
         <router-link
           class="follow-metric"
           :to="{ name: 'Followers', params: { username: props.user.username } }"
-          ><strong>{{ props.user.followerCount }}</strong
+          ><strong>{{ followerCount }}</strong
           ><span class="follow gray-text"> Followers</span></router-link
         >
       </span>

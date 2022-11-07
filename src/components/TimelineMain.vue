@@ -11,24 +11,6 @@ const store = useTweetStore();
 const tweets = computed(() =>
   store.tweets.map((tweet) => ({ data: tweet, type: tweet.type }))
 );
-
-//const querySnapshot = await getDocs(collection(db, "tweets"));
-// querySnapshot.forEach((doc) => {
-//   // doc.data() is never undefined for query doc snapshots
-//   console.log(doc.id, " => ", doc.data());
-// });
-
-async function delay(time) {
-  await new Promise((res) => {
-    setTimeout(() => {
-      //console.log(res);
-    }, time);
-  });
-}
-
-onMounted(() => {
-  delay(0);
-});
 </script>
 
 <template>

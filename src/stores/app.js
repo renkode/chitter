@@ -33,7 +33,7 @@ export const useAppStore = defineStore("app", {
   },
   actions: {
     async goTo(route) {
-      await router.push(route);
+      return router.push(route);
     },
 
     setCurrentUser(user) {
@@ -44,7 +44,7 @@ export const useAppStore = defineStore("app", {
     async logIn(email, password) {
       const users = useUsersStore();
       return signInWithEmailAndPassword(auth, email, password)
-        .then(async (userCredential) => {
+        .then((userCredential) => {
           // Signed in
           const user = userCredential.user;
           users.syncCurrentUserToAuth(user.uid);
