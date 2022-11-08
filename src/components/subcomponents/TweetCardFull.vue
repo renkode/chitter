@@ -1,5 +1,5 @@
 <script setup>
-import { ref, defineProps, computed } from "vue";
+import { ref, defineProps } from "vue";
 import ProfilePicture from "./ProfilePicture.vue";
 import EmbeddedText from "./EmbeddedText.vue";
 import formatDateMixin from "@/mixins/formatDateMixin.js";
@@ -25,12 +25,9 @@ const retweetedBy = ref(await props.retweetedBy);
 const isTweetMenuOpen = ref(false);
 const tweetContainer = ref(null);
 
-const isLiked = computed(() =>
-  tweets.hasLiked(props.tweet.id, users.currentId)
-);
-const isRetweeted = computed(() =>
-  tweets.hasRetweeted(props.tweet.id, users.currentId)
-);
+const isLiked = ref(await tweets.hasLiked(props.id, users.currentId));
+const isRetweeted = ref(await tweets.hasRetweeted(props.id, users.currentId));
+const canFollow = ref(users.canFollow(user.value.id));
 
 const toggleTweetMenu = () => {
   if (!users.currentUser) return;
@@ -125,7 +122,7 @@ const shareTweet = () => {
                   </li>
                   <li
                     class="tweet-menu-item"
-                    v-if="users.canFollow(users.currentUser, user.id)"
+                    v-if="users.currentId !== user.id && canFollow"
                     @click="users.followUser(users.currentId, user.id)"
                   >
                     <span class="tweet-menu-icon"
@@ -137,7 +134,7 @@ const shareTweet = () => {
                   </li>
                   <li
                     class="tweet-menu-item"
-                    v-if="!users.canFollow(users.currentUser, user.id)"
+                    v-if="users.currentId !== user.id && !canFollow"
                     @click="users.unfollowUser(users.currentId, user.id)"
                   >
                     <span class="tweet-menu-icon"

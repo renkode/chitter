@@ -177,9 +177,9 @@ export const useTweetStore = defineStore("tweets", {
     },
 
     async hasLiked(id, userId) {
-      const tweet = await this.getTweet(id);
-      if (!tweet) return false;
-      return tweet.likesFrom.includes(userId);
+      return this.getTweet(id)
+        .then((t) => t.likesFrom.includes(userId))
+        .catch(() => false);
     },
 
     async addRetweet(id, userId, isRetweetofRetweet) {
@@ -227,9 +227,9 @@ export const useTweetStore = defineStore("tweets", {
     },
 
     async hasRetweeted(id, userId) {
-      const tweet = await this.getTweet(id);
-      if (!tweet) return false;
-      return tweet.retweetsFrom.includes(userId);
+      return this.getTweet(id)
+        .then((t) => t.retweetsFrom.includes(userId))
+        .catch(() => false);
     },
 
     async uploadImage(id, file, index = null) {

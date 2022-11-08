@@ -1,5 +1,5 @@
 <script setup>
-import { ref, defineProps, computed, onMounted, onBeforeUnmount } from "vue";
+import { ref, defineProps, onMounted, onBeforeUnmount } from "vue";
 import dayjs from "dayjs";
 import ProfilePicture from "./ProfilePicture.vue";
 import EmbeddedText from "./EmbeddedText.vue";
@@ -20,7 +20,7 @@ const props = defineProps({
   retweetedBy: Promise,
   replyingTo: String,
   isPreviousReply: Boolean, // render gray line for tweet thread
-  isNotification: Boolean, // highlight if new notification
+  isNewNotification: Boolean, // highlight if new notification
 });
 
 const user = ref(await props.user);
@@ -35,12 +35,9 @@ const currentTime = ref(dayjs().toISOString());
 const getTimeSinceCreation = ref(
   formatDateMixin.formatTweetDate(props.tweet.timestamp, currentTime.value)
 );
-const isLiked = computed(() =>
-  tweets.hasLiked(props.tweet.id, users.currentId)
-);
-const isRetweeted = computed(() =>
-  tweets.hasRetweeted(props.tweet.id, users.currentId)
-);
+const isLiked = ref(await tweets.hasLiked(props.id, users.currentId));
+const isRetweeted = ref(await tweets.hasRetweeted(props.id, users.currentId));
+const canFollow = ref(users.canFollow(user.value.id));
 
 const toggleTweetMenu = () => {
   if (!users.currentUser) return;
@@ -100,7 +97,7 @@ onBeforeUnmount(() => {
 <template>
   <div
     class="tweet-container"
-    :class="{ border: !isPreviousReply, new: isNotification }"
+    :class="{ border: !isPreviousReply, new: isNewNotification }"
     @click="app.setTweetContext(props.id)"
   >
     <div
@@ -154,7 +151,7 @@ onBeforeUnmount(() => {
                 </li>
                 <li
                   class="tweet-menu-item"
-                  v-if="users.canFollow(users.currentUser, user.id)"
+                  v-if="users.currentId !== user.id && canFollow"
                   @click="users.followUser(users.currentId, user.id)"
                 >
                   <span class="tweet-menu-icon"
@@ -166,7 +163,7 @@ onBeforeUnmount(() => {
                 </li>
                 <li
                   class="tweet-menu-item"
-                  v-if="!users.canFollow(users.currentUser, user.id)"
+                  v-if="users.currentId !== user.id && !canFollow"
                   @click="users.unfollowUser(users.currentId, user.id)"
                 >
                   <span class="tweet-menu-icon"

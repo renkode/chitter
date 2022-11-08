@@ -249,7 +249,7 @@ export const useUsersStore = defineStore("users", {
     },
 
     canFollow(targetId) {
-      if (this.currentUser.id === targetId) return false;
+      if (this.currentId === targetId) return false;
       return !this.currentUser.following.includes(targetId);
     },
 

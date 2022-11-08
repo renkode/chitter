@@ -22,28 +22,23 @@ const getUserProps = async (userId) => {
 
 <template>
   <div class="tweet-list">
-    <Suspense v-if="props.tweets && props.tweets.length > 0" timeout="0">
-      <template #default>
-        <TransitionGroup name="fade-down">
-          <template v-for="tweet in props.tweets">
-            <TweetCard
-              v-if="tweet"
-              :key="tweet.id"
-              :id="tweet.id"
-              :user="getUserProps(tweet.authorId)"
-              :tweet="tweet"
-              :type="tweet.type"
-              :retweetedBy="tweet.retweetedBy"
-              :replyingTo="
-                tweet.replyingToUser
-                  ? users.getUsername(tweet.replyingToUser)
-                  : null
-              "
-            />
-          </template> </TransitionGroup
-      ></template>
-      <template #fallback> <LoadSpinner /></template>
-    </Suspense>
+    <TransitionGroup
+      name="fade-down"
+      v-if="props.tweets && props.tweets.length > 0"
+    >
+      <TweetCard
+        v-for="(tweet, index) in props.tweets"
+        :key="tweet.id + index"
+        :id="tweet.id"
+        :user="getUserProps(tweet.authorId)"
+        :tweet="tweet"
+        :type="tweet.type"
+        :retweetedBy="tweet.retweetedBy"
+        :replyingTo="
+          tweet.replyingToUser ? users.getUsername(tweet.replyingToUser) : null
+        "
+    /></TransitionGroup>
+
     <div class="error gray-text" v-else>No tweets to display</div>
   </div>
 </template>

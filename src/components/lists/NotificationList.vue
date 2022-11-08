@@ -23,7 +23,7 @@ const notifs = ref(
             avatarUrl: user.avatarUrl,
           },
           tweet,
-          isNotification: users.tweetIsNewNotification(notif.tweetId),
+          isNewNotification: users.tweetIsNewNotification(notif.tweetId),
         };
       } // map to NotificationCard
       else {
@@ -55,7 +55,7 @@ const notifs = ref(
             :tweet="notif.tweet"
             :type="'reply'"
             :replyingTo="users.currentUser.username"
-            :isNotification="notif.isNotification"
+            :isNewNotification="notif.isNewNotification"
           />
         </template>
 
@@ -66,7 +66,7 @@ const notifs = ref(
             :user="notif.user"
             :tweet="notif.tweet"
             :type="'status'"
-            :isNotification="notif.isNotification"
+            :isNewNotification="notif.isNewNotification"
           />
         </template>
 
