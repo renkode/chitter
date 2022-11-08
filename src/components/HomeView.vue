@@ -1,5 +1,5 @@
 <script setup>
-import { computed } from "vue";
+import { ref } from "vue";
 import { useAppStore } from "@/stores/app.js";
 import { useTweetStore } from "@/stores/tweets.js";
 import { useUsersStore } from "@/stores/users.js";
@@ -9,18 +9,17 @@ import ComposeTweet from "./subcomponents/ComposeTweet.vue";
 //import { collection, getDocs } from "firebase/firestore";
 
 const app = useAppStore();
-const tweets = useTweetStore();
+const store = useTweetStore();
 const users = useUsersStore();
-const localTweets = computed(() =>
-  tweets.tweets.map((localTweet) => {
-    if (tweets.getTweet(localTweet.id)) {
-      const tweet = tweets.getTweet(localTweet.id);
+const tweets = ref(
+  store.tweets.map(async (tweet) => {
+    if (await store.getTweet(tweet.id)) {
+      const tweet = store.getTweet(tweet.id);
       return {
         data: tweet,
-        type: localTweet.type,
         retweetedBy:
-          localTweet.type === "retweet"
-            ? users.getUser(localTweet.retweetedBy).name
+          tweet.type === "retweet"
+            ? await users.getUsername(tweet.retweetedBy) // getusername
             : null,
       };
     }
@@ -32,7 +31,7 @@ const localTweets = computed(() =>
   <div>
     <ComposeTweet />
     <div class="tweet-list-container">
-      <TweetList v-if="users.currentUser" :tweets="localTweets" />
+      <TweetList v-if="users.currentUser" :tweets="tweets" />
     </div>
   </div>
 </template>

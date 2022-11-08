@@ -14,8 +14,6 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  position: absolute;
-  top: 35%;
 }
 
 .loader,

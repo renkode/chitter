@@ -13,13 +13,15 @@ const app = useAppStore();
 const users = useUsersStore();
 const props = defineProps({
   id: String,
-  user: Object,
+  user: Promise,
   tweet: Object,
   type: String, // status, retweet, reply
-  replyingTo: String,
+  replyingTo: Promise,
   isRetweetedBy: String,
 });
 
+const user = ref(await props.user);
+const retweetedBy = ref(await props.retweetedBy);
 const isTweetMenuOpen = ref(false);
 const tweetContainer = ref(null);
 
@@ -42,26 +44,26 @@ const deleteTweet = () => {
   } else {
     app.setTweetContext(null);
   }
-  tweets.removeTweet(props.id, props.user.id);
+  tweets.removeTweet(props.id, user.value.id);
 };
 
 const toggleLike = () => {
   if (!isLiked.value) {
-    tweets.addLike(props.id, users.currentId, props.retweetedBy);
+    tweets.addLike(props.id, users.currentId, retweetedBy.value);
   } else {
     tweets.removeLike(props.id, users.currentId);
   }
 };
 const toggleRetweet = () => {
   if (!isRetweeted.value) {
-    tweets.addRetweet(props.id, users.currentId, props.retweetedBy);
+    tweets.addRetweet(props.id, users.currentId, retweetedBy.value);
   } else {
     tweets.removeRetweet(props.id, users.currentId);
   }
 };
 const setReply = () => {
   app.setModalType("reply");
-  app.setModalReply(props.user.id, props.id);
+  app.setModalReply(user.value.id, props.id);
   app.toggleModal();
 };
 const shareTweet = () => {
@@ -84,9 +86,9 @@ const shareTweet = () => {
       <div class="profile-pic-and-user">
         <div class="profile-pic-container">
           <ProfilePicture
-            :url="props.user.avatarUrl"
+            :url="user.avatarUrl"
             :size="48"
-            @click.stop="app.viewUserProfile(props.user.username)"
+            @click.stop="app.viewUserProfile(user.username)"
           />
         </div>
         <div class="tweet-data">
@@ -94,13 +96,13 @@ const shareTweet = () => {
             <div class="user-info-wrapper">
               <span
                 class="display-name"
-                @click.stop="app.viewUserProfile(props.user.username)"
-                ><a>{{ props.user.name }}</a></span
+                @click.stop="app.viewUserProfile(user.username)"
+                ><a>{{ user.name }}</a></span
               >
               <span
                 class="username gray-text"
-                @click.stop="app.viewUserProfile(props.user.username)"
-                ><a>@{{ props.user.username }}</a></span
+                @click.stop="app.viewUserProfile(user.username)"
+                ><a>@{{ user.username }}</a></span
               >
             </div>
             <span
@@ -113,8 +115,7 @@ const shareTweet = () => {
                   <li
                     class="tweet-menu-item delete-tweet"
                     v-if="
-                      users.currentId == props.user.id ||
-                      users.currentUser.isAdmin
+                      users.currentId == user.id || users.currentUser.isAdmin
                     "
                     @click="deleteTweet"
                   >
@@ -124,27 +125,27 @@ const shareTweet = () => {
                   </li>
                   <li
                     class="tweet-menu-item"
-                    v-if="users.canFollow(users.currentUser, props.user.id)"
-                    @click="users.followUser(users.currentId, props.user.id)"
+                    v-if="users.canFollow(users.currentUser, user.id)"
+                    @click="users.followUser(users.currentId, user.id)"
                   >
                     <span class="tweet-menu-icon"
                       ><v-icon
                         name="co-user-follow"
                         scale="1.1"
                         fill="#ffffff80" /></span
-                    >Follow @{{ props.user.username }}
+                    >Follow @{{ user.username }}
                   </li>
                   <li
                     class="tweet-menu-item"
-                    v-if="users.canUnfollow(users.currentUser, props.user.id)"
-                    @click="users.unfollowUser(users.currentId, props.user.id)"
+                    v-if="!users.canFollow(users.currentUser, user.id)"
+                    @click="users.unfollowUser(users.currentId, user.id)"
                   >
                     <span class="tweet-menu-icon"
                       ><v-icon
                         name="co-user-unfollow"
                         scale="1.1"
                         fill="#ffffff80" /></span
-                    >Unfollow @{{ props.user.username }}
+                    >Unfollow @{{ user.username }}
                   </li>
                   <button class="cancel-btn">Cancel</button>
                 </ul>

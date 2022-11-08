@@ -1,14 +1,12 @@
 import { createWebHistory, createRouter } from "vue-router";
 import { useAppStore } from "@/stores/app";
 import { useUsersStore } from "@/stores/users";
-const LocalTimeline = () => import("@/components/LocalTimeline.vue"); // lazy load routes
-const TimelineMain = () => import("@/components/TimelineMain.vue");
-const NotificationMain = () => import("@/components/NotificationMain.vue");
-const ProfileMain = () => import("@/components/ProfileMain.vue");
+const HomeView = () => import("@/components/HomeView.vue"); // lazy load routes
+const ExploreView = () => import("@/components/ExploreView.vue");
+const NotificationView = () => import("@/components/NotificationView.vue");
+const ProfileView = () => import("@/components/ProfileView.vue");
 const FollowLists = () => import("@/components/lists/FollowLists.vue");
-const TweetContext = () => import("@/components/TweetContext.vue");
-// const SignUp = () => import("@/components/SignUp.vue");
-// const LogIn = () => import("@/components/LogIn.vue");
+const TweetView = () => import("@/components/TweetView.vue");
 
 const Error = {
   template: '<div class="error gray-text" v-else>Tweet does not exist.</div>',
@@ -30,24 +28,24 @@ const routes = [
   {
     path: "/home",
     name: "Home",
-    component: LocalTimeline,
+    component: HomeView,
     meta: { requiresAuth: true },
   },
   {
     path: "/explore",
     name: "Explore",
-    component: TimelineMain,
+    component: ExploreView,
   },
   {
     path: "/notifications",
     name: "Notifications",
-    component: NotificationMain,
+    component: NotificationView,
     meta: { requiresAuth: true },
   },
   {
     path: "/:username",
     name: "Profile",
-    component: ProfileMain,
+    component: ProfileView,
     props: true,
   },
   {
@@ -65,19 +63,10 @@ const routes = [
   {
     path: "/status/:id",
     name: "Tweet",
-    component: TweetContext,
+    component: TweetView,
     props: true,
   },
-  // {
-  //   path: "/signup",
-  //   name: "Signup",
-  //   component: SignUp,
-  // },
-  // {
-  //   path: "/login",
-  //   name: "Login",
-  //   component: LogIn,
-  // },
+
   {
     path: "/:catchAll(.*)",
     component: Error,

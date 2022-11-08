@@ -46,7 +46,6 @@ const handleInput = () => {
 const getInitialReplyUser = (str) => {
   // e.g. "@username hello world" is a reply
   const firstWord = str.replace(/\r?\n/, " ").split(" ")[0];
-  console.log(firstWord);
   if (
     atRegex.test(firstWord) &&
     users.getUserByUsername(firstWord.replace("@", ""))

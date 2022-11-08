@@ -27,7 +27,7 @@ var uid = new ShortUniqueId();
 export const useTweetStore = defineStore("tweets", {
   state: () => ({
     tweets: [],
-    lastDocTimestamp: null,
+    docPointer: null,
     fetchLimit: 4,
     isUploading: false,
   }),
@@ -38,6 +38,12 @@ export const useTweetStore = defineStore("tweets", {
       if (docRef.exists()) return docRef.data();
       console.log(`Tweet ${id} does not exist.`);
       return null;
+    },
+
+    sortByTimestamp(arr) {
+      return arr.sort((a, b) =>
+        a.timestamp > b.timestamp ? -1 : a.timestamp < b.timestamp ? 1 : 0
+      );
     },
 
     setTweets(arr) {
@@ -84,10 +90,63 @@ export const useTweetStore = defineStore("tweets", {
       updateDoc(doc(db, "timelines", id), { tweets: arr });
     },
 
-    addToTimeline(id, element) {
+    addTweetToTimeline(id, element) {
       updateDoc(doc(db, "timelines", id), {
         tweets: arrayUnion(element),
       });
+    },
+
+    async createTimelineTweet(userId, tweetId, type, timestamp, retweetedBy) {
+      const timeline = await this.getTimeline(userId);
+      if (
+        timeline.filter((t) => t.id === tweetId && t.type === type).length > 0
+      )
+        return; // no repeats
+      this.addTweetToTimeline(userId, {
+        id: tweetId,
+        type,
+        timestamp,
+        retweetedBy,
+      });
+    },
+
+    async addToAllFollowerTimelines(
+      targetUserId,
+      tweetId,
+      type,
+      timestamp,
+      retweetedBy
+    ) {
+      const store = useUsersStore();
+      const user = await store.getUser(targetUserId);
+      return Promise.all(
+        user.followers.map((follower) =>
+          this.createTimelineTweet(
+            follower,
+            tweetId,
+            type,
+            timestamp,
+            retweetedBy
+          )
+        )
+      );
+    },
+
+    async removeFromTimeline(userId, tweetId) {
+      const tweets = await this.getTimeline(userId);
+      if (!tweets) return;
+      const newTimeline = tweets.filter((tweet) => tweet.id !== tweetId);
+      this.updateTimeline(userId, newTimeline);
+    },
+
+    async removeFromAllFollowerTimelines(targetUserId, tweetId) {
+      const store = useUsersStore();
+      const user = await store.getUser(targetUserId);
+      return Promise.all(
+        user.followers.map((follower) =>
+          this.removeFromTimeline(follower, tweetId)
+        )
+      );
     },
 
     async addLike(id, userId, isRetweet) {
@@ -112,9 +171,9 @@ export const useTweetStore = defineStore("tweets", {
       users.removeLike(userId, id);
     },
 
-    removeAllLikes(arr) {
+    removeAllLikes(arr, tweetId) {
       const users = useUsersStore();
-      Promise.all(arr.map((user) => users.removeLike(user, id)));
+      Promise.all(arr.map((user) => users.removeLike(user, tweetId)));
     },
 
     async hasLiked(id, userId) {
@@ -128,22 +187,23 @@ export const useTweetStore = defineStore("tweets", {
       this.addToFieldArray(id, "retweetsFrom", userId);
 
       const users = useUsersStore();
-      users.addRetweet(userId, id);
-      users.addToLocalTimeline(
-        userId,
-        id,
-        "retweet",
-        new Date().toISOString(),
-        userId
-      );
-      users.addToAllFollowerTimelines(
-        userId,
-        id,
-        "retweet",
-        new Date().toISOString(),
-        userId
-      );
       const tweet = await this.getTweet(id);
+      users.addRetweet(userId, id, tweet.authorId);
+      this.createTimelineTweet(
+        userId,
+        id,
+        "retweet",
+        new Date().toISOString(),
+        userId
+      );
+      this.addToAllFollowerTimelines(
+        userId,
+        id,
+        "retweet",
+        new Date().toISOString(),
+        userId
+      );
+
       if (tweet.authorId !== userId) {
         isRetweetofRetweet
           ? users.notify(tweet.authorId, userId, "retweet-retweet", id)
@@ -157,13 +217,13 @@ export const useTweetStore = defineStore("tweets", {
 
       const users = useUsersStore();
       users.removeRetweet(userId, id);
-      users.removeFromLocalTimeline(userId, id); // self
-      users.removeFromAllFollowerTimelines(userId, id); // followers
+      this.removeFromTimeline(userId, id); // self
+      this.removeFromAllFollowerTimelines(userId, id); // followers
     },
 
-    removeAllRetweets(arr) {
+    removeAllRetweets(arr, tweetId) {
       const users = useUsersStore();
-      Promise.all(arr.map((user) => users.removeRetweet(user, id)));
+      Promise.all(arr.map((user) => users.removeRetweet(user, tweetId)));
     },
 
     async hasRetweeted(id, userId) {
@@ -205,7 +265,7 @@ export const useTweetStore = defineStore("tweets", {
         type,
         text,
         media,
-        authorId: authorId,
+        authorId,
         replyCount: 0,
         retweetCount: 0,
         likeCount: 0,
@@ -221,16 +281,24 @@ export const useTweetStore = defineStore("tweets", {
         likesFrom: [],
       };
       this.tweets.unshift(newTweet);
-      await setDoc(doc(db, "tweets", id), newTweet);
+      await setDoc(doc(db, "tweets", tweetId), newTweet);
       if (type === "reply" && replyingToTweet) {
-        replyOrigin.addToFieldArray(replyingToTweet, "repliesFrom", tweetId);
+        this.addToFieldArray(replyingToTweet, "repliesFrom", tweetId);
       }
       // update timelines and notify if tweet is a reply/mentions other users
       const users = useUsersStore();
       const containsMedia = media.length > 0 ? true : false;
-      users.addTweet(authorId, tweetId, type, containsMedia, timestamp);
-      users.addToLocalTimeline(authorId, tweetId, type, timestamp); // self
-      users.addToAllFollowerTimelines(authorId, tweetId, type, timestamp); // followers
+      users.addTweet(
+        authorId,
+        tweetId,
+        authorId,
+        type,
+        containsMedia,
+        replyingToUser,
+        timestamp
+      );
+      this.addTweetToTimeline(authorId, tweetId, type, timestamp); // self
+      this.addToAllFollowerTimelines(authorId, tweetId, type, timestamp); // followers
       if (type === "reply" && replyingToUser !== authorId) {
         users.notify(replyingToUser, authorId, type, tweetId);
       }
@@ -261,14 +329,14 @@ export const useTweetStore = defineStore("tweets", {
 
       const users = useUsersStore();
       users.removeTweet(userId, id);
-      users.removeFromLocalTimeline(userId, id); // self
-      users.removeFromAllFollowerTimelines(userId, id); // followers
-      this.removeAllLikesFromTweet([...tweet.likesFrom]);
-      this.removeAllRetweetsFromTweet([...tweet.retweetsFrom]);
+      this.removeFromTimeline(userId, id); // self
+      this.removeFromAllFollowerTimelines(userId, id); // followers
+      this.removeAllLikesFromTweet([...tweet.likesFrom], id);
+      this.removeAllRetweetsFromTweet([...tweet.retweetsFrom], id);
       if (tweet.media.length > 0) this.deleteMedia(id, tweet.media.length);
       if (tweet.replyingToUser)
         users.deleteReplyNotification(tweet.replyingToUser, id);
-      return tweet.deleteDoc(doc(db, "tweets", id));
+      return deleteDoc(doc(db, "tweets", id));
     },
   },
 });
