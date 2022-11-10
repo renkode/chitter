@@ -26,6 +26,13 @@ const maxedImages = computed(() => images.value.length === 4);
 const charactersLeft = computed(() => 280 - str.value.length);
 const isYellowRange = computed(() => charactersLeft.value <= 20);
 const isRedRange = computed(() => charactersLeft.value <= 0);
+const canTweet = computed(
+  () =>
+    !user.value ||
+    isRedRange.value ||
+    noContent.value ||
+    tweetStore.uploadProgress
+);
 
 const onFileChange = (e) => {
   images.value.push(e.currentTarget.files[0]);
@@ -100,6 +107,7 @@ const postTweet = () => {
   );
   str.value = "";
   images.value = [];
+  imagePreviews.value = [];
   if (app.showModal) app.toggleModal();
 };
 
@@ -125,6 +133,12 @@ onMounted(() => {
 
 <template>
   <div class="compose-tweet-container">
+    <div class="progress-bar" v-show="tweetStore.uploadProgress">
+      <div
+        class="progress-bar-blue"
+        :style="`--percent: ${tweetStore.uploadProgress}%`"
+      ></div>
+    </div>
     <div class="profile-pic-container">
       <ProfilePicture :url="user ? user.avatarUrl : ''" :size="48" />
     </div>
@@ -136,6 +150,7 @@ onMounted(() => {
           @input="handleInput"
           v-model="str"
           maxlength="280"
+          :disabled="tweetStore.uploadProgress"
         ></textarea>
         <div
           class="tweet-media"
@@ -184,7 +199,7 @@ onMounted(() => {
           >
           <button
             class="new-tweet-btn"
-            :disabled="!user || isRedRange || noContent"
+            :disabled="canTweet"
             @click="postTweet(null)"
           >
             Tweet
@@ -197,10 +212,26 @@ onMounted(() => {
 
 <style scoped>
 .compose-tweet-container {
+  position: relative;
   max-width: 600px;
   width: 100%;
   padding: 1rem;
   display: flex;
+}
+
+.progress-bar {
+  width: 100%;
+  height: 3px;
+  background-color: #1687d369;
+  position: absolute;
+  top: 0;
+}
+
+.progress-bar-blue {
+  --percent: 0%;
+  width: var(--percent);
+  height: 3px;
+  background-color: #1687d3;
 }
 
 .compose-tweet-body {

@@ -19,6 +19,7 @@ import {
   uploadBytes,
   getDownloadURL,
   deleteObject,
+  uploadBytesResumable,
 } from "firebase/storage";
 import ShortUniqueId from "short-unique-id";
 
@@ -29,7 +30,7 @@ export const useTweetStore = defineStore("tweets", {
     tweets: [],
     docPointer: null,
     fetchLimit: 4,
-    isUploading: false,
+    uploadProgress: null,
   }),
   getters: {},
   actions: {
@@ -240,11 +241,31 @@ export const useTweetStore = defineStore("tweets", {
         .catch(() => false);
     },
 
-    async uploadImage(id, file, index = null) {
+    uploadImage(id, file, index = null) {
       if (!file) return "";
-      const imgRef = ref(storage, `tweet/${id}${index ? `-${index}` : ""}`);
-      await uploadBytes(imgRef, file);
-      return getDownloadURL(imgRef);
+      return new Promise((resolve, reject) => {
+        const imgRef = ref(storage, `tweet/${id}-${index}`);
+        const uploadTask = uploadBytesResumable(imgRef, file);
+
+        uploadTask.on(
+          "state_changed",
+          (snapshot) => {
+            this.uploadProgress = Math.trunc(
+              (snapshot.bytesTransferred / snapshot.totalBytes) * 100
+            );
+          },
+          (error) => {
+            console.log(error);
+            reject(error);
+          },
+          () => {
+            getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
+              this.uploadProgress = null;
+              resolve(downloadURL);
+            });
+          }
+        );
+      });
     },
 
     async addTweet(
@@ -320,18 +341,11 @@ export const useTweetStore = defineStore("tweets", {
     },
 
     async deleteMedia(id, length) {
-      if (length === 1) {
-        const imgRef = ref(storage, `tweet/${id}`);
+      for (let i = 0; i < length; i++) {
+        const imgRef = ref(storage, `tweet/${id}-${i}`);
         deleteObject(imgRef).catch((e) => {
           console.log(e);
         });
-      } else {
-        for (const index of Array.from(length)) {
-          const imgRef = ref(storage, `tweet/${id}-${index}`);
-          deleteObject(imgRef).catch((e) => {
-            console.log(e);
-          });
-        }
       }
     },
 
