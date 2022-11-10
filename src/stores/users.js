@@ -32,30 +32,33 @@ export const useUsersStore = defineStore("users", {
       return null;
     },
 
-    updateUser(id, obj) {
-      updateDoc(doc(db, "users", id), obj);
+    async getUserTweets(id) {
+      const docRef = await getDoc(doc(db, "user-tweets", id));
+      if (docRef.exists()) return docRef.data().tweets;
+      return null;
+    },
+
+    updateDocInCollection(collection, id, obj) {
+      updateDoc(doc(db, collection, id), obj).catch((e) => console.log(e));
     },
 
     increment(id, field, amount) {
       updateDoc(doc(db, "users", id), {
         [field]: increment(amount),
-      });
+      }).catch((e) => console.log(e));
     },
 
-    async addToFieldArray(id, field, element) {
-      const user = await this.getUser(id);
-      if (!user[field])
-        throw new Error(`User ${id}: '${field}' does not exist.`);
-      updateDoc(doc(db, "users", id), {
+    async addToFieldArray(collection, id, field, element) {
+      updateDoc(doc(db, collection, id), {
         [field]: arrayUnion(element),
-      });
+      }).catch((e) => console.log(e));
     },
 
-    async removeFromFieldArray(id, field, element) {
+    async removeFromFieldArray(collection, id, field, element) {
       // WARNING: SIMPLE ARRAYS ONLY
-      return updateDoc(doc(db, "users", id), {
+      return updateDoc(doc(db, collection, id), {
         [field]: arrayRemove(element),
-      });
+      }).catch((e) => console.log(e));
     },
 
     setCurrentUser(user, id) {
@@ -84,7 +87,6 @@ export const useUsersStore = defineStore("users", {
         followerCount: 0,
         tweetCount: 0,
         timestamp: new Date().toISOString(),
-        tweets: [],
         likes: [],
         following: [],
         followers: [],
@@ -93,6 +95,9 @@ export const useUsersStore = defineStore("users", {
       };
       this.setCurrentUser(newUser, id);
       setDoc(doc(db, "users", id), newUser);
+      setDoc(doc(db, "user-tweets", id), { tweets: [] });
+      setDoc(doc(db, "notifications", id), { old: [], new: [] });
+      setDoc(doc(db, "timelines", id), { tweets: [] });
       return newUser;
     },
 
@@ -104,10 +109,12 @@ export const useUsersStore = defineStore("users", {
     async getUserByUsername(username) {
       if (!username) return;
       let id = null;
-      const users = collection(db, "users");
-      const q = query(users, where("username", "==", username));
+      const q = query(
+        collection(db, "users"),
+        where("username", "==", username)
+      );
       const querySnapshot = await getDocs(q);
-      if (querySnapshot[0]) id = querySnapshot[0].id;
+      querySnapshot.forEach((doc) => (id = doc.id));
       if (!id) return null;
       return this.getUser(id);
     },
@@ -162,7 +169,7 @@ export const useUsersStore = defineStore("users", {
         avatarUrl,
         headerUrl,
       };
-      this.updateUser(id, newInfo);
+      this.updateDocInCollection("users", id, newInfo);
     },
 
     addTweet(
@@ -174,20 +181,22 @@ export const useUsersStore = defineStore("users", {
       replyingToUser = null,
       timestamp
     ) {
-      this.addToFieldArray(userId, "tweets", {
+      const isSelfReply = replyingToUser === authorId ? true : false;
+      this.addToFieldArray("user-tweets", userId, "tweets", {
         authorId,
         id: tweetId,
         type,
         containsMedia,
         replyingToUser,
+        isSelfReply,
         timestamp,
       });
     },
 
     async removeTweet(userId, tweetId) {
-      const user = await this.getUser(userId);
-      const newTweets = user.tweets.filter((t) => t.id !== tweetId);
-      this.updateUser(userId, newTweets);
+      const tweets = await this.getUserTweets(userId);
+      const newTweets = tweets.filter((t) => t.id !== tweetId);
+      this.updateDocInCollection("user-tweets", userId, { tweets: newTweets });
     },
 
     addRetweet(userId, tweetId, authorId) {
@@ -203,34 +212,34 @@ export const useUsersStore = defineStore("users", {
     },
 
     async removeRetweet(userId, tweetId) {
-      const user = await this.getUser(userId);
-      const newTweets = user.tweets.filter(
+      const tweets = await this.getUserTweets(userId);
+      const newTweets = tweets.filter(
         (t) => t.id !== tweetId || t.type !== "retweet"
       );
-      this.updateUser(userId, newTweets);
+      this.updateDocInCollection("user-tweets", userId, { tweets: newTweets });
     },
 
     addLike(userId, tweetId) {
-      this.addToFieldArray(userId, "likes", tweetId);
+      this.addToFieldArray("users", userId, "likes", tweetId);
     },
 
     removeLike(userId, tweetId) {
-      this.removeFromFieldArray(userId, "likes", tweetId);
+      this.removeFromFieldArray("users", userId, "likes", tweetId);
     },
 
     followUser(targetId) {
       this.increment(this.currentId, "followingCount", 1);
       this.increment(targetId, "followerCount", 1);
-      this.addToFieldArray(this.currentId, "following", targetId);
-      this.addToFieldArray(targetId, "followers", this.currentId);
+      this.addToFieldArray("users", this.currentId, "following", targetId);
+      this.addToFieldArray("users", targetId, "followers", this.currentId);
       this.notify(targetId, this.currentId, "follow");
     },
 
     async unfollowUser(targetId) {
       this.increment(this.currentId, "followingCount", -1);
       this.increment(targetId, "followerCount", -1);
-      this.removeFromFieldArray(this.currentId, "following", targetId);
-      this.removeFromFieldArray(targetId, "followers", this.currentId);
+      this.removeFromFieldArray("users", this.currentId, "following", targetId);
+      this.removeFromFieldArray("users", targetId, "followers", this.currentId);
       this.notify(targetId, this.currentId, "follow");
       // remove unfollowed user from your timeline
       const store = useTweetStore();
@@ -263,22 +272,6 @@ export const useUsersStore = defineStore("users", {
       this.notifications = await this.getNotificationsDoc(id);
     },
 
-    updateNotifications(id, obj) {
-      updateDoc(doc(db, "notifications", id), obj);
-    },
-
-    addToNotifications(id, field, element) {
-      updateDoc(doc(db, "notifications", id), {
-        [field]: arrayUnion(element),
-      });
-    },
-
-    removeFromNotifications(id, field, element) {
-      updateDoc(doc(db, "notifications", id), {
-        [field]: arrayRemove(element),
-      });
-    },
-
     async notify(targetId, fromUserId, type, tweetId = null) {
       const targetNotifs = await this.getNotificationsDoc(targetId);
       if (!targetNotifs) return;
@@ -298,7 +291,7 @@ export const useUsersStore = defineStore("users", {
             n.tweetId === newNotif.tweetId
         ).length === 0
       ) {
-        this.addToNotifications(targetId, "new", newNotif);
+        this.addToFieldArray("notifications", targetId, "new", newNotif);
       }
     },
 
@@ -310,7 +303,7 @@ export const useUsersStore = defineStore("users", {
         ],
         new: [],
       };
-      this.updateNotifications(this.currentId, notifs);
+      this.updateDocInCollection("notifications", this.currentId, notifs);
     },
 
     async deleteReplyNotification(userId, tweetId) {
@@ -319,12 +312,16 @@ export const useUsersStore = defineStore("users", {
       // remove reply from new notif array
       if (notifs.filter((n) => n.tweetId === tweetId).length > 0) {
         const newNotifications = notifs.filter((n) => n.tweetId !== tweetId);
-        this.updateNotifications(userId, { new: newNotifications });
+        this.updateDocInCollection("notifications", userId, {
+          new: newNotifications,
+        });
       }
       // remove reply from old notif array
       if (notifs.filter((n) => n.tweetId === tweetId).length > 0) {
         const oldNotifications = notifs.filter((n) => n.tweetId !== tweetId);
-        this.updateNotifications(userId, { old: oldNotifications });
+        this.updateDocInCollection("notifications", userId, {
+          old: oldNotifications,
+        });
       }
     },
 

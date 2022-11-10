@@ -50,10 +50,6 @@ export const useTweetStore = defineStore("tweets", {
       this.tweets = [...arr];
     },
 
-    updateTweet(id, obj) {
-      updateDoc(doc(db, "tweets", id), obj);
-    },
-
     increment(id, field, amount) {
       updateDoc(doc(db, "tweets", id), {
         [field]: increment(amount),
@@ -76,9 +72,9 @@ export const useTweetStore = defineStore("tweets", {
       });
     },
 
-    async getTimeline(id) {
-      const docRef = await getDoc(doc(db, "timeline", id));
-      if (docRef.exists()) return docRef.data();
+    async getTimelineTweets(id) {
+      const docRef = await getDoc(doc(db, "timelines", id));
+      if (docRef.exists()) return docRef.data().tweets;
       return null;
     },
 
@@ -90,19 +86,25 @@ export const useTweetStore = defineStore("tweets", {
       updateDoc(doc(db, "timelines", id), { tweets: arr });
     },
 
-    addTweetToTimeline(id, element) {
+    addToTimeline(id, element) {
       updateDoc(doc(db, "timelines", id), {
         tweets: arrayUnion(element),
       });
     },
 
-    async createTimelineTweet(userId, tweetId, type, timestamp, retweetedBy) {
-      const timeline = await this.getTimeline(userId);
+    async createTimelineTweet(
+      userId,
+      tweetId,
+      type,
+      timestamp,
+      retweetedBy = null
+    ) {
+      const timeline = await this.getTimelineTweets(userId);
       if (
         timeline.filter((t) => t.id === tweetId && t.type === type).length > 0
       )
         return; // no repeats
-      this.addTweetToTimeline(userId, {
+      this.addToTimeline(userId, {
         id: tweetId,
         type,
         timestamp,
@@ -133,9 +135,9 @@ export const useTweetStore = defineStore("tweets", {
     },
 
     async removeFromTimeline(userId, tweetId) {
-      const tweets = await this.getTimeline(userId);
-      if (!tweets) return;
-      const newTimeline = tweets.filter((tweet) => tweet.id !== tweetId);
+      const timeline = await this.getTimelineTweets(userId);
+      if (!timeline) return;
+      const newTimeline = timeline.filter((tweet) => tweet.id !== tweetId);
       this.updateTimeline(userId, newTimeline);
     },
 
@@ -297,7 +299,7 @@ export const useTweetStore = defineStore("tweets", {
         replyingToUser,
         timestamp
       );
-      this.addTweetToTimeline(authorId, tweetId, type, timestamp); // self
+      this.createTimelineTweet(authorId, tweetId, type, timestamp); // self
       this.addToAllFollowerTimelines(authorId, tweetId, type, timestamp); // followers
       if (type === "reply" && replyingToUser !== authorId) {
         users.notify(replyingToUser, authorId, type, tweetId);
@@ -331,8 +333,8 @@ export const useTweetStore = defineStore("tweets", {
       users.removeTweet(userId, id);
       this.removeFromTimeline(userId, id); // self
       this.removeFromAllFollowerTimelines(userId, id); // followers
-      this.removeAllLikesFromTweet([...tweet.likesFrom], id);
-      this.removeAllRetweetsFromTweet([...tweet.retweetsFrom], id);
+      this.removeAllLikes([...tweet.likesFrom], id);
+      this.removeAllRetweets([...tweet.retweetsFrom], id);
       if (tweet.media.length > 0) this.deleteMedia(id, tweet.media.length);
       if (tweet.replyingToUser)
         users.deleteReplyNotification(tweet.replyingToUser, id);

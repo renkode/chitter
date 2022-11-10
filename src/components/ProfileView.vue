@@ -2,6 +2,7 @@
 import { defineProps, ref, computed, watch, onMounted } from "vue";
 import ProfileBio from "./subcomponents/ProfileBio.vue";
 import TweetList from "./lists/TweetList.vue";
+import LoadSpinner from "./subcomponents/LoadSpinner.vue";
 import { useUsersStore } from "@/stores/users.js";
 import { useTweetStore } from "@/stores/tweets.js";
 
@@ -11,6 +12,7 @@ const users = useUsersStore();
 const props = defineProps(["username"]);
 
 // initialize
+const pending = ref(true);
 const user = ref(
   props.username === users.currentUser.username
     ? computed(() => users.currentUser)
@@ -25,44 +27,56 @@ const setTab = (newTab) => {
 
 // functions for fetching tweets based on tab
 async function fetchTweets() {
-  const twts = user.value.tweets.filter(
+  const doc = await users.getUserTweets(user.value.id);
+  const twts = doc.filter(
     (tweet) =>
       tweet.type === "status" ||
       tweet.type === "retweet" ||
       (tweet.type === "reply" && tweet.replyingToUser == tweet.authorId) // self reply
   );
   // TO-DO: trim by fetch length
-  await Promise.all(twts.map((t) => store.getTweet(t.id))).then((values) =>
-    store.setTweets(store.sortByTimestamp(values))
-  );
+  await Promise.all(twts.map((t) => store.getTweet(t.id))).then((values) => {
+    pending.value = false;
+    store.setTweets(store.sortByTimestamp(values));
+  });
 }
 
 async function fetchTweetsAndReplies() {
-  const twts = user.value.tweets.filter(
+  const doc = await users.getUserTweets(user.value.id);
+  const twts = doc.filter(
     (tweet) => tweet.type === "status" || tweet.type === "reply"
   );
   // TO-DO: trim by fetch length
-  await Promise.all(twts.map((t) => store.getTweet(t.id))).then((values) =>
-    store.setTweets(store.sortByTimestamp(values))
-  );
+  await Promise.all(twts.map((t) => store.getTweet(t.id))).then((values) => {
+    pending.value = false;
+    store.setTweets(store.sortByTimestamp(values));
+  });
 }
 
 async function fetchMedia() {
-  const twts = user.value.tweets.filter((tweet) => tweet.containsMedia);
+  const doc = await users.getUserTweets(user.value.id);
+  const twts = doc.filter((tweet) => tweet.containsMedia);
   // TO-DO: trim by fetch length
-  await Promise.all(twts.map((t) => store.getTweet(t.id))).then((values) =>
-    store.setTweets(store.sortByTimestamp(values))
-  );
+  await Promise.all(twts.map((t) => store.getTweet(t.id))).then((values) => {
+    pending.value = false;
+    store.setTweets(store.sortByTimestamp(values));
+  });
 }
 
 async function fetchLikes() {
   // TO-DO: trim by fetch length
   await Promise.all(user.value.likes.map((t) => store.getTweet(t.id))).then(
-    (values) => store.setTweets(store.sortByTimestamp(values))
+    (values) => {
+      pending.value = false;
+      store.setTweets(store.sortByTimestamp(values));
+    }
   );
 }
 
-onMounted(() => fetchTweets());
+onMounted(() => {
+  if (user.value === null) return;
+  fetchTweets();
+});
 
 watch(tab, () => {
   switch (tab.value) {
@@ -95,8 +109,9 @@ watch(
 <template>
   <div class="profile-wrapper">
     <ProfileBio v-if="user" :user="user" :tab="tab" :setTab="setTab" />
-    <TweetList v-if="user" :tweets="tweets" />
-    <div class="error gray-text" v-else>User not found.</div>
+    <TweetList v-if="!pending && user" :tweets="tweets" />
+    <LoadSpinner v-if="pending && user !== null" />
+    <div class="error gray-text" v-if="user === null">User not found.</div>
   </div>
 </template>
 

@@ -51,7 +51,7 @@ const getUserProps = async (userId) => {
 
 .fade-down-enter-from,
 .fade-down-leave-to {
-  transform: translateY(-15px);
+  /* transform: translateY(-15px); */
   opacity: 0;
 }
 
