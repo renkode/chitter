@@ -1,5 +1,5 @@
 <script setup>
-import { computed, onMounted } from "vue";
+import { computed, onMounted, watch } from "vue";
 import { useAppStore } from "@/stores/app.js";
 import { useTweetStore } from "@/stores/tweets.js";
 import ComposeTweet from "./subcomponents/ComposeTweet.vue";
@@ -22,6 +22,10 @@ async function fetchTweets() {
 }
 
 onMounted(() => fetchTweets());
+
+watch(tweets, () => {
+  store.sortTweets();
+});
 </script>
 
 <template>

@@ -15,6 +15,7 @@ const props = defineProps(["isModal"]);
 const textArea = ref(null);
 const circle = ref(null);
 const images = ref([]);
+const imagePreviews = ref([]);
 const str = ref("");
 
 const user = computed(() => users.currentUser);
@@ -27,11 +28,13 @@ const isYellowRange = computed(() => charactersLeft.value <= 20);
 const isRedRange = computed(() => charactersLeft.value <= 0);
 
 const onFileChange = (e) => {
-  images.value.push(URL.createObjectURL(e.currentTarget.files[0]));
+  images.value.push(e.currentTarget.files[0]);
+  imagePreviews.value.push(URL.createObjectURL(e.currentTarget.files[0]));
 };
 
 const removeFile = (index) => {
   images.value.splice(index, 1);
+  imagePreviews.value.splice(index, 1);
 };
 
 const resizeTextArea = () => {
@@ -141,7 +144,7 @@ onMounted(() => {
         >
           <div
             class="image-preview-wrapper"
-            v-for="img in images"
+            v-for="img in imagePreviews"
             :key="images.indexOf(img)"
           >
             <img :src="img" class="image-preview" />

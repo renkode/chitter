@@ -102,6 +102,7 @@ watch(
       props.username === users.currentUser.username
         ? computed(() => users.currentUser).value
         : await users.getUserByUsername(props.username);
+    fetchTweets();
   }
 );
 </script>

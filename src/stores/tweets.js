@@ -46,6 +46,12 @@ export const useTweetStore = defineStore("tweets", {
       );
     },
 
+    sortTweets() {
+      this.tweets.sort((a, b) =>
+        a.timestamp > b.timestamp ? -1 : a.timestamp < b.timestamp ? 1 : 0
+      );
+    },
+
     setTweets(arr) {
       this.tweets = [...arr];
     },
@@ -314,11 +320,18 @@ export const useTweetStore = defineStore("tweets", {
     },
 
     async deleteMedia(id, length) {
-      for (const index of Array.from(length)) {
-        const imgRef = ref(storage, `tweets/${id}-${index}`);
+      if (length === 1) {
+        const imgRef = ref(storage, `tweet/${id}`);
         deleteObject(imgRef).catch((e) => {
           console.log(e);
         });
+      } else {
+        for (const index of Array.from(length)) {
+          const imgRef = ref(storage, `tweet/${id}-${index}`);
+          deleteObject(imgRef).catch((e) => {
+            console.log(e);
+          });
+        }
       }
     },
 

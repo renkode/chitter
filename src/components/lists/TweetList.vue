@@ -27,8 +27,8 @@ const getUserProps = async (userId) => {
       v-if="props.tweets && props.tweets.length > 0"
     >
       <TweetCard
-        v-for="(tweet, index) in props.tweets"
-        :key="tweet.id + index"
+        v-for="tweet in props.tweets"
+        :key="tweet.id + tweet.type"
         :id="tweet.id"
         :user="getUserProps(tweet.authorId)"
         :tweet="tweet"
@@ -51,7 +51,7 @@ const getUserProps = async (userId) => {
 
 .fade-down-enter-from,
 .fade-down-leave-to {
-  /* transform: translateY(-15px); */
+  transform: translateY(-15px);
   opacity: 0;
 }
 
