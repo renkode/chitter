@@ -15,12 +15,11 @@ const props = defineProps({
   id: String,
   user: Promise,
   tweet: Object,
-  replyingTo: Promise,
+  replyingTo: String,
   retweetedBy: String,
 });
 
 const user = ref(await props.user);
-const retweetedBy = ref(props.retweetedBy);
 const isTweetMenuOpen = ref(false);
 const tweetContainer = ref(null);
 
@@ -47,7 +46,7 @@ const deleteTweet = () => {
 
 const toggleLike = () => {
   if (!isLiked.value) {
-    tweets.addLike(props.id, users.currentId, retweetedBy.value);
+    tweets.addLike(props.id, users.currentId, props.retweetedBy);
     likes.value++;
     isLiked.value = true;
   } else {
@@ -58,7 +57,7 @@ const toggleLike = () => {
 };
 const toggleRetweet = () => {
   if (!isRetweeted.value) {
-    tweets.addRetweet(props.id, users.currentId, retweetedBy.value);
+    tweets.addRetweet(props.id, users.currentId, props.retweetedBy);
     retweets.value++;
     isRetweeted.value = true;
   } else {

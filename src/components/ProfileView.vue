@@ -32,16 +32,15 @@ async function fetchTweets() {
   // get statuses, retweets, and self replies
   const twts = doc.filter(
     (tweet) =>
-      tweet.type === "status" ||
-      tweet.type === "retweet" ||
-      (tweet.type === "reply" && tweet.replyingToUser == tweet.authorId)
+      tweet.type === "status" || tweet.type === "retweet" || tweet.isSelfReply
   );
-  // then add retweetedBy property if applicable and update timestamp for retweets
+  // then add retweetedBy property if applicable and update type/timestamp for retweets
   await Promise.all(
     twts.map(async (t) =>
       Object.assign(await store.getTweet(t.id), {
         retweetedBy: t.type === "retweet" ? props.username : null,
         timestamp: t.timestamp,
+        type: t.type,
       })
     )
   ).then((values) => {

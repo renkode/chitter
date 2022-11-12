@@ -23,7 +23,6 @@ const props = defineProps({
 });
 
 const user = ref(await props.user);
-const retweetedBy = ref(props.retweetedBy);
 
 var relativeTime = require("dayjs/plugin/relativeTime");
 dayjs.extend(relativeTime);
@@ -51,7 +50,7 @@ const deleteTweet = () => {
 
 const toggleLike = () => {
   if (!isLiked.value) {
-    tweets.addLike(props.id, users.currentId, retweetedBy.value);
+    tweets.addLike(props.id, users.currentId, props.retweetedBy);
     likes.value++;
     isLiked.value = true;
   } else {
@@ -62,7 +61,7 @@ const toggleLike = () => {
 };
 const toggleRetweet = () => {
   if (!isRetweeted.value) {
-    tweets.addRetweet(props.id, users.currentId, retweetedBy.value);
+    tweets.addRetweet(props.id, users.currentId, props.retweetedBy);
     retweets.value++;
     isRetweeted.value = true;
   } else {
@@ -109,10 +108,9 @@ onBeforeUnmount(() => {
     :class="{ border: !isPreviousReply, new: isNewNotification }"
     @click="app.setTweetContext(props.id)"
   >
-    <div class="user-retweet gray-text" v-if="retweetedBy">
+    <div class="user-retweet gray-text" v-if="props.retweetedBy">
       <v-icon name="la-retweet-solid" scale="0.89" fill="#ffffff80" />
-      {{ retweetedBy }}
-      Retweeted
+      <span class="retweeted-by">{{ props.retweetedBy }} Retweeted</span>
     </div>
     <div class="tweet-body">
       <div class="profile-pic-container">
@@ -294,8 +292,13 @@ onBeforeUnmount(() => {
   align-items: center;
   width: 100%;
   padding-left: 10%;
-  margin-bottom: 3px;
   gap: 6px;
+}
+
+.retweeted-by {
+  display: flex;
+  justify-content: center;
+  height: 1.4rem;
 }
 
 .tweet-body {

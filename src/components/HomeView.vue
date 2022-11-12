@@ -1,37 +1,51 @@
 <script setup>
-import { ref } from "vue";
+import { ref, computed, onMounted, watch } from "vue";
 import { useAppStore } from "@/stores/app.js";
 import { useTweetStore } from "@/stores/tweets.js";
 import { useUsersStore } from "@/stores/users.js";
 import TweetList from "./lists/TweetList.vue";
 import ComposeTweet from "./subcomponents/ComposeTweet.vue";
-//import db from "../firebase.js";
-//import { collection, getDocs } from "firebase/firestore";
+import LoadSpinner from "./subcomponents/LoadSpinner.vue";
 
 const app = useAppStore();
 const store = useTweetStore();
 const users = useUsersStore();
-const tweets = ref(
-  store.tweets.map(async (tweet) => {
-    if (await store.getTweet(tweet.id)) {
-      const tweet = store.getTweet(tweet.id);
-      return {
-        data: tweet,
-        retweetedBy:
-          tweet.type === "retweet"
-            ? await users.getUsername(tweet.retweetedBy) // getusername
-            : null,
-      };
-    }
-  })
-);
+const tweets = computed(() => store.tweets);
+const pending = ref(true);
+
+// get all tweets from timeline document, have to update properties if the tweet is a reply and/or retweet
+const fetchTweets = async () => {
+  const tl = await store.getTimelineTweets(users.currentId);
+  await Promise.all(
+    tl.map(async (t) =>
+      Object.assign(await store.getTweet(t.id), {
+        type: t.type,
+        retweetedBy: t.retweetedBy
+          ? await users.getUsername(t.retweetedBy)
+          : null,
+        replyingTo: t.replyingTo ? await users.getUsername(t.replyingTo) : null,
+        timestamp: t.timestamp,
+      })
+    )
+  ).then((values) => {
+    pending.value = false;
+    store.setTweets(store.sortByTimestamp(values));
+  });
+};
+
+onMounted(() => fetchTweets());
+
+watch(tweets, () => {
+  store.sortTweets();
+});
 </script>
 
 <template>
   <div>
     <ComposeTweet />
     <div class="tweet-list-container">
-      <TweetList v-if="users.currentUser" :tweets="tweets" />
+      <TweetList v-if="!pending" :tweets="tweets" />
+      <LoadSpinner v-else />
     </div>
   </div>
 </template>
