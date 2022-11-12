@@ -4,6 +4,9 @@ import { useTweetStore } from "@/stores/tweets.js";
 import { useUsersStore } from "@/stores/users.js";
 import TweetCard from "../subcomponents/TweetCard.vue";
 import NotificationCard from "../subcomponents/NotificationCard.vue";
+import ShortUniqueId from "short-unique-id";
+
+var uid = new ShortUniqueId();
 
 const tweets = useTweetStore();
 const users = useUsersStore();
@@ -11,24 +14,18 @@ const props = defineProps({ notifs: Array }); // { fromUser, type, tweetId }
 const notifs = ref(
   await Promise.all(
     props.notifs.map(async (notif) => {
-      const user = await users.getUser(notif.fromUser);
       const tweet = notif.tweetId ? await tweets.getTweet(notif.tweetId) : null;
-      // map to TweetCard
+      // map to TweetCard for replies and mentions
       if (notif.type === "reply" || notif.type === "mention") {
-        return {
-          user: {
-            id: notif.fromUser,
-            name: user.name,
-            username: user.username,
-            avatarUrl: user.avatarUrl,
-          },
+        return Object.assign(notif, {
+          id: tweet.id,
           tweet,
           isNewNotification: users.tweetIsNewNotification(notif.tweetId),
-        };
-      } // map to NotificationCard
+        });
+      } // map to NotificationCard for follows/likes/retweets
       else {
-        return {
-          id: tweet ? notif.tweetId : null,
+        const user = await users.getUser(notif.fromUser);
+        return Object.assign(notif, {
           type: notif.type,
           name: user.name,
           username: user.username,
@@ -36,7 +33,7 @@ const notifs = ref(
           tweetText: tweet ? tweet.text : null,
           containsMedia: tweet ? tweet.media.length > 0 : null,
           isNew: users.isNewNotification(notif),
-        };
+        });
       }
     })
   )
@@ -49,9 +46,9 @@ const notifs = ref(
       <template v-for="(notif, index) in notifs">
         <template v-if="notif.type === 'reply'">
           <TweetCard
-            :key="notif.id"
+            :key="notif.id + uid()"
             :id="notif.id"
-            :user="notif.user"
+            :user="users.getUserProps(notif.fromUser)"
             :tweet="notif.tweet"
             :type="'reply'"
             :replyingTo="users.currentUser.username"
@@ -61,9 +58,9 @@ const notifs = ref(
 
         <template v-else-if="notif.type === 'mention'">
           <TweetCard
-            :key="notif.id"
+            :key="notif.id + uid()"
             :id="notif.id"
-            :user="notif.user"
+            :user="users.getUserProps(notif.fromUser)"
             :tweet="notif.tweet"
             :type="'status'"
             :isNewNotification="notif.isNewNotification"
@@ -72,21 +69,21 @@ const notifs = ref(
 
         <template v-else-if="notif.type !== 'reply' && notif.type !== 'follow'">
           <NotificationCard
-            :key="index"
+            :key="index + uid()"
             :id="notif.id"
             :type="notif.type"
             :iconUrl="notif.iconUrl"
             :name="notif.name"
             :username="notif.username"
             :tweetText="notif.text"
-            :containsMedia="notif.media.length > 0"
+            :containsMedia="notif.media && notif.media.length > 0"
             :isNew="notif.isNew"
           />
         </template>
 
         <template v-else>
           <NotificationCard
-            :key="index"
+            :key="index + uid()"
             :type="notif.type"
             :iconUrl="notif.avatarUrl"
             :name="notif.name"

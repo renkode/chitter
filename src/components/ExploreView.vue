@@ -16,7 +16,7 @@ async function fetchTweets() {
   const q = query(collection(db, "tweets"), where("type", "!=", "reply"));
   const querySnapshot = await getDocs(q);
   querySnapshot.forEach((doc) => {
-    twts.push(doc.data());
+    twts.push(Object.assign(doc.data()));
   });
   store.setTweets(store.sortByTimestamp(twts));
 }

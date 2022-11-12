@@ -30,11 +30,12 @@ const isRetweeted = ref(await tweets.hasRetweeted(props.id, users.currentId));
 const canFollow = ref(users.canFollow(user.value.id));
 
 const toggleTweetMenu = () => {
-  if (!users.currentUser) return;
+  if (!users.currentId) return;
   isTweetMenuOpen.value = !isTweetMenuOpen.value;
 };
 
 const deleteTweet = () => {
+  if (!users.currentId) return;
   if (app.routeTweetId == props.id) {
     if (props.tweet.replyingToTweet)
       app.setTweetContext(props.tweet.replyingToTweet);
@@ -45,6 +46,7 @@ const deleteTweet = () => {
 };
 
 const toggleLike = () => {
+  if (!users.currentId) return;
   if (!isLiked.value) {
     tweets.addLike(props.id, users.currentId, props.retweetedBy);
     likes.value++;
@@ -56,6 +58,7 @@ const toggleLike = () => {
   }
 };
 const toggleRetweet = () => {
+  if (!users.currentId) return;
   if (!isRetweeted.value) {
     tweets.addRetweet(props.id, users.currentId, props.retweetedBy);
     retweets.value++;
@@ -67,6 +70,7 @@ const toggleRetweet = () => {
   }
 };
 const setReply = () => {
+  if (!users.currentId) return;
   app.setModalType("reply");
   app.setModalReply(user.value.id, props.id);
   app.toggleModal();

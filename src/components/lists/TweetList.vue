@@ -6,18 +6,6 @@ import LoadSpinner from "../subcomponents/LoadSpinner.vue";
 
 const users = useUsersStore();
 const props = defineProps(["tweets"]);
-
-const getUserProps = async (userId) => {
-  return users
-    .getUser(userId)
-    .then((user) => ({
-      id: userId,
-      name: user.name,
-      username: user.username,
-      avatarUrl: user.avatarUrl,
-    }))
-    .catch(() => null);
-};
 </script>
 
 <template>
@@ -30,7 +18,7 @@ const getUserProps = async (userId) => {
         v-for="tweet in props.tweets"
         :key="tweet.id + tweet.type"
         :id="tweet.id"
-        :user="getUserProps(tweet.authorId)"
+        :user="users.getUserProps(tweet.authorId)"
         :tweet="tweet"
         :retweetedBy="tweet.retweetedBy"
         :replyingTo="tweet.replyingToUser"

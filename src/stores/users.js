@@ -38,6 +38,17 @@ export const useUsersStore = defineStore("users", {
       return null;
     },
 
+    async getUserProps(id) {
+      return this.getUser(id)
+        .then((user) => ({
+          id,
+          name: user.name,
+          username: user.username,
+          avatarUrl: user.avatarUrl,
+        }))
+        .catch(() => null);
+    },
+
     updateDocInCollection(collection, id, obj) {
       updateDoc(doc(db, collection, id), obj).catch((e) => console.log(e));
     },
@@ -90,8 +101,6 @@ export const useUsersStore = defineStore("users", {
         likes: [],
         following: [],
         followers: [],
-        newNotifications: [],
-        oldNotifications: [],
       };
       this.setCurrentUser(newUser, id);
       setDoc(doc(db, "users", id), newUser);
@@ -258,7 +267,7 @@ export const useUsersStore = defineStore("users", {
     },
 
     canFollow(targetId) {
-      if (this.currentId === targetId) return false;
+      if (!this.currentId || this.currentId === targetId) return false;
       return !this.currentUser.following.includes(targetId);
     },
 
@@ -295,12 +304,9 @@ export const useUsersStore = defineStore("users", {
       }
     },
 
-    async clearNotifications() {
+    clearNotifications() {
       const notifs = {
-        old: [
-          ...this.currentUser.oldNotifications,
-          ...this.currentUser.newNotifications,
-        ],
+        old: [...this.notifications.old, ...this.notifications.new],
         new: [],
       };
       this.updateDocInCollection("notifications", this.currentId, notifs);

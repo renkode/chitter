@@ -358,7 +358,7 @@ export const useTweetStore = defineStore("tweets", {
         null,
         replyingToUser
       ); // followers
-      if (type === "reply" && replyingToUser !== authorId) {
+      if (replyingToUser && replyingToUser !== authorId) {
         users.notify(replyingToUser, authorId, type, tweetId);
       }
       if (mentionedUsers && mentionedUsers.length > 0) {

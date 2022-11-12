@@ -53,14 +53,16 @@ const handleInput = () => {
   resizeTextArea();
 };
 
-const getInitialReplyUser = (str) => {
+const getInitialReplyUser = async (str) => {
   // e.g. "@username hello world" is a reply
   const firstWord = str.replace(/\r?\n/, " ").split(" ")[0];
   if (
     atRegex.test(firstWord) &&
-    users.getUserByUsername(firstWord.replace("@", ""))
+    (await users.getUserByUsername(firstWord.replace("@", "")))
   ) {
-    return users.getUserByUsername(firstWord.replace("@", "")).id;
+    return users
+      .getUserByUsername(firstWord.replace("@", ""))
+      .then((user) => user.id);
   } else {
     return null;
   }
@@ -77,23 +79,23 @@ const getMentions = (str) => {
     return str
       .split(" ")
       .filter((word) => atRegex.test(word) && word !== str.split(" ")[0])
-      .map((word) => {
-        const user = users.getUserByUsername(word.replace("@", ""));
-        if (user) return user.id;
+      .map(async (word) => {
+        const user = await users.getUserByUsername(word.replace("@", ""));
+        return user ? user.id : null;
       });
   } else {
     return null;
   }
 };
 
-const postTweet = () => {
+const postTweet = async () => {
   if (noContent.value) return;
   let replyingToTweet =
     app.modalType === "reply" ? app.modalReply.tweetId : null;
   const replyingToUser =
     app.modalType === "reply"
       ? app.modalReply.userId
-      : getInitialReplyUser(str.value);
+      : await getInitialReplyUser(str.value);
   const mentionedUsers = getMentions(str.value);
   const type = app.modalType === "reply" || replyingToUser ? "reply" : "status";
   tweetStore.addTweet(
