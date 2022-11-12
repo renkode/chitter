@@ -17,12 +17,13 @@ const props = defineProps({
   user: Promise, // id, name, username, avatarUrl
   tweet: Object,
   retweetedBy: String,
-  replyingTo: String,
+  replyingTo: [String, Promise],
   isPreviousReply: Boolean, // render gray line for tweet thread
   isNewNotification: Boolean, // highlight if new notification
 });
 
 const user = ref(await props.user);
+const replyingTo = ref(await props.replyingTo);
 
 var relativeTime = require("dayjs/plugin/relativeTime");
 dayjs.extend(relativeTime);
@@ -192,10 +193,8 @@ onBeforeUnmount(() => {
             v-if="props.tweet.type === 'reply' && props.tweet.replyingToTweet"
           >
             <span class="gray-text">Replying to </span>
-            <a
-              class="blue-link"
-              @click.stop="app.viewUserProfile(props.replyingTo)"
-              >@{{ props.replyingTo }}</a
+            <a class="blue-link" @click.stop="app.viewUserProfile(replyingTo)"
+              >@{{ replyingTo }}</a
             >
           </div>
           <div class="tweet-text">

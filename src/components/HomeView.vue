@@ -23,7 +23,9 @@ const fetchTweets = async () => {
         retweetedBy: t.retweetedBy
           ? await users.getUsername(t.retweetedBy)
           : null,
-        replyingTo: t.replyingTo ? await users.getUsername(t.replyingTo) : null,
+        replyingToUser: t.replyingToUser
+          ? await users.getUsername(t.replyingToUser)
+          : null,
         timestamp: t.timestamp,
       })
     )

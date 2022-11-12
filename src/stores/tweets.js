@@ -105,7 +105,7 @@ export const useTweetStore = defineStore("tweets", {
       type,
       timestamp,
       retweetedBy = null,
-      replyingTo = null
+      replyingToUser = null
     ) {
       const timeline = await this.getTimelineTweets(userId);
       if (
@@ -117,7 +117,7 @@ export const useTweetStore = defineStore("tweets", {
         type,
         timestamp,
         retweetedBy,
-        replyingTo,
+        replyingToUser,
       });
     },
 
@@ -127,7 +127,7 @@ export const useTweetStore = defineStore("tweets", {
       type,
       timestamp,
       retweetedBy,
-      replyingTo
+      replyingToUser
     ) {
       const store = useUsersStore();
       const user = await store.getUser(targetUserId);
@@ -139,7 +139,7 @@ export const useTweetStore = defineStore("tweets", {
             type,
             timestamp,
             retweetedBy,
-            replyingTo
+            replyingToUser
           )
         )
       );

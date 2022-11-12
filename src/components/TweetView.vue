@@ -12,47 +12,52 @@ const users = useUsersStore();
 const store = useTweetStore();
 const props = defineProps(["id"]);
 
-const tweet = computed(() => store.getTweet(props.id));
-const previousTweet = computed(() => {
-  if (tweet.value) return store.getTweet(tweet.value.replyingToTweet);
-  return null;
-});
+const tweet = ref(await store.getTweet(props.id));
+const previousTweet = ref();
 const previousTweets = ref([]);
-const replies = computed(() => {
-  if (tweet.value) {
-    return tweet.value.repliesFrom.map((id) => store.getTweet(id)) || [];
-  } else {
-    return null;
-  }
-});
+const replies = ref();
 
 // kinda like a linked list
-const fetchPreviousTweets = () => {
+const fetchPreviousTweets = async () => {
   previousTweets.value = [];
   if (!tweet.value) return;
   let currentTweet = tweet.value;
   while (currentTweet.replyingToTweet) {
     try {
-      let lastTweet = store.getTweet(currentTweet.replyingToTweet);
+      let lastTweet = await store.getTweet(currentTweet.replyingToTweet);
       if (!lastTweet) {
-        previousTweets.value.unshift(null);
+        previousTweets.value.unshift(null); // deleted tweet
         break;
       }
       previousTweets.value.unshift(lastTweet);
       currentTweet = lastTweet;
-    } catch {
-      throw new Error("loop gone wild");
+    } catch (e) {
+      console.log(e);
     }
   }
 };
 
-// refresh whenever current tweet or previous tweet change/get deleted
-watch([() => previousTweet], () => {
+watch(tweet, async () => {
+  previousTweet.value = await store.getTweet(tweet.value.replyingToTweet);
+  replies.value = await Promise.all(
+    tweet.value.repliesFrom.map((id) => store.getTweet(id))
+  );
   fetchPreviousTweets();
 });
 
-onMounted(() => {
-  fetchPreviousTweets();
+// refresh whenever current tweet or previous tweet change/get deleted
+watch([() => previousTweet], async () => {
+  await fetchPreviousTweets();
+});
+
+onMounted(async () => {
+  if (tweet.value) {
+    previousTweet.value = await store.getTweet(tweet.value.replyingToTweet);
+    replies.value = await Promise.all(
+      tweet.value.repliesFrom.map((id) => store.getTweet(id))
+    );
+  }
+  await fetchPreviousTweets();
 });
 </script>
 
@@ -70,12 +75,7 @@ onMounted(() => {
         <TweetCard
           :key="tweet.id"
           :id="tweet.id"
-          :user="{
-            id: tweet.authorId,
-            name: users.getUser(tweet.authorId).name,
-            username: users.getUser(tweet.authorId).username,
-            avatarUrl: users.getUser(tweet.authorId).avatarUrl,
-          }"
+          :user="users.getUserProps(tweet.authorId)"
           :tweet="tweet"
           :type="tweet.type"
           :replyingTo="users.getUsername(tweet.replyingToUser)"
@@ -86,12 +86,7 @@ onMounted(() => {
     <template v-if="tweet">
       <TweetCardFull
         :id="tweet.id"
-        :user="{
-          id: tweet.authorId,
-          name: users.getUser(tweet.authorId).name,
-          username: users.getUser(tweet.authorId).username,
-          avatarUrl: users.getUser(tweet.authorId).avatarUrl,
-        }"
+        :user="users.getUserProps(tweet.authorId)"
         :tweet="tweet"
         :type="tweet.type"
         :replyingTo="users.getUsername(tweet.replyingToUser)"
@@ -102,12 +97,7 @@ onMounted(() => {
         v-for="tweet in replies"
         :key="tweet.id"
         :id="tweet.id"
-        :user="{
-          id: tweet.authorId,
-          name: users.getUser(tweet.authorId).name,
-          username: users.getUser(tweet.authorId).username,
-          avatarUrl: users.getUser(tweet.authorId).avatarUrl,
-        }"
+        :user="users.getUserProps(tweet.authorId)"
         :tweet="tweet"
         :type="tweet.type"
         :replyingTo="users.getUsername(tweet.replyingToUser)"

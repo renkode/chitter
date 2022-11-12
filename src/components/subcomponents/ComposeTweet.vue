@@ -127,10 +127,6 @@ watch(str, () => {
     circle.value.style = `--circle: ${characterRatio}; --color: #1d9bf0;--outerRadius: 22px; --innerRadius: 18px;`;
   }
 });
-
-onMounted(() => {
-  // resizeTextArea();
-});
 </script>
 
 <template>

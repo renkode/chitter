@@ -15,11 +15,12 @@ const props = defineProps({
   id: String,
   user: Promise,
   tweet: Object,
-  replyingTo: String,
+  replyingTo: [String, Promise],
   retweetedBy: String,
 });
 
 const user = ref(await props.user);
+const replyingTo = ref(await props.replyingTo);
 const isTweetMenuOpen = ref(false);
 const tweetContainer = ref(null);
 
@@ -166,10 +167,8 @@ const shareTweet = () => {
           v-if="props.tweet.type === 'reply' && props.tweet.replyingToTweet"
         >
           <span class="gray-text">Replying to </span>
-          <a
-            class="blue-link"
-            @click.stop="app.viewUserProfile(props.replyingTo)"
-            >@{{ props.replyingTo }}</a
+          <a class="blue-link" @click.stop="app.viewUserProfile(replyingTo)"
+            >@{{ replyingTo }}</a
           >
         </div>
         <div class="tweet-text"><EmbeddedText :text="props.tweet.text" /></div>

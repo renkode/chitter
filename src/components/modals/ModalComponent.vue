@@ -21,9 +21,15 @@ const app = useAppStore();
       <UserListModal
         v-if="app.modalType === 'retweet-list' || app.modalType === 'like-list'"
       />
-      <ComposeTweetModal
-        v-if="app.modalType === 'status' || app.modalType === 'reply'"
-      />
+
+      <Suspense>
+        <template #default>
+          <ComposeTweetModal
+            v-if="app.modalType === 'status' || app.modalType === 'reply'"
+          />
+        </template>
+      </Suspense>
+
       <Suspense>
         <template #default
           ><SignUpModal v-if="app.modalType === 'signup'"
