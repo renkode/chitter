@@ -28,10 +28,10 @@ const getUserProps = async (userId) => {
     >
       <TweetCard
         v-for="tweet in props.tweets"
-        :key="tweet.data.id + tweet.data.type"
-        :id="tweet.data.id"
-        :user="getUserProps(tweet.data.authorId)"
-        :tweet="tweet.data"
+        :key="tweet.id + tweet.type"
+        :id="tweet.id"
+        :user="getUserProps(tweet.authorId)"
+        :tweet="tweet"
         :retweetedBy="tweet.retweetedBy"
         :replyingTo="tweet.replyingToUser"
     /></TransitionGroup>

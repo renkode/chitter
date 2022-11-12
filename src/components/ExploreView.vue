@@ -7,11 +7,11 @@ import TweetList from "./lists/TweetList.vue";
 import { db } from "@/firebase.js";
 import { collection, getDocs, query, where } from "firebase/firestore";
 
-const app = useAppStore();
 const store = useTweetStore();
 const tweets = computed(() => store.tweets);
 
 async function fetchTweets() {
+  store.setTweets([]);
   const twts = [];
   const q = query(collection(db, "tweets"), where("type", "!=", "reply"));
   const querySnapshot = await getDocs(q);
