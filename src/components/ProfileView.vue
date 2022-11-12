@@ -35,7 +35,13 @@ async function fetchTweets() {
       (tweet.type === "reply" && tweet.replyingToUser == tweet.authorId) // self reply
   );
   // TO-DO: trim by fetch length
-  await Promise.all(twts.map((t) => store.getTweet(t.id))).then((values) => {
+  await Promise.all(
+    twts.map(async (t) => ({
+      data: await store.getTweet(t.id),
+      retweetedBy: t.type === "retweet" ? props.username : null,
+      timestamp: t.timestamp,
+    }))
+  ).then((values) => {
     pending.value = false;
     store.setTweets(store.sortByTimestamp(values));
   });
@@ -47,7 +53,15 @@ async function fetchTweetsAndReplies() {
     (tweet) => tweet.type === "status" || tweet.type === "reply"
   );
   // TO-DO: trim by fetch length
-  await Promise.all(twts.map((t) => store.getTweet(t.id))).then((values) => {
+  await Promise.all(
+    twts.map(async (t) => ({
+      data: await store.getTweet(t.id),
+      replyingToUser: t.replyToUser
+        ? await users.getUsername(t.replyingToUser)
+        : null,
+      timestamp: t.timestamp,
+    }))
+  ).then((values) => {
     pending.value = false;
     store.setTweets(store.sortByTimestamp(values));
   });
@@ -57,7 +71,12 @@ async function fetchMedia() {
   const doc = await users.getUserTweets(user.value.id);
   const twts = doc.filter((tweet) => tweet.containsMedia);
   // TO-DO: trim by fetch length
-  await Promise.all(twts.map((t) => store.getTweet(t.id))).then((values) => {
+  await Promise.all(
+    twts.map(async (t) => ({
+      data: await store.getTweet(t.id),
+      timestamp: t.timestamp,
+    }))
+  ).then((values) => {
     pending.value = false;
     store.setTweets(store.sortByTimestamp(values));
   });
@@ -65,12 +84,15 @@ async function fetchMedia() {
 
 async function fetchLikes() {
   // TO-DO: trim by fetch length
-  await Promise.all(user.value.likes.map((t) => store.getTweet(t.id))).then(
-    (values) => {
-      pending.value = false;
-      store.setTweets(store.sortByTimestamp(values));
-    }
-  );
+  await Promise.all(
+    user.value.likes.map(async (t) => ({
+      data: await store.getTweet(t),
+      timestamp: t.timestamp,
+    }))
+  ).then((values) => {
+    pending.value = false;
+    store.setTweets(store.sortByTimestamp(values));
+  });
 }
 
 onMounted(() => {

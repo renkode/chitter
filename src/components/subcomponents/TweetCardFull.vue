@@ -15,17 +15,18 @@ const props = defineProps({
   id: String,
   user: Promise,
   tweet: Object,
-  type: String, // status, retweet, reply
   replyingTo: Promise,
-  isRetweetedBy: String,
+  retweetedBy: String,
 });
 
 const user = ref(await props.user);
-const retweetedBy = ref(await props.retweetedBy);
+const retweetedBy = ref(props.retweetedBy);
 const isTweetMenuOpen = ref(false);
 const tweetContainer = ref(null);
 
+const likes = ref(props.tweet.likeCount);
 const isLiked = ref(await tweets.hasLiked(props.id, users.currentId));
+const retweets = ref(props.tweet.retweetCount);
 const isRetweeted = ref(await tweets.hasRetweeted(props.id, users.currentId));
 const canFollow = ref(users.canFollow(user.value.id));
 
@@ -47,15 +48,23 @@ const deleteTweet = () => {
 const toggleLike = () => {
   if (!isLiked.value) {
     tweets.addLike(props.id, users.currentId, retweetedBy.value);
+    likes.value++;
+    isLiked.value = true;
   } else {
     tweets.removeLike(props.id, users.currentId);
+    likes.value--;
+    isLiked.value = false;
   }
 };
 const toggleRetweet = () => {
   if (!isRetweeted.value) {
     tweets.addRetweet(props.id, users.currentId, retweetedBy.value);
+    retweets.value++;
+    isRetweeted.value = true;
   } else {
     tweets.removeRetweet(props.id, users.currentId);
+    retweets.value--;
+    isRetweeted.value = false;
   }
 };
 const setReply = () => {
@@ -71,10 +80,7 @@ const shareTweet = () => {
 
 <template>
   <div class="tweet-container" ref="tweetContainer">
-    <div
-      class="user-retweet gray-text"
-      v-if="props.type === 'retweet' && props.retweetedBy"
-    >
+    <div class="user-retweet gray-text" v-if="props.retweetedBy">
       <v-icon name="la-retweet-solid" scale="0.89" fill="#ffffff80" />
       {{ props.retweetedBy }}
       Retweeted
@@ -189,22 +195,19 @@ const shareTweet = () => {
         }}</span>
       </div>
 
-      <div
-        class="tweet-metrics-wrapper"
-        v-if="props.tweet.retweetCount > 0 || props.tweet.likeCount > 0"
-      >
+      <div class="tweet-metrics-wrapper" v-if="retweets > 0 || likes > 0">
         <span
           class="tweet-metric"
-          v-if="props.tweet.retweetCount > 0"
+          v-if="retweets > 0"
           @click="app.toggleModal('retweet-list')"
-          ><strong>{{ props.tweet.retweetCount }}</strong>
+          ><strong>{{ retweets }}</strong>
           <span class="gray-text"> Retweets</span></span
         >
         <span
           class="tweet-metric"
-          v-if="props.tweet.likeCount > 0"
+          v-if="likes > 0"
           @click="app.toggleModal('like-list')"
-          ><strong>{{ props.tweet.likeCount }}</strong>
+          ><strong>{{ likes }}</strong>
           <span class="gray-text"> Likes</span></span
         >
       </div>

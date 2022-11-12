@@ -175,7 +175,10 @@ export const useTweetStore = defineStore("tweets", {
     removeLike(id, userId) {
       this.increment(id, "likeCount", -1);
       this.removeFromFieldArray(id, "likesFrom", userId);
-
+      this.tweets.splice(
+        this.tweets.findIndex((t) => t.id === id),
+        1
+      );
       const users = useUsersStore();
       users.removeLike(userId, id);
     },
@@ -223,7 +226,10 @@ export const useTweetStore = defineStore("tweets", {
     removeRetweet(id, userId) {
       this.increment(id, "retweetCount", -1);
       this.removeFromFieldArray(id, "retweetsFrom", userId);
-
+      this.tweets.splice(
+        this.tweets.findIndex((t) => t.id === id && t.type === "retweet"),
+        1
+      );
       const users = useUsersStore();
       users.removeRetweet(userId, id);
       this.removeFromTimeline(userId, id); // self

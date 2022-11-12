@@ -189,6 +189,7 @@ export const useUsersStore = defineStore("users", {
         containsMedia,
         replyingToUser,
         isSelfReply,
+        retweetedBy: type === "retweet" ? authorId : null,
         timestamp,
       });
     },

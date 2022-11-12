@@ -28,15 +28,12 @@ const getUserProps = async (userId) => {
     >
       <TweetCard
         v-for="tweet in props.tweets"
-        :key="tweet.id + tweet.type"
-        :id="tweet.id"
-        :user="getUserProps(tweet.authorId)"
-        :tweet="tweet"
-        :type="tweet.type"
+        :key="tweet.data.id + tweet.data.type"
+        :id="tweet.data.id"
+        :user="getUserProps(tweet.data.authorId)"
+        :tweet="tweet.data"
         :retweetedBy="tweet.retweetedBy"
-        :replyingTo="
-          tweet.replyingToUser ? users.getUsername(tweet.replyingToUser) : null
-        "
+        :replyingTo="tweet.replyingToUser"
     /></TransitionGroup>
 
     <div class="error gray-text" v-else>No tweets to display</div>

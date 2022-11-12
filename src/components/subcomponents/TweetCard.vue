@@ -16,15 +16,14 @@ const props = defineProps({
   id: String,
   user: Promise, // id, name, username, avatarUrl
   tweet: Object,
-  type: String, // status, retweet, reply
-  retweetedBy: Promise,
+  retweetedBy: String,
   replyingTo: String,
   isPreviousReply: Boolean, // render gray line for tweet thread
   isNewNotification: Boolean, // highlight if new notification
 });
 
 const user = ref(await props.user);
-const retweetedBy = ref(await props.retweetedBy);
+const retweetedBy = ref(props.retweetedBy);
 
 var relativeTime = require("dayjs/plugin/relativeTime");
 dayjs.extend(relativeTime);
@@ -35,7 +34,9 @@ const currentTime = ref(dayjs().toISOString());
 const getTimeSinceCreation = ref(
   formatDateMixin.formatTweetDate(props.tweet.timestamp, currentTime.value)
 );
+const likes = ref(props.tweet.likeCount);
 const isLiked = ref(await tweets.hasLiked(props.id, users.currentId));
+const retweets = ref(props.tweet.retweetCount);
 const isRetweeted = ref(await tweets.hasRetweeted(props.id, users.currentId));
 const canFollow = ref(users.canFollow(user.value.id));
 
@@ -51,15 +52,23 @@ const deleteTweet = () => {
 const toggleLike = () => {
   if (!isLiked.value) {
     tweets.addLike(props.id, users.currentId, retweetedBy.value);
+    likes.value++;
+    isLiked.value = true;
   } else {
     tweets.removeLike(props.id, users.currentId);
+    likes.value--;
+    isLiked.value = false;
   }
 };
 const toggleRetweet = () => {
   if (!isRetweeted.value) {
     tweets.addRetweet(props.id, users.currentId, retweetedBy.value);
+    retweets.value++;
+    isRetweeted.value = true;
   } else {
     tweets.removeRetweet(props.id, users.currentId);
+    retweets.value--;
+    isRetweeted.value = false;
   }
 };
 const setReply = () => {
@@ -100,10 +109,7 @@ onBeforeUnmount(() => {
     :class="{ border: !isPreviousReply, new: isNewNotification }"
     @click="app.setTweetContext(props.id)"
   >
-    <div
-      class="user-retweet gray-text"
-      v-if="props.type === 'retweet' && retweetedBy"
-    >
+    <div class="user-retweet gray-text" v-if="retweetedBy">
       <v-icon name="la-retweet-solid" scale="0.89" fill="#ffffff80" />
       {{ retweetedBy }}
       Retweeted
@@ -226,9 +232,9 @@ onBeforeUnmount(() => {
               @click.stop="toggleRetweet"
               ><v-icon name="la-retweet-solid" scale="1.15" fill="#ffffff80"
             /></span>
-            <span class="tweet-metric retweet-metric gray-text">{{
-              props.tweet.retweetCount || ""
-            }}</span>
+            <span class="tweet-metric retweet-metric gray-text"
+              ><span v-if="retweets > 0">{{ retweets }}</span></span
+            >
           </span>
           <span class="tweet-metrics">
             <span
@@ -237,9 +243,9 @@ onBeforeUnmount(() => {
               @click.stop="toggleLike"
               ><v-icon name="fa-regular-heart" scale="1.0" fill="#ffffff80"
             /></span>
-            <span class="tweet-metric like-metric gray-text">{{
-              props.tweet.likeCount || ""
-            }}</span>
+            <span class="tweet-metric like-metric gray-text"
+              ><span v-if="likes > 0">{{ likes }}</span></span
+            >
           </span>
           <span
             class="tweet-action-icon share-tweet-btn"
