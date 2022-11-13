@@ -2088,7 +2088,7 @@
               if (!t.includes(e)) throw Error("wrong tab");
               this.profileTab = e;
             },
-            setTweetContext(e) {
+            viewTweet(e) {
               window.getSelection().toString().length > 0 ||
                 s.Z.push({ name: "Tweet", params: { id: e } });
             },

@@ -300,8 +300,7 @@
                       { border: !e.isPreviousReply, new: e.isNewNotification },
                     ]),
                     onClick:
-                      l[6] ||
-                      (l[6] = (e) => (0, i.SU)(J).setTweetContext(t.id)),
+                      l[6] || (l[6] = (e) => (0, i.SU)(J).viewTweet(t.id)),
                   },
                   [
                     "retweet" === t.type && t.retweetedBy

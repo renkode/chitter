@@ -93,8 +93,8 @@
               le = () => {
                 i.routeTweetId == t.id
                   ? t.tweet.replyingToTweet &&
-                    i.setTweetContext(t.tweet.replyingToTweet)
-                  : i.setTweetContext(null),
+                    i.viewTweet(t.tweet.replyingToTweet)
+                  : i.viewTweet(null),
                   s.removeTweet(t.id, t.user.id);
               },
               ie = () => {
@@ -971,8 +971,7 @@
                       { border: !e.isPreviousReply, new: e.isNewNotification },
                     ]),
                     onClick:
-                      n[6] ||
-                      (n[6] = (e) => (0, i.SU)(J).setTweetContext(t.id)),
+                      n[6] || (n[6] = (e) => (0, i.SU)(J).viewTweet(t.id)),
                   },
                   [
                     "retweet" === t.type && t.retweetedBy

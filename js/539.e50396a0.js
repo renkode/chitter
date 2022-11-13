@@ -66,7 +66,7 @@
           function k() {
             "follow" === t.type
               ? r.viewUserProfile(t.username)
-              : r.setTweetContext(t.id);
+              : r.viewTweet(t.id);
           }
           return (r, n) => {
             const S = (0, i.up)("v-icon");
@@ -584,8 +584,7 @@
                       { border: !e.isPreviousReply, new: e.isNewNotification },
                     ]),
                     onClick:
-                      l[6] ||
-                      (l[6] = (e) => (0, n.SU)(J).setTweetContext(t.id)),
+                      l[6] || (l[6] = (e) => (0, n.SU)(J).viewTweet(t.id)),
                   },
                   [
                     "retweet" === t.type && t.retweetedBy
