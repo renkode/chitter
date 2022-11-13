@@ -5,6 +5,7 @@ import UserListModal from "./UserListModal.vue";
 import ComposeTweetModal from "./ComposeTweetModal.vue";
 import SignUpModal from "./SignUpModal.vue";
 import LogInModal from "./LogInModal.vue";
+import LoadSpinner from "../subcomponents/LoadSpinner.vue";
 
 const app = useAppStore();
 </script>
@@ -18,9 +19,15 @@ const app = useAppStore();
         /></template>
       </Suspense>
 
-      <UserListModal
-        v-if="app.modalType === 'retweet-list' || app.modalType === 'like-list'"
-      />
+      <Suspense>
+        <template #default>
+          <UserListModal
+            v-if="
+              app.modalType === 'retweet-list' || app.modalType === 'like-list'
+            "
+        /></template>
+        <template #fallback><LoadSpinner /></template>
+      </Suspense>
 
       <Suspense>
         <template #default>

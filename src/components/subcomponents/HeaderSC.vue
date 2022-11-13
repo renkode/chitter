@@ -11,9 +11,7 @@ const users = useUsersStore();
 const user = ref(
   users.currentUser && app.routeUsername === users.currentUser.username
     ? computed(() => users.currentUser)
-    : (await users.getUserByUsername(app.routeUsername))
-    ? await users.getUserByUsername(app.routeUsername)
-    : null
+    : await users.getUserByUsername(app.routeUsername)
 );
 
 const canGoBack = computed(() => {

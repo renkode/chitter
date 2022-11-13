@@ -83,22 +83,20 @@ async function fetchMedia() {
   // TO-DO: trim by fetch length
   const doc = await users.getUserTweets(user.value.id);
   const twts = doc.filter((tweet) => tweet.containsMedia);
-  await Promise.all(twts.map(async (t) => await store.getTweet(t.id))).then(
+  await Promise.all(twts.map((t) => store.getTweet(t.id))).then((values) => {
+    pending.value = false;
+    store.setTweets(store.sortByTimestamp(values));
+  });
+}
+
+async function fetchLikes() {
+  // TO-DO: trim by fetch length
+  await Promise.all(user.value.likes.map((id) => store.getTweet(id))).then(
     (values) => {
       pending.value = false;
       store.setTweets(store.sortByTimestamp(values));
     }
   );
-}
-
-async function fetchLikes() {
-  // TO-DO: trim by fetch length
-  await Promise.all(
-    user.value.likes.map(async (t) => await store.getTweet(t.id))
-  ).then((values) => {
-    pending.value = false;
-    store.setTweets(store.sortByTimestamp(values));
-  });
 }
 
 onBeforeMount(() => {

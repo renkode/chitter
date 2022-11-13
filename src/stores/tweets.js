@@ -85,10 +85,6 @@ export const useTweetStore = defineStore("tweets", {
       return null;
     },
 
-    async queryTimeline() {
-      //TO-DO
-    },
-
     updateTimeline(id, arr) {
       updateDoc(doc(db, "timelines", id), { tweets: arr });
     },
@@ -114,6 +110,7 @@ export const useTweetStore = defineStore("tweets", {
         return; // no repeats
       this.addToTimeline(userId, {
         id: tweetId,
+        fromUserId: userId,
         type,
         timestamp,
         retweetedBy,
@@ -179,20 +176,17 @@ export const useTweetStore = defineStore("tweets", {
       }
     },
 
-    removeLike(id, userId) {
+    removeLike(id, userId, authorId) {
       this.increment(id, "likeCount", -1);
       this.removeFromFieldArray(id, "likesFrom", userId);
-      this.tweets.splice(
-        this.tweets.findIndex((t) => t.id === id),
-        1
-      );
       const users = useUsersStore();
       users.removeLike(userId, id);
+      users.deleteNotification(authorId, id);
     },
 
-    removeAllLikes(arr, tweetId) {
+    removeAllLikes(arr, tweetId, authorId) {
       const users = useUsersStore();
-      Promise.all(arr.map((user) => users.removeLike(user, tweetId)));
+      Promise.all(arr.map((user) => users.removeLike(user, tweetId, authorId)));
     },
 
     async hasLiked(id, userId) {
@@ -201,7 +195,7 @@ export const useTweetStore = defineStore("tweets", {
         .catch(() => false);
     },
 
-    async addRetweet(id, userId, isRetweetofRetweet) {
+    async addRetweet(id, userId, retweetedBy) {
       this.increment(id, "retweetCount", 1);
       this.addToFieldArray(id, "retweetsFrom", userId);
 
@@ -223,14 +217,14 @@ export const useTweetStore = defineStore("tweets", {
         userId
       );
 
-      if (tweet.authorId !== userId) {
-        isRetweetofRetweet
+      if (tweet.authorId !== userId && retweetedBy !== userId) {
+        retweetedBy
           ? users.notify(tweet.authorId, userId, "retweet-retweet", id)
           : users.notify(tweet.authorId, userId, "retweet-origin", id);
       }
     },
 
-    removeRetweet(id, userId) {
+    removeRetweet(id, userId, authorId) {
       this.increment(id, "retweetCount", -1);
       this.removeFromFieldArray(id, "retweetsFrom", userId);
       if (
@@ -244,11 +238,14 @@ export const useTweetStore = defineStore("tweets", {
       users.removeRetweet(userId, id);
       this.removeFromTimeline(userId, id, true); // self
       this.removeFromAllFollowerTimelines(userId, id, true); // followers
+      users.deleteNotification(authorId, id);
     },
 
-    removeAllRetweets(arr, tweetId) {
+    removeAllRetweets(arr, tweetId, authorId) {
       const users = useUsersStore();
-      Promise.all(arr.map((user) => users.removeRetweet(user, tweetId)));
+      Promise.all(
+        arr.map((user) => users.removeRetweet(user, tweetId, authorId))
+      );
     },
 
     async hasRetweeted(id, userId) {
@@ -402,11 +399,13 @@ export const useTweetStore = defineStore("tweets", {
       users.removeTweet(userId, id);
       this.removeFromTimeline(userId, id); // self
       this.removeFromAllFollowerTimelines(userId, id); // followers
-      this.removeAllLikes([...tweet.likesFrom], id);
-      this.removeAllRetweets([...tweet.retweetsFrom], id);
+      this.removeAllLikes([...tweet.likesFrom], id, tweet.authorId);
+      this.removeAllRetweets([...tweet.retweetsFrom], id, tweet.authorId);
       if (tweet.media.length > 0) this.deleteMedia(id, tweet.media.length);
+      // remove notifs that reference this tweet
+      users.deleteNotification(users.currentId, id);
       if (tweet.replyingToUser)
-        users.deleteReplyNotification(tweet.replyingToUser, id);
+        users.deleteNotification(tweet.replyingToUser, id);
       return deleteDoc(doc(db, "tweets", id));
     },
   },

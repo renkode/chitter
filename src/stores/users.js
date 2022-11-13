@@ -252,7 +252,7 @@ export const useUsersStore = defineStore("users", {
       this.notify(targetId, this.currentId, "follow");
       // remove unfollowed user from your timeline
       const store = useTweetStore();
-      const tweets = await store.getTimeline(this.currentId);
+      const tweets = await store.getTimelineTweets(this.currentId);
       if (!tweets) return;
       const newTimeline = tweets.filter(
         (tweet) => tweet.fromUserId !== targetId
@@ -313,10 +313,10 @@ export const useUsersStore = defineStore("users", {
       this.updateDocInCollection("notifications", this.currentId, newNotifs);
     },
 
-    async deleteReplyNotification(userId, tweetId) {
+    async deleteNotification(userId, tweetId) {
       const notifs = await this.getNotificationsDoc(userId);
       if (!notifs) return;
-      // remove reply from new notif array
+      // remove from new notif array
       if (notifs.new.filter((n) => n.tweetId === tweetId).length > 0) {
         const newNotifications = notifs.new.filter(
           (n) => n.tweetId !== tweetId
@@ -325,7 +325,7 @@ export const useUsersStore = defineStore("users", {
           new: newNotifications,
         });
       }
-      // remove reply from old notif array
+      // remove from old notif array
       if (notifs.old.filter((n) => n.tweetId === tweetId).length > 0) {
         const oldNotifications = notifs.old.filter(
           (n) => n.tweetId !== tweetId
@@ -341,10 +341,7 @@ export const useUsersStore = defineStore("users", {
     },
 
     getAllNotifications() {
-      return [
-        ...this.notifications.new.reverse(),
-        ...this.notifications.old.reverse(),
-      ];
+      return [...this.notifications.old, ...this.notifications.new];
     },
 
     isNewNotification(notif) {

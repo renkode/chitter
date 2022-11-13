@@ -1,5 +1,5 @@
 <script setup>
-import { computed } from "vue";
+import { ref, computed } from "vue";
 import UserList from "../lists/UserList.vue";
 import ModalHeader from "./ModalHeader.vue";
 import { useAppStore } from "@/stores/app";
@@ -17,15 +17,21 @@ const headerText = computed(() =>
     ? "Liked by"
     : ""
 );
-const currentTweet = computed(() => tweets.getTweet(app.routeTweetId));
-const list = computed(() => {
+const currentTweet = ref(await tweets.getTweet(app.routeTweetId));
+const list = ref(await fetchUsers());
+
+async function fetchUsers() {
   if (currentTweet.value && app.modalType === "retweet-list") {
-    return currentTweet.value.retweetsFrom.map((id) => users.getUser(id));
+    return Promise.all(
+      currentTweet.value.retweetsFrom.map((id) => users.getUser(id))
+    );
   } else if (app.modalType === "like-list") {
-    return currentTweet.value.likesFrom.map((id) => users.getUser(id));
+    return Promise.all(
+      currentTweet.value.likesFrom.map((id) => users.getUser(id))
+    );
   }
   return null;
-});
+}
 </script>
 
 <template>

@@ -7,7 +7,7 @@ const app = useAppStore();
 const props = defineProps({
   type: String,
   id: String,
-  iconUrl: String,
+  avatarUrl: String,
   name: String,
   username: String,
   tweetText: String,
@@ -59,7 +59,7 @@ function handleClick() {
       /></span>
     </div>
     <div class="notif-body">
-      <ProfilePicture :url="props.iconUrl" :size="32" />
+      <ProfilePicture :url="props.avatarUrl" :size="32" />
       <div class="notif-text">
         <strong>{{ props.name }}</strong
         >{{ notifText }}

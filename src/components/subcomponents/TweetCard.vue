@@ -1,5 +1,5 @@
 <script setup>
-import { ref, defineProps, onMounted, onBeforeUnmount } from "vue";
+import { ref, computed, defineProps, onMounted, onBeforeUnmount } from "vue";
 import dayjs from "dayjs";
 import ProfilePicture from "./ProfilePicture.vue";
 import EmbeddedText from "./EmbeddedText.vue";
@@ -38,7 +38,7 @@ const likes = ref(props.tweet.likeCount);
 const isLiked = ref(await tweets.hasLiked(props.id, users.currentId));
 const retweets = ref(props.tweet.retweetCount);
 const isRetweeted = ref(await tweets.hasRetweeted(props.id, users.currentId));
-const canFollow = ref(users.canFollow(user.value.id));
+const canFollow = computed(() => users.canFollow(user.value.id));
 
 const toggleTweetMenu = () => {
   if (!users.currentId) return;
@@ -57,7 +57,7 @@ const toggleLike = () => {
     likes.value++;
     isLiked.value = true;
   } else {
-    tweets.removeLike(props.id, users.currentId);
+    tweets.removeLike(props.id, users.currentId, user.value.id);
     likes.value--;
     isLiked.value = false;
   }
@@ -69,7 +69,7 @@ const toggleRetweet = () => {
     retweets.value++;
     isRetweeted.value = true;
   } else {
-    tweets.removeRetweet(props.id, users.currentId);
+    tweets.removeRetweet(props.id, users.currentId, user.value.id);
     retweets.value--;
     isRetweeted.value = false;
   }
@@ -161,7 +161,7 @@ onBeforeUnmount(() => {
                 <li
                   class="tweet-menu-item"
                   v-if="users.currentId !== user.id && canFollow"
-                  @click="users.followUser(users.currentId, user.id)"
+                  @click="users.followUser(user.id)"
                 >
                   <span class="tweet-menu-icon"
                     ><v-icon
@@ -173,7 +173,7 @@ onBeforeUnmount(() => {
                 <li
                   class="tweet-menu-item"
                   v-if="users.currentId !== user.id && !canFollow"
-                  @click="users.unfollowUser(users.currentId, user.id)"
+                  @click="users.unfollowUser(user.id)"
                 >
                   <span class="tweet-menu-icon"
                     ><v-icon

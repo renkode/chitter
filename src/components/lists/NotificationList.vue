@@ -12,31 +12,36 @@ const tweets = useTweetStore();
 const users = useUsersStore();
 const props = defineProps({ notifs: Array }); // { fromUser, type, tweetId }
 const notifs = ref(
-  await Promise.all(
-    props.notifs.map(async (notif) => {
-      const tweet = notif.tweetId ? await tweets.getTweet(notif.tweetId) : null;
-      // map to TweetCard for replies and mentions
-      if (notif.type === "reply" || notif.type === "mention") {
-        return Object.assign(notif, {
-          id: tweet.id,
-          tweet,
-          isNewNotification: users.tweetIsNewNotification(notif.tweetId),
-        });
-      } // map to NotificationCard for follows/likes/retweets
-      else {
-        const user = await users.getUser(notif.fromUser);
-        return Object.assign(notif, {
-          type: notif.type,
-          name: user.name,
-          username: user.username,
-          avatarUrl: user.avatarUrl,
-          tweetText: tweet ? tweet.text : null,
-          containsMedia: tweet ? tweet.media.length > 0 : null,
-          isNew: users.isNewNotification(notif),
-        });
-      }
-    })
-  )
+  (
+    await Promise.all(
+      props.notifs.map(async (notif) => {
+        const tweet = notif.tweetId
+          ? await tweets.getTweet(notif.tweetId)
+          : null;
+        // map to TweetCard for replies and mentions
+        if (notif.type === "reply" || notif.type === "mention") {
+          return Object.assign(notif, {
+            id: tweet.id,
+            tweet,
+            isNewNotification: users.tweetIsNewNotification(notif.tweetId),
+          });
+        } // map to NotificationCard for follows/likes/retweets
+        else {
+          const user = await users.getUser(notif.fromUser);
+          return Object.assign(notif, {
+            id: tweet ? tweet.id : null,
+            type: notif.type,
+            name: user.name,
+            username: user.username,
+            avatarUrl: user.avatarUrl,
+            tweetText: tweet ? tweet.text : null,
+            containsMedia: tweet ? tweet.media.length > 0 : null,
+            isNew: users.isNewNotification(notif),
+          });
+        }
+      })
+    )
+  ).reverse()
 );
 </script>
 
@@ -72,10 +77,10 @@ const notifs = ref(
             :key="index + uid()"
             :id="notif.id"
             :type="notif.type"
-            :iconUrl="notif.iconUrl"
+            :avatarUrl="notif.avatarUrl"
             :name="notif.name"
             :username="notif.username"
-            :tweetText="notif.text"
+            :tweetText="notif.tweetText"
             :containsMedia="notif.media && notif.media.length > 0"
             :isNew="notif.isNew"
           />
@@ -85,7 +90,7 @@ const notifs = ref(
           <NotificationCard
             :key="index + uid()"
             :type="notif.type"
-            :iconUrl="notif.avatarUrl"
+            :avatarUrl="notif.avatarUrl"
             :name="notif.name"
             :username="notif.username"
             :isNew="notif.isNew"
