@@ -36,7 +36,12 @@ async function fetchPreviousTweets() {
         prev.unshift({ id: null }); // deleted tweet
         break;
       }
-      prev.unshift(Object.assign(lastTweet, { isPreviousReply: true }));
+      prev.unshift(
+        Object.assign(lastTweet, {
+          isPreviousReply: true,
+          replyingToUser: await users.getUsername(lastTweet.authorId),
+        })
+      );
       currentTweet = lastTweet;
     } catch (e) {
       console.log(e);
@@ -54,11 +59,12 @@ async function fetchRepliesToCurrentTweet() {
 
 async function updateTweets() {
   if (!viewingTweet.value) return [null];
+  const replyingToUser = await users.getUsername(viewingTweet.value.authorId);
   return store.setTweets([
     ...(await fetchPreviousTweets()),
     Object.assign(viewingTweet.value, {
-      username: await users.getUsername(viewingTweet.value.authorId),
-    }), // vue keeps throwing indexOf error for some reason if i put this in the template
+      replyingToUser,
+    }),
     ...(await fetchRepliesToCurrentTweet()),
   ]);
 }
@@ -84,6 +90,8 @@ onMounted(async () => {
   }
   pending.value = false;
 });
+
+// NOTE: passing a promise to replyToUser will cause the tweets to pop in whenever they resolve, and that looks super ugly
 </script>
 
 <template>
@@ -104,11 +112,7 @@ onMounted(async () => {
             :user="users.getUserProps(tweet.authorId)"
             :tweet="tweet"
             :type="tweet.type"
-            :replyingTo="
-              tweet.replyingToUser
-                ? users.getUsername(tweet.replyingToUser)
-                : null
-            "
+            :replyingTo="tweet.replyingToUser"
             :isPreviousReply="true"
           />
         </template>
@@ -120,11 +124,7 @@ onMounted(async () => {
             :user="users.getUserProps(tweet.authorId)"
             :tweet="tweet"
             :type="tweet.type"
-            :replyingTo="
-              tweet.replyingToUser
-                ? users.getUsername(tweet.replyingToUser)
-                : null
-            "
+            :replyingTo="tweet.replyingToUser"
           />
         </template>
         <template v-else>
@@ -134,7 +134,7 @@ onMounted(async () => {
             :user="users.getUserProps(tweet.authorId)"
             :tweet="tweet"
             :type="tweet.type"
-            :replyingTo="viewingTweet.username"
+            :replyingTo="viewingTweet.replyingToUser"
             :isPreviousReply="false"
           />
         </template>
