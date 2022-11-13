@@ -291,10 +291,13 @@ export const useTweetStore = defineStore("tweets", {
       authorId,
       replyingToTweet = null,
       replyingToUser = null,
-      mentionedUsers = null
+      mentionedUsers = null,
+      isViewingTweet
     ) {
+      const users = useUsersStore();
       const tweetId = uid();
       const timestamp = new Date().toISOString();
+      // upload images to storage
       let media = [];
       if (mediaFiles.length > 0) {
         await Promise.all(
@@ -325,13 +328,22 @@ export const useTweetStore = defineStore("tweets", {
         quotesFrom: [],
         likesFrom: [],
       };
-      this.tweets.unshift(newTweet);
+
+      // update client-side tweets
+      const temp = Object.assign({}, newTweet, {
+        replyingToUser: replyingToUser
+          ? users.getUsername(replyingToUser)
+          : null,
+      });
+      isViewingTweet ? this.tweets.push(temp) : this.tweets.unshift(temp);
+
+      // update server-side tweets
       await setDoc(doc(db, "tweets", tweetId), newTweet);
       if (type === "reply" && replyingToTweet) {
         this.addToFieldArray(replyingToTweet, "repliesFrom", tweetId);
       }
+
       // update timelines and notify if tweet is a reply/mentions other users
-      const users = useUsersStore();
       const containsMedia = media.length > 0 ? true : false;
       users.addTweet(
         authorId,
@@ -357,7 +369,7 @@ export const useTweetStore = defineStore("tweets", {
         timestamp,
         null,
         replyingToUser
-      ); // followers
+      );
       if (replyingToUser && replyingToUser !== authorId) {
         users.notify(replyingToUser, authorId, type, tweetId);
       }
@@ -383,7 +395,7 @@ export const useTweetStore = defineStore("tweets", {
       const tweet = await this.getTweet(id);
       if (!tweet) return;
       this.setTweets(this.tweets.filter((t) => t.id !== id));
-      if (tweet.replyingToTweet)
+      if (tweet.replyingToTweet && (await this.getTweet(tweet.replyingToTweet)))
         this.removeFromFieldArray(tweet.replyingToTweet, "repliesFrom", id);
 
       const users = useUsersStore();

@@ -1,5 +1,12 @@
 <script setup>
-import { defineProps, ref, computed, watch, onMounted } from "vue";
+import {
+  defineProps,
+  ref,
+  computed,
+  watch,
+  onMounted,
+  onBeforeMount,
+} from "vue";
 import ProfileBio from "./subcomponents/ProfileBio.vue";
 import TweetList from "./lists/TweetList.vue";
 import LoadSpinner from "./subcomponents/LoadSpinner.vue";
@@ -41,6 +48,7 @@ async function fetchTweets() {
         retweetedBy: t.type === "retweet" ? props.username : null,
         timestamp: t.timestamp,
         type: t.type,
+        replyingToUser: t.replyingToUser ? users.currentUser.username : null,
       })
     )
   ).then((values) => {
@@ -60,7 +68,7 @@ async function fetchTweetsAndReplies() {
   await Promise.all(
     twts.map(async (t) =>
       Object.assign(await store.getTweet(t.id), {
-        user: await users.getUserProps(doc.data().authorId),
+        user: await users.getUserProps(t.authorId),
         replyingToUser:
           t.type === "reply" ? await users.getUsername(t.replyingToUser) : null,
       })
@@ -93,12 +101,17 @@ async function fetchLikes() {
   });
 }
 
+onBeforeMount(() => {
+  store.setTweets([]);
+});
+
 onMounted(() => {
   if (user.value === null) return;
   fetchTweets();
 });
 
 watch(tab, () => {
+  pending.value = true;
   switch (tab.value) {
     case "tweets-and-replies":
       fetchTweetsAndReplies();

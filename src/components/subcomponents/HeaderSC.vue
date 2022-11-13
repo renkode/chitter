@@ -11,7 +11,7 @@ const users = useUsersStore();
 const user = ref(
   users.currentUser && app.routeUsername === users.currentUser.username
     ? computed(() => users.currentUser)
-    : app.routeUsername
+    : (await users.getUserByUsername(app.routeUsername))
     ? await users.getUserByUsername(app.routeUsername)
     : null
 );

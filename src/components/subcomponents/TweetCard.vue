@@ -295,6 +295,7 @@ onBeforeUnmount(() => {
   align-items: center;
   width: 100%;
   padding-left: 10%;
+  padding-bottom: 6px;
   gap: 6px;
 }
 

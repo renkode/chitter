@@ -40,7 +40,7 @@ const deleteTweet = () => {
   if (app.routeTweetId == props.id) {
     if (props.tweet.replyingToTweet) app.viewTweet(props.tweet.replyingToTweet);
   } else {
-    app.viewTweet(null);
+    app.viewTweet();
   }
   tweets.removeTweet(props.id, user.value.id);
 };
