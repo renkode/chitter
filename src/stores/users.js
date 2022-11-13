@@ -111,6 +111,7 @@ export const useUsersStore = defineStore("users", {
     },
 
     async getUsername(id) {
+      if (!id) return null;
       const user = await this.getUser(id);
       return user ? user.username : "";
     },

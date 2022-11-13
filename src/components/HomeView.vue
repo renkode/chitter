@@ -20,12 +20,8 @@ const fetchTweets = async () => {
     tl.map(async (t) =>
       Object.assign(await store.getTweet(t.id), {
         type: t.type,
-        retweetedBy: t.retweetedBy
-          ? await users.getUsername(t.retweetedBy)
-          : null,
-        replyingToUser: t.replyingToUser
-          ? await users.getUsername(t.replyingToUser)
-          : null,
+        retweetedBy: await users.getUsername(t.retweetedBy),
+        replyingToUser: await users.getUsername(t.replyingToUser),
         timestamp: t.timestamp,
       })
     )

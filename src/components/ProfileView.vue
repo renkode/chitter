@@ -69,8 +69,7 @@ async function fetchTweetsAndReplies() {
     twts.map(async (t) =>
       Object.assign(await store.getTweet(t.id), {
         user: await users.getUserProps(t.authorId),
-        replyingToUser:
-          t.type === "reply" ? await users.getUsername(t.replyingToUser) : null,
+        replyingToUser: await users.getUsername(t.replyingToUser),
       })
     )
   ).then((values) => {
@@ -83,7 +82,15 @@ async function fetchMedia() {
   // TO-DO: trim by fetch length
   const doc = await users.getUserTweets(user.value.id);
   const twts = doc.filter((tweet) => tweet.containsMedia);
-  await Promise.all(twts.map((t) => store.getTweet(t.id))).then((values) => {
+  await Promise.all(
+    twts.map(async (t) =>
+      store.getTweet(t.id).then(async (data) =>
+        Object.assign(data, {
+          replyingToUser: await users.getUsername(data.replyingToUser),
+        })
+      )
+    )
+  ).then((values) => {
     pending.value = false;
     store.setTweets(store.sortByTimestamp(values));
   });
@@ -91,12 +98,18 @@ async function fetchMedia() {
 
 async function fetchLikes() {
   // TO-DO: trim by fetch length
-  await Promise.all(user.value.likes.map((id) => store.getTweet(id))).then(
-    (values) => {
-      pending.value = false;
-      store.setTweets(store.sortByTimestamp(values));
-    }
-  );
+  return Promise.all(
+    user.value.likes.map(async (id) =>
+      store.getTweet(id).then(async (data) =>
+        Object.assign(data, {
+          replyingToUser: await users.getUsername(data.replyingToUser),
+        })
+      )
+    )
+  ).then((values) => {
+    pending.value = false;
+    store.setTweets(store.sortByTimestamp(values));
+  });
 }
 
 onBeforeMount(() => {

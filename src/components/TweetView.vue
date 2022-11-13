@@ -40,6 +40,7 @@ async function fetchPreviousTweets() {
         Object.assign(lastTweet, {
           isPreviousReply: true,
           replyingToUser: await users.getUsername(lastTweet.authorId),
+          user: await users.getUserProps(lastTweet.authorId), // for timing issues
         })
       );
       currentTweet = lastTweet;
@@ -91,7 +92,7 @@ onMounted(async () => {
   pending.value = false;
 });
 
-// NOTE: passing a promise to replyToUser will cause the tweets to pop in whenever they resolve, and that looks super ugly
+// NOTE: passing a promise to replyToUser/user will cause the tweets to pop in whenever they resolve, and that looks super ugly
 </script>
 
 <template>
@@ -109,7 +110,7 @@ onMounted(async () => {
           <TweetCard
             :key="tweet.id"
             :id="tweet.id"
-            :user="users.getUserProps(tweet.authorId)"
+            :user="tweet.user"
             :tweet="tweet"
             :type="tweet.type"
             :replyingTo="tweet.replyingToUser"

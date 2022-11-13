@@ -14,7 +14,7 @@ const app = useAppStore();
 const users = useUsersStore();
 const props = defineProps({
   id: String,
-  user: Promise, // id, name, username, avatarUrl
+  user: [Object, Promise], // id, name, username, avatarUrl
   tweet: Object,
   retweetedBy: String,
   replyingTo: [String, Promise],

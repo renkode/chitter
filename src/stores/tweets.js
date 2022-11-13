@@ -328,9 +328,7 @@ export const useTweetStore = defineStore("tweets", {
 
       // update client-side tweets
       const temp = Object.assign({}, newTweet, {
-        replyingToUser: replyingToUser
-          ? users.getUsername(replyingToUser)
-          : null,
+        replyingToUser: users.getUsername(replyingToUser),
       });
       isViewingTweet ? this.tweets.push(temp) : this.tweets.unshift(temp);
 
