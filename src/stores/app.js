@@ -1,25 +1,20 @@
 import { defineStore } from "pinia";
 import { useUsersStore } from "./users";
 import router from "@/router/index.js";
-import { auth, db } from "@/firebase.js";
+import { auth } from "@/firebase.js";
 import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
   signOut,
 } from "firebase/auth";
-import { collection, doc, setDoc, getDoc } from "firebase/firestore";
 
 export const useAppStore = defineStore("app", {
   state: () => ({
-    currentId: null, // initialized on mount
-    currentUser: null, // initialized on mount
-    profileTab: "tweets", // tweets (default) | tweets-and-replies | media | likes
     showModal: false,
     modalType: "status", // status | reply | edit-profile | retweet-list | like-list
     modalReply: { userId: null, tweetId: null },
     showToast: false,
     toastText: "",
-    componentKey: 0, // to force component update
   }),
   getters: {
     routeName: () => {
@@ -91,15 +86,6 @@ export const useAppStore = defineStore("app", {
           console.log(errorMessage);
           return errorCode;
         });
-    },
-
-    setProfileTab(tab) {
-      if (this.profileTab === tab) return;
-      const tabs = ["tweets", "tweets-and-replies", "media", "likes"];
-      if (!tabs.includes(tab)) {
-        throw Error("wrong tab");
-      }
-      this.profileTab = tab;
     },
 
     viewTweet(id) {

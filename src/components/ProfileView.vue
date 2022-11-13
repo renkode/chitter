@@ -21,7 +21,7 @@ const props = defineProps(["username"]);
 // initialize
 const pending = ref(true);
 const user = ref(
-  props.username === users.currentUser.username
+  users.currentId && props.username === users.currentUser.username
     ? computed(() => users.currentUser)
     : await users.getUserByUsername(props.username)
 );

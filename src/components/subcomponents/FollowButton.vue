@@ -7,11 +7,13 @@ const props = defineProps(["userId"]);
 const emit = defineEmits(["increment"]);
 
 const follow = () => {
+  if (!users.currentId) return;
   users.followUser(props.userId);
   emit("increment", 1);
 };
 
 const unfollow = () => {
+  if (!users.currentId) return;
   users.unfollowUser(props.userId);
   emit("increment", -1);
 };

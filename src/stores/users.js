@@ -1,5 +1,5 @@
 import { defineStore } from "pinia";
-import { auth, db, storage } from "@/firebase.js";
+import { db, storage } from "@/firebase.js";
 import {
   collection,
   doc,

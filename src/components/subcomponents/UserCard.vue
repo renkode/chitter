@@ -13,6 +13,7 @@ const props = defineProps([
   "username",
   "avatarUrl",
   "description",
+  "isSimple",
 ]);
 const isFollowing = ref(
   users.currentId
@@ -22,12 +23,15 @@ const isFollowing = ref(
 
 function goToProfile() {
   app.viewUserProfile(props.username);
-  // if (app.showModal) app.toggleModal();
 }
 </script>
 
 <template>
-  <div class="user-container" @click="goToProfile">
+  <div
+    class="user-container"
+    @click="goToProfile"
+    :class="{ isSimple: props.isSimple }"
+  >
     <div class="profile-pic-container">
       <ProfilePicture
         :url="props.avatarUrl"
@@ -48,9 +52,14 @@ function goToProfile() {
             </div>
           </span>
         </div>
-        <FollowButton v-if="users.currentId" :userId="props.id" />
+        <FollowButton
+          v-if="users.currentId && users.currentId !== props.id"
+          :userId="props.id"
+        />
       </div>
-      <div class="description">{{ props.description }}</div>
+      <div class="description" v-if="props.description">
+        {{ props.description }}
+      </div>
     </div>
   </div>
 </template>
@@ -110,5 +119,21 @@ function goToProfile() {
   word-wrap: normal;
   word-break: normal;
   white-space: nowrap;
+}
+
+.isSimple.user-container {
+  border-top: 0;
+}
+
+.isSimple .user-body {
+  justify-content: center;
+}
+
+.isSimple .user-info-wrapper {
+  width: auto;
+}
+
+.isSimple .user-info-and-btn {
+  margin-bottom: 0;
 }
 </style>

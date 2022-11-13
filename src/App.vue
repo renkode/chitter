@@ -81,7 +81,10 @@ onBeforeUnmount(() => {
       </div>
     </div>
 
-    <MediaSidebar v-show="width >= 1005" />
+    <Suspense timeout="0"
+      ><template #default> <MediaSidebar v-show="width >= 1005" /></template
+    ></Suspense>
+
     <SignUpBanner v-if="!users.currentUser" />
   </template>
 

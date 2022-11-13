@@ -1,9 +1,16 @@
 <script setup>
+import { onMounted, ref } from "vue";
 import { useAppStore } from "@/stores/app";
 import { useUsersStore } from "@/stores/users";
+import UserCard from "./subcomponents/UserCard.vue";
 
 const app = useAppStore();
 const users = useUsersStore();
+const userProps = ref(null);
+
+onMounted(async () => {
+  userProps.value = await users.getUserByUsername("renkode");
+});
 </script>
 
 <template>
@@ -23,7 +30,7 @@ const users = useUsersStore();
             Sign up now to get your own personalized timeline!
           </div>
           <button class="sign-up-btn" @click="app.toggleModal('signup')">
-            Sign up with email
+            <span>Sign up with email</span>
           </button>
           <div class="gray-text">
             By signing up, you agree to the
@@ -32,6 +39,18 @@ const users = useUsersStore();
             <a class="blue-link">Cookie Use</a>.
           </div>
         </div>
+      </div>
+
+      <div class="media-container" v-if="users.currentUser">
+        <div class="media-header">Who to Follow</div>
+        <UserCard
+          v-if="userProps"
+          :id="userProps.id"
+          :name="userProps.name"
+          :username="userProps.username"
+          :avatarUrl="userProps.avatarUrl"
+          :isSimple="true"
+        />
       </div>
 
       <div class="media-container">
@@ -96,7 +115,8 @@ const users = useUsersStore();
 
 .search-tweet,
 .media-container,
-.trend-container {
+.trend-container,
+.user-container {
   width: 100%;
 }
 
@@ -172,18 +192,27 @@ input:focus {
   background-color: rgba(255, 255, 255, 0.07);
 }
 
+.sign-up-btn span {
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
 .trend-info {
   display: flex;
   flex-direction: column;
   line-height: 1.25rem;
 }
 
-.trend-container {
-  padding: 10px 14px 10px 14px;
+.trend-container,
+.user-container {
+  padding: 12px 14px;
   transition: background-color 0.15s ease;
 }
 
-.trend-container:hover {
+.trend-container:hover,
+.user-container:hover {
   background-color: rgba(255, 255, 255, 0.07);
 }
 
