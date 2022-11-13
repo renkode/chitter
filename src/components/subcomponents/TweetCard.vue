@@ -111,7 +111,7 @@ onBeforeUnmount(() => {
   <div
     class="tweet-container"
     :class="{ border: !isPreviousReply, new: isNewNotification }"
-    @click="app.setTweetContext(props.id)"
+    @click="app.viewTweet(props.id)"
   >
     <div class="user-retweet gray-text" v-if="props.retweetedBy">
       <v-icon name="la-retweet-solid" scale="0.89" fill="#ffffff80" />

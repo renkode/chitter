@@ -384,7 +384,7 @@ export const useTweetStore = defineStore("tweets", {
       if (!tweet) return;
       this.setTweets(this.tweets.filter((t) => t.id !== id));
       if (tweet.replyingToTweet)
-        this.removeFromFieldArray(id, "repliesFrom", id);
+        this.removeFromFieldArray(tweet.replyingToTweet, "repliesFrom", id);
 
       const users = useUsersStore();
       users.removeTweet(userId, id);

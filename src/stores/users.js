@@ -304,27 +304,32 @@ export const useUsersStore = defineStore("users", {
       }
     },
 
-    clearNotifications() {
-      const notifs = {
-        old: [...this.notifications.old, ...this.notifications.new],
+    async clearNotifications() {
+      const notifs = await this.getNotificationsDoc(this.currentId);
+      const newNotifs = {
+        old: [...notifs.old, ...notifs.new],
         new: [],
       };
-      this.updateDocInCollection("notifications", this.currentId, notifs);
+      this.updateDocInCollection("notifications", this.currentId, newNotifs);
     },
 
     async deleteReplyNotification(userId, tweetId) {
       const notifs = await this.getNotificationsDoc(userId);
       if (!notifs) return;
       // remove reply from new notif array
-      if (notifs.filter((n) => n.tweetId === tweetId).length > 0) {
-        const newNotifications = notifs.filter((n) => n.tweetId !== tweetId);
+      if (notifs.new.filter((n) => n.tweetId === tweetId).length > 0) {
+        const newNotifications = notifs.new.filter(
+          (n) => n.tweetId !== tweetId
+        );
         this.updateDocInCollection("notifications", userId, {
           new: newNotifications,
         });
       }
       // remove reply from old notif array
-      if (notifs.filter((n) => n.tweetId === tweetId).length > 0) {
-        const oldNotifications = notifs.filter((n) => n.tweetId !== tweetId);
+      if (notifs.old.filter((n) => n.tweetId === tweetId).length > 0) {
+        const oldNotifications = notifs.old.filter(
+          (n) => n.tweetId !== tweetId
+        );
         this.updateDocInCollection("notifications", userId, {
           old: oldNotifications,
         });

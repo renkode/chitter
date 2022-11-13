@@ -17,6 +17,7 @@ const circle = ref(null);
 const images = ref([]);
 const imagePreviews = ref([]);
 const str = ref("");
+const isUploading = ref(false);
 
 const user = computed(() => users.currentUser);
 const noContent = computed(
@@ -35,8 +36,13 @@ const canTweet = computed(
 );
 
 const onFileChange = (e) => {
-  images.value.push(e.currentTarget.files[0]);
-  imagePreviews.value.push(URL.createObjectURL(e.currentTarget.files[0]));
+  Array.from(e.currentTarget.files)
+    .slice(0, 4)
+    .forEach((f) => images.value.push(f));
+  Array.from(e.currentTarget.files)
+    .slice(0, 4)
+    .map((file) => URL.createObjectURL(file))
+    .forEach((f) => imagePreviews.value.push(f));
 };
 
 const removeFile = (index) => {
@@ -90,15 +96,19 @@ const getMentions = (str) => {
 
 const postTweet = async () => {
   if (noContent.value) return;
+  isUploading.value = true;
   let replyingToTweet =
-    app.modalType === "reply" ? app.modalReply.tweetId : null;
+    props.isModal && app.modalType === "reply" ? app.modalReply.tweetId : null;
   const replyingToUser =
-    app.modalType === "reply"
+    props.isModal && app.modalType === "reply"
       ? app.modalReply.userId
       : await getInitialReplyUser(str.value);
   const mentionedUsers = getMentions(str.value);
-  const type = app.modalType === "reply" || replyingToUser ? "reply" : "status";
-  tweetStore.addTweet(
+  const type =
+    (props.isModal && app.modalType === "reply") || replyingToUser
+      ? "reply"
+      : "status";
+  await tweetStore.addTweet(
     type,
     str.value,
     images.value,
@@ -107,6 +117,7 @@ const postTweet = async () => {
     replyingToUser,
     mentionedUsers
   );
+  isUploading.value = false;
   str.value = "";
   images.value = [];
   imagePreviews.value = [];
@@ -131,7 +142,7 @@ watch(str, () => {
 
 <template>
   <div class="compose-tweet-container">
-    <div class="progress-bar" v-show="tweetStore.uploadProgress">
+    <div class="progress-bar" v-show="isUploading">
       <div
         class="progress-bar-blue"
         :style="`--percent: ${tweetStore.uploadProgress}%`"
@@ -148,7 +159,7 @@ watch(str, () => {
           @input="handleInput"
           v-model="str"
           maxlength="280"
-          :disabled="tweetStore.uploadProgress"
+          :disabled="isUploading"
         ></textarea>
         <div
           class="tweet-media"
@@ -160,10 +171,15 @@ watch(str, () => {
             v-for="img in imagePreviews"
             :key="images.indexOf(img)"
           >
-            <img :src="img" class="image-preview" />
+            <img
+              :src="img"
+              class="image-preview"
+              :class="{ uploading: isUploading }"
+            />
             <button
               class="remove-image-btn"
               @click="removeFile(images.indexOf(img))"
+              v-if="!isUploading"
             >
               <v-icon name="bi-x" scale="1.6" fill="white" />
             </button>
@@ -179,6 +195,7 @@ watch(str, () => {
             @change="onFileChange"
             hidden
             :disabled="maxedImages"
+            multiple
           />
           <label :for="`upload-image-${isModal ? 'modal' : ''}`"
             ><v-icon name="ri-image-add-line" scale="1.1" fill="#1d9bf0" />
@@ -223,6 +240,7 @@ watch(str, () => {
   background-color: #1687d369;
   position: absolute;
   top: 0;
+  left: 0;
 }
 
 .progress-bar-blue {
@@ -313,6 +331,10 @@ textarea:focus {
 }
 .image-preview-wrapper img {
   flex: 1;
+}
+
+img.uploading {
+  opacity: 0.5;
 }
 
 .remove-image-btn {

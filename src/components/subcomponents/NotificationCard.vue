@@ -40,7 +40,7 @@ function handleClick() {
   if (props.type === "follow") {
     app.viewUserProfile(props.username);
   } else {
-    app.setTweetContext(props.id);
+    app.viewTweet(props.id);
   }
 }
 </script>

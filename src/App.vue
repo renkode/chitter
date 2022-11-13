@@ -72,7 +72,9 @@ onBeforeUnmount(() => {
         <router-view v-slot="{ Component }">
           <Transition name="fade" mode="out-in">
             <Suspense timeout="0">
-              <template #default> <component :is="Component" /> </template>
+              <template #default>
+                <component :is="Component" :key="app.componentKey" />
+              </template>
               <template #fallback> <LoadSpinner /> </template>
             </Suspense>
           </Transition>

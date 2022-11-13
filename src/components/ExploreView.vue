@@ -1,5 +1,5 @@
 <script setup>
-import { computed, onMounted, watch } from "vue";
+import { ref, computed, onMounted, watch } from "vue";
 import { useAppStore } from "@/stores/app.js";
 import { useTweetStore } from "@/stores/tweets.js";
 import ComposeTweet from "./subcomponents/ComposeTweet.vue";
@@ -9,6 +9,7 @@ import { collection, getDocs, query, where } from "firebase/firestore";
 
 const store = useTweetStore();
 const tweets = computed(() => store.tweets);
+const pending = ref(true);
 
 async function fetchTweets() {
   store.setTweets([]);
@@ -19,6 +20,7 @@ async function fetchTweets() {
     twts.push(Object.assign(doc.data()));
   });
   store.setTweets(store.sortByTimestamp(twts));
+  pending.value = false;
 }
 
 onMounted(() => fetchTweets());
@@ -32,7 +34,7 @@ watch(tweets, () => {
   <div>
     <ComposeTweet />
     <div class="tweet-list-container">
-      <TweetList :tweets="tweets" />
+      <TweetList :tweets="tweets" :pending="pending" />
     </div>
   </div>
 </template>

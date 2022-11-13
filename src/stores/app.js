@@ -19,6 +19,7 @@ export const useAppStore = defineStore("app", {
     modalReply: { userId: null, tweetId: null },
     showToast: false,
     toastText: "",
+    componentKey: 0, // to force component update
   }),
   getters: {
     routeName: () => {
@@ -101,7 +102,7 @@ export const useAppStore = defineStore("app", {
       this.profileTab = tab;
     },
 
-    setTweetContext(id) {
+    viewTweet(id) {
       if (window.getSelection().toString().length > 0) return; // don't trigger click while highlighting text
       router.push({ name: "Tweet", params: { id } });
     },

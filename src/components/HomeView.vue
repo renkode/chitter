@@ -46,7 +46,7 @@ watch(tweets, () => {
   <div>
     <ComposeTweet />
     <div class="tweet-list-container">
-      <TweetList v-if="!pending" :tweets="tweets" />
+      <TweetList v-if="!pending" :tweets="tweets" :pending="pending" />
       <LoadSpinner v-else />
     </div>
   </div>

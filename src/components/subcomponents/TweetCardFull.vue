@@ -38,10 +38,9 @@ const toggleTweetMenu = () => {
 const deleteTweet = () => {
   if (!users.currentId) return;
   if (app.routeTweetId == props.id) {
-    if (props.tweet.replyingToTweet)
-      app.setTweetContext(props.tweet.replyingToTweet);
+    if (props.tweet.replyingToTweet) app.viewTweet(props.tweet.replyingToTweet);
   } else {
-    app.setTweetContext(null);
+    app.viewTweet(null);
   }
   tweets.removeTweet(props.id, user.value.id);
 };

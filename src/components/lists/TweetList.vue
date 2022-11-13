@@ -5,7 +5,7 @@ import TweetCard from "../subcomponents/TweetCard.vue";
 import LoadSpinner from "../subcomponents/LoadSpinner.vue";
 
 const users = useUsersStore();
-const props = defineProps(["tweets"]);
+const props = defineProps(["tweets", "pending"]);
 </script>
 
 <template>
@@ -24,7 +24,9 @@ const props = defineProps(["tweets"]);
         :replyingTo="tweet.replyingToUser"
     /></TransitionGroup>
 
-    <div class="error gray-text" v-else>No tweets to display</div>
+    <div class="error gray-text" v-else-if="!props.pending">
+      No tweets to display
+    </div>
   </div>
 </template>
 

@@ -60,6 +60,7 @@ async function fetchTweetsAndReplies() {
   await Promise.all(
     twts.map(async (t) =>
       Object.assign(await store.getTweet(t.id), {
+        user: await users.getUserProps(doc.data().authorId),
         replyingToUser:
           t.type === "reply" ? await users.getUsername(t.replyingToUser) : null,
       })
@@ -129,7 +130,7 @@ watch(
 <template>
   <div class="profile-wrapper">
     <ProfileBio v-if="user" :user="user" :tab="tab" :setTab="setTab" />
-    <TweetList v-if="!pending && user" :tweets="tweets" />
+    <TweetList v-if="!pending && user" :tweets="tweets" :pending="pending" />
     <LoadSpinner v-if="pending && user !== null" />
     <div class="error gray-text" v-if="user === null">User not found.</div>
   </div>
