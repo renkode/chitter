@@ -6,6 +6,7 @@ import FollowButton from "./FollowButton.vue";
 import formatDateMixin from "@/mixins/formatDateMixin.js";
 import { useAppStore } from "@/stores/app.js";
 import { useUsersStore } from "@/stores/users.js";
+import { getSingular } from "@/mixins/utilities";
 
 const app = useAppStore();
 const users = useUsersStore();
@@ -99,7 +100,9 @@ const isFollowing = ref(
           class="follow-metric"
           :to="{ name: 'Followers', params: { username: props.user.username } }"
           ><strong>{{ followerCount }}</strong
-          ><span class="follow gray-text"> Followers</span></router-link
+          ><span class="follow gray-text">
+            {{ getSingular(" Followers", followerCount) }}</span
+          ></router-link
         >
       </span>
     </div>

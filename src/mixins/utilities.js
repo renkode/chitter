@@ -24,6 +24,10 @@ const getMediaClass = (images) => {
   }
 };
 
+const getSingular = (string, num) => {
+  return num === 1 ? string.slice(0, string.length - 1) : string;
+};
+
 const calendar = [
   {
     month: "",
@@ -87,4 +91,5 @@ export {
   usernameRegex,
   emailRegex,
   calendar,
+  getSingular,
 };

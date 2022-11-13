@@ -326,6 +326,7 @@ onBeforeUnmount(() => {
   height: 100%;
   position: relative;
   margin: auto;
+  bottom: -5px;
 }
 
 .tweet-data {

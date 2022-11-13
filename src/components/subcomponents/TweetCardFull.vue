@@ -7,6 +7,7 @@ import { getMediaClass } from "@/mixins/utilities.js";
 import { useTweetStore } from "@/stores/tweets.js";
 import { useAppStore } from "@/stores/app.js";
 import { useUsersStore } from "@/stores/users.js";
+import { getSingular } from "@/mixins/utilities";
 
 const tweets = useTweetStore();
 const app = useAppStore();
@@ -202,14 +203,18 @@ const shareTweet = () => {
           v-if="retweets > 0"
           @click="app.toggleModal('retweet-list')"
           ><strong>{{ retweets }}</strong>
-          <span class="gray-text"> Retweets</span></span
+          <span class="gray-text">{{
+            getSingular(" Retweets", retweets)
+          }}</span></span
         >
         <span
           class="tweet-metric"
           v-if="likes > 0"
           @click="app.toggleModal('like-list')"
           ><strong>{{ likes }}</strong>
-          <span class="gray-text"> Likes</span></span
+          <span class="gray-text">{{
+            getSingular(" Likes", likes)
+          }}</span></span
         >
       </div>
 
