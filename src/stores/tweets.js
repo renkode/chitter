@@ -100,7 +100,7 @@ export const useTweetStore = defineStore("tweets", {
       tweetId,
       type,
       timestamp,
-      retweetedBy = null,
+      fromUserId,
       replyingToUser = null
     ) {
       const timeline = await this.getTimelineTweets(userId);
@@ -110,10 +110,9 @@ export const useTweetStore = defineStore("tweets", {
         return; // no repeats
       this.addToTimeline(userId, {
         id: tweetId,
-        fromUserId: userId,
         type,
         timestamp,
-        retweetedBy,
+        fromUserId,
         replyingToUser,
       });
     },
@@ -123,7 +122,7 @@ export const useTweetStore = defineStore("tweets", {
       tweetId,
       type,
       timestamp,
-      retweetedBy,
+      fromUserId,
       replyingToUser
     ) {
       const store = useUsersStore();
@@ -135,7 +134,7 @@ export const useTweetStore = defineStore("tweets", {
             tweetId,
             type,
             timestamp,
-            retweetedBy,
+            fromUserId,
             replyingToUser
           )
         )
@@ -195,7 +194,7 @@ export const useTweetStore = defineStore("tweets", {
         .catch(() => false);
     },
 
-    async addRetweet(id, userId, retweetedBy) {
+    async addRetweet(id, userId, retweeterOfRetweet) {
       this.increment(id, "retweetCount", 1);
       this.addToFieldArray(id, "retweetsFrom", userId);
 
@@ -207,18 +206,18 @@ export const useTweetStore = defineStore("tweets", {
         id,
         "retweet",
         new Date().toISOString(),
-        userId
+        retweeterOfRetweet ? retweeterOfRetweet : userId
       );
       this.addToAllFollowerTimelines(
         userId,
         id,
         "retweet",
         new Date().toISOString(),
-        userId
+        retweeterOfRetweet ? retweeterOfRetweet : userId
       );
 
-      if (tweet.authorId !== userId && retweetedBy !== userId) {
-        retweetedBy
+      if (tweet.authorId !== userId && retweeterOfRetweet !== userId) {
+        retweeterOfRetweet
           ? users.notify(tweet.authorId, userId, "retweet-retweet", id)
           : users.notify(tweet.authorId, userId, "retweet-origin", id);
       }
@@ -354,7 +353,7 @@ export const useTweetStore = defineStore("tweets", {
         tweetId,
         type,
         timestamp,
-        null,
+        authorId,
         replyingToUser
       ); // self
       this.addToAllFollowerTimelines(
@@ -394,7 +393,7 @@ export const useTweetStore = defineStore("tweets", {
         this.removeFromFieldArray(tweet.replyingToTweet, "repliesFrom", id);
 
       const users = useUsersStore();
-      users.removeTweet(userId, id);
+      await users.removeTweet(userId, id);
       this.removeFromTimeline(userId, id); // self
       this.removeFromAllFollowerTimelines(userId, id); // followers
       this.removeAllLikes([...tweet.likesFrom], id, tweet.authorId);

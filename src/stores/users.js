@@ -110,6 +110,12 @@ export const useUsersStore = defineStore("users", {
       return newUser;
     },
 
+    async getName(id) {
+      if (!id) return null;
+      const user = await this.getUser(id);
+      return user ? user.name : "";
+    },
+
     async getUsername(id) {
       if (!id) return null;
       const user = await this.getUser(id);

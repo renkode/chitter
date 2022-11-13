@@ -33,15 +33,15 @@ onBeforeMount(() => {
     let notifUnsub;
     if (user) {
       await users.syncCurrentUserToAuth(user.uid);
+      await users.syncNotifications(user.uid);
       // real-time user and notif updates
-      userUnsub = onSnapshot(doc(db, "users", auth.currentUser.uid), () => {
+      userUnsub = onSnapshot(doc(db, "users", user.uid), () => {
         if (app.routeName !== "Notifications")
           // otherwise it'll re-render if you like a tweet
           users.syncCurrentUserToAuth(user.uid);
       });
-      notifUnsub = onSnapshot(
-        doc(db, "notifications", auth.currentUser.uid),
-        () => users.syncNotifications(user.uid)
+      notifUnsub = onSnapshot(doc(db, "notifications", user.uid), () =>
+        users.syncNotifications(user.uid)
       );
     } else {
       if (userUnsub) userUnsub();
