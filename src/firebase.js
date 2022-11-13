@@ -5,6 +5,7 @@ import {
   getAuth,
   setPersistence,
   browserLocalPersistence,
+  onAuthStateChanged,
 } from "firebase/auth";
 import { getStorage } from "firebase/storage";
 
@@ -25,6 +26,19 @@ const config = {
 
 const app = initializeApp(config);
 
+const user = () => {
+  return new Promise((resolve, reject) => {
+    const unsubscribe = onAuthStateChanged(
+      auth,
+      (userFirebase) => {
+        unsubscribe();
+        resolve(userFirebase);
+      },
+      reject
+    );
+  });
+};
+
 const db = getFirestore();
 
 const auth = getAuth();
@@ -32,4 +46,4 @@ setPersistence(auth, browserLocalPersistence);
 
 const storage = getStorage(app);
 
-export { db, auth, storage };
+export { db, auth, storage, user };

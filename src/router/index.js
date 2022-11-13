@@ -1,6 +1,7 @@
 import { createWebHistory, createRouter } from "vue-router";
 import { useAppStore } from "@/stores/app";
 import { useUsersStore } from "@/stores/users";
+import { user } from "@/firebase.js";
 const HomeView = () => import("@/components/HomeView.vue"); // lazy load routes
 const ExploreView = () => import("@/components/ExploreView.vue");
 const NotificationView = () => import("@/components/NotificationView.vue");
@@ -78,11 +79,10 @@ const router = createRouter({
   routes,
 });
 
-router.beforeEach((to, from, next) => {
+router.beforeEach(async (to, from, next) => {
   const app = useAppStore();
-  const users = useUsersStore();
   if (app.showModal) app.toggleModal();
-  if (to.meta.requiresAuth && !users.currentId) {
+  if (to.meta.requiresAuth && !(await user())) {
     return next("/explore");
   } else {
     return next();

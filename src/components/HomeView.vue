@@ -15,6 +15,7 @@ const pending = ref(true);
 
 // get all tweets from timeline document, have to update properties if the tweet is a reply and/or retweet
 const fetchTweets = async () => {
+  if (!users.currentId) return;
   const tl = await store.getTimelineTweets(users.currentId);
   await Promise.all(
     tl.map(async (t) =>

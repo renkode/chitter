@@ -1,22 +1,18 @@
 import { defineStore } from "pinia";
 import { useUsersStore } from "@/stores/users";
-import { auth, db, storage } from "@/firebase.js";
+import { db, storage } from "@/firebase.js";
 import {
-  collection,
   doc,
   setDoc,
   getDoc,
-  getDocs,
   updateDoc,
   deleteDoc,
-  query,
   arrayRemove,
   increment,
   arrayUnion,
 } from "firebase/firestore";
 import {
   ref,
-  uploadBytes,
   getDownloadURL,
   deleteObject,
   uploadBytesResumable,
@@ -400,7 +396,7 @@ export const useTweetStore = defineStore("tweets", {
       this.removeAllRetweets([...tweet.retweetsFrom], id, tweet.authorId);
       if (tweet.media.length > 0) this.deleteMedia(id, tweet.media.length);
       // remove notifs that reference this tweet
-      users.deleteNotification(users.currentId, id);
+      users.deleteNotification(userId, id);
       if (tweet.replyingToUser)
         users.deleteNotification(tweet.replyingToUser, id);
       return deleteDoc(doc(db, "tweets", id));

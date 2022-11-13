@@ -22,13 +22,10 @@ const onWidthChange = () => {
   width.value = window.innerWidth;
 };
 
-const firebaseTest = async () => {
-  console.log(auth.currentUser);
-};
-
 // persist data
 onBeforeMount(() => {
   auth.onAuthStateChanged(async (user) => {
+    fetching.value = true;
     let userUnsub;
     let notifUnsub;
     if (user) {
