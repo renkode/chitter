@@ -32,7 +32,7 @@
           type: String,
           id: String,
           userId: String,
-          iconUrl: String,
+          avatarUrl: String,
           name: String,
           username: String,
           tweetText: String,
@@ -110,7 +110,7 @@
                       : (0, i.kq)("", !0),
                   ]),
                   (0, i._)("div", U, [
-                    (0, i.Wm)(u.Z, { url: t.iconUrl, size: 32 }, null, 8, [
+                    (0, i.Wm)(u.Z, { url: t.avatarUrl, size: 32 }, null, 8, [
                       "url",
                     ]),
                     (0, i._)("div", g, [
@@ -256,7 +256,7 @@
                                             key: t,
                                             id: e.tweetId,
                                             type: e.type,
-                                            iconUrl: (0, s.SU)(u).getUser(
+                                            avatarUrl: (0, s.SU)(u).getUser(
                                               e.fromUser
                                             ).avatarUrl,
                                             name: (0, s.SU)(u).getUser(
@@ -283,7 +283,7 @@
                                           [
                                             "id",
                                             "type",
-                                            "iconUrl",
+                                            "avatarUrl",
                                             "name",
                                             "username",
                                             "tweetText",
@@ -300,7 +300,7 @@
                                             userId: (0, s.SU)(u).getUser(
                                               e.fromUser
                                             ).id,
-                                            iconUrl: (0, s.SU)(u).getUser(
+                                            avatarUrl: (0, s.SU)(u).getUser(
                                               e.fromUser
                                             ).avatarUrl,
                                             name: (0, s.SU)(u).getUser(
@@ -321,7 +321,7 @@
                                           [
                                             "type",
                                             "userId",
-                                            "iconUrl",
+                                            "avatarUrl",
                                             "name",
                                             "username",
                                             "isNew",
