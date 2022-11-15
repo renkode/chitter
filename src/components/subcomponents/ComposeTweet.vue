@@ -1,10 +1,11 @@
 <script setup>
-import { onMounted, ref, computed, watch, defineProps } from "vue";
+import { ref, computed, watch, defineProps } from "vue";
 import ProfilePicture from "./ProfilePicture.vue";
 import { useAppStore } from "@/stores/app";
 import { useTweetStore } from "@/stores/tweets";
 import { useUsersStore } from "@/stores/users";
 import { getMediaClass, atRegex } from "@/mixins/utilities.js";
+import sanitizeHtml from "sanitize-html";
 
 const app = useAppStore();
 const tweetStore = useTweetStore();
@@ -74,7 +75,7 @@ const getInitialReplyUser = async (str) => {
   }
 };
 
-const getMentions = (str) => {
+const getMentions = async (str) => {
   // e.g. "hello world @username" is a mention
   if (
     str
@@ -82,13 +83,15 @@ const getMentions = (str) => {
       .split(" ")
       .some((word) => atRegex.test(word))
   ) {
-    return str
-      .split(" ")
-      .filter((word) => atRegex.test(word) && word !== str.split(" ")[0])
-      .map(async (word) => {
-        const user = await users.getUserByUsername(word.replace("@", ""));
-        return user ? user.id : null;
-      });
+    return Promise.all(
+      str
+        .split(" ")
+        .filter((word) => atRegex.test(word) && word !== str.split(" ")[0])
+        .map(async (word) => {
+          const user = await users.getUserByUsername(word.replace("@", ""));
+          return user ? user.id : null;
+        })
+    );
   } else {
     return null;
   }
@@ -103,7 +106,7 @@ const postTweet = async () => {
     props.isModal && app.modalType === "reply"
       ? app.modalReply.userId
       : await getInitialReplyUser(str.value);
-  const mentionedUsers = getMentions(str.value);
+  const mentionedUsers = (await getMentions(str.value)).filter((v) => v);
   const type =
     (props.isModal && app.modalType === "reply") || replyingToUser
       ? "reply"
@@ -111,7 +114,11 @@ const postTweet = async () => {
   const isViewingTweet = app.routeName === "Tweet" ? true : false;
   await tweetStore.addTweet(
     type,
-    str.value,
+    sanitizeHtml(str.value, {
+      allowedTags: [],
+      allowedAttributes: {},
+      disallowedTagsMode: "recursiveEscape",
+    }),
     images.value,
     user.value.id,
     replyingToTweet,

@@ -389,11 +389,16 @@ export const useTweetStore = defineStore("tweets", {
         this.removeFromFieldArray(tweet.replyingToTweet, "repliesFrom", id);
 
       const users = useUsersStore();
-      await users.removeTweet(userId, id);
+      users.removeTweet(userId, id);
       this.removeFromTimeline(userId, id); // self
       this.removeFromAllFollowerTimelines(userId, id); // followers
       this.removeAllLikes([...tweet.likesFrom], id, tweet.authorId);
-      this.removeAllRetweets([...tweet.retweetsFrom], id, tweet.authorId);
+      // have to filter self otherwise the status tweet occasionally gets zombified even with await
+      this.removeAllRetweets(
+        [...tweet.retweetsFrom].filter((uid) => uid !== userId),
+        id,
+        tweet.authorId
+      );
       if (tweet.media.length > 0) this.deleteMedia(id, tweet.media.length);
       // remove notifs that reference this tweet
       users.deleteNotification(userId, id);

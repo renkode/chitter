@@ -41,18 +41,6 @@ onMounted(async () => {
         </div>
       </div>
 
-      <div class="media-container" v-if="users.currentUser">
-        <div class="media-header">Who to Follow</div>
-        <UserCard
-          v-if="userProps"
-          :id="userProps.id"
-          :name="userProps.name"
-          :username="userProps.username"
-          :avatarUrl="userProps.avatarUrl"
-          :isSimple="true"
-        />
-      </div>
-
       <div class="media-container">
         <div class="media-header">What's happening</div>
         <div class="trend-container">
@@ -82,9 +70,22 @@ onMounted(async () => {
           </div>
         </div>
       </div>
-      <footer>
+
+      <div class="media-container" v-if="users.currentUser">
+        <div class="media-header">Who to Follow</div>
+        <UserCard
+          v-if="userProps"
+          :id="userProps.id"
+          :name="userProps.name"
+          :username="userProps.username"
+          :avatarUrl="userProps.avatarUrl"
+          :isSimple="true"
+        />
+      </div>
+
+      <!-- <footer>
         Developed by <a href="https://github.com/renkode/">renkode</a>
-      </footer>
+      </footer> -->
     </div>
   </div>
 </template>

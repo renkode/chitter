@@ -1,8 +1,7 @@
 <script setup>
-import { defineProps, computed } from "vue";
+import { defineProps } from "vue";
 import { useUsersStore } from "@/stores/users.js";
 import TweetCard from "../subcomponents/TweetCard.vue";
-import LoadSpinner from "../subcomponents/LoadSpinner.vue";
 
 const users = useUsersStore();
 const props = defineProps(["tweets", "pending"]);

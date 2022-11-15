@@ -20,9 +20,10 @@ const props = defineProps(["username"]);
 
 // initialize
 const pending = ref(true);
+const currentUser = computed(() => users.currentUser);
 const user = ref(
   users.currentId && props.username === users.currentUser.username
-    ? computed(() => users.currentUser)
+    ? currentUser.value
     : await users.getUserByUsername(props.username)
 );
 const tweets = computed(() => store.tweets);
@@ -144,7 +145,7 @@ watch(
   async () => {
     user.value =
       props.username === users.currentUser.username
-        ? computed(() => users.currentUser).value
+        ? currentUser.value
         : await users.getUserByUsername(props.username);
     fetchTweets();
   }

@@ -1,13 +1,20 @@
 <script setup>
-import { ref, defineProps, onMounted } from "vue";
+import {
+  ref,
+  defineProps,
+  onMounted,
+  onBeforeUpdate,
+  onUpdated,
+  onBeforeUnmount,
+} from "vue";
 import { urlRegex, hashtagRegex, atRegex } from "@/mixins/utilities.js";
 import { useAppStore } from "@/stores/app";
 
 const props = defineProps(["text"]);
-const textEl = ref(null);
 const app = useAppStore();
+const textEl = ref(null);
 
-const embedLinks = () => {
+function embedLinks() {
   if (!props.text || props.text.length === 0) return;
 
   const embedArr = props.text.split(" ").map((str) => {
@@ -35,22 +42,39 @@ const embedLinks = () => {
     }
   });
   return embedArr.join(" ");
+}
+
+const handleClick = (e) => {
+  e.stopPropagation();
+  app.viewUserProfile(e.currentTarget.dataset.username);
 };
 
 onMounted(() => {
   const anchors = textEl.value.querySelectorAll(".user-link");
   Array.from(anchors).forEach((anchor) =>
-    anchor.addEventListener(
-      "click",
-      function handleClick(e) {
-        e.stopPropagation();
-        app.viewUserProfile(anchor.dataset.username);
-      },
-      {
-        capture: false,
-        once: true,
-      }
-    )
+    anchor.addEventListener("click", handleClick)
+  );
+});
+
+// edge case: user edits profile bio
+onBeforeUpdate(() => {
+  const anchors = textEl.value.querySelectorAll(".user-link");
+  Array.from(anchors).forEach((anchor) =>
+    anchor.removeEventListener("click", handleClick)
+  );
+});
+
+onUpdated(() => {
+  const anchors = textEl.value.querySelectorAll(".user-link");
+  Array.from(anchors).forEach((anchor) =>
+    anchor.addEventListener("click", handleClick)
+  );
+});
+
+onBeforeUnmount(() => {
+  const anchors = textEl.value.querySelectorAll(".user-link");
+  Array.from(anchors).forEach((anchor) =>
+    anchor.removeEventListener("click", handleClick)
   );
 });
 </script>

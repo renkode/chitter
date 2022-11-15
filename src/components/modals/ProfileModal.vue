@@ -7,6 +7,7 @@ import InputComponent from "../subcomponents/InputComponent.vue";
 import { useAppStore } from "@/stores/app.js";
 import { useUsersStore } from "@/stores/users";
 import { usernameRegex, calendar } from "@/mixins/utilities.js";
+import sanitizeHtml from "sanitize-html";
 
 const app = useAppStore();
 const users = useUsersStore();
@@ -98,7 +99,11 @@ const updateProfile = () => {
     users.currentId,
     nameInput.value,
     usernameInput.value,
-    bioInput.value,
+    sanitizeHtml(bioInput.value, {
+      allowedTags: [],
+      allowedAttributes: {},
+      disallowedTagsMode: "recursiveEscape",
+    }),
     locationInput.value,
     websiteInput.value,
     newBirthDate,

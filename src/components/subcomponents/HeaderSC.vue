@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed } from "vue";
+import { ref, computed, watch } from "vue";
 import { useAppStore } from "@/stores/app.js";
 import { useUsersStore } from "@/stores/users.js";
 import router from "@/router/index.js";
@@ -8,9 +8,10 @@ const app = useAppStore();
 const users = useUsersStore();
 
 // have to check app.routeUsername or firebase gets mad
+const currentUser = computed(() => users.currentUser);
 const user = ref(
   users.currentUser && app.routeUsername === users.currentUser.username
-    ? computed(() => users.currentUser)
+    ? currentUser.value
     : await users.getUserByUsername(app.routeUsername)
 );
 
@@ -24,6 +25,16 @@ const canGoBack = computed(() => {
   ];
   return routes.includes(app.routeName);
 });
+
+watch(
+  () => app.routeUsername,
+  async () => {
+    user.value =
+      users.currentUser && app.routeUsername === users.currentUser.username
+        ? users.currentUser
+        : await users.getUserByUsername(app.routeUsername);
+  }
+);
 </script>
 
 <template>

@@ -47,7 +47,10 @@ function goToProfile() {
           >
           <span class="username-wrapper">
             <span class="username gray-text"> @{{ props.username }} </span>
-            <div v-if="isFollowing" class="follows-you gray-text">
+            <div
+              v-if="isFollowing && !props.isSimple"
+              class="follows-you gray-text"
+            >
               Follows you
             </div>
           </span>

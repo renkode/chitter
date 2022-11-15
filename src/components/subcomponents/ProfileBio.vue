@@ -3,6 +3,7 @@ import { ref, defineProps, computed } from "vue";
 import ProfilePicture from "./ProfilePicture.vue";
 import HeaderPicture from "./HeaderPicture.vue";
 import FollowButton from "./FollowButton.vue";
+import EmbeddedText from "./EmbeddedText.vue";
 import formatDateMixin from "@/mixins/formatDateMixin.js";
 import { useAppStore } from "@/stores/app.js";
 import { useUsersStore } from "@/stores/users.js";
@@ -55,7 +56,9 @@ const isFollowing = ref(
           </div>
         </span>
       </div>
-      <span class="description">{{ props.user.description }}</span>
+      <span class="description"
+        ><EmbeddedText :text="props.user.description"
+      /></span>
       <span class="misc-info-wrapper">
         <span class="misc-info gray-text" v-if="props.user.location"
           ><span class="misc-icon"
