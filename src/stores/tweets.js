@@ -24,8 +24,8 @@ var uid = new ShortUniqueId();
 export const useTweetStore = defineStore("tweets", {
   state: () => ({
     tweets: [],
-    docPointer: null,
-    fetchLimit: 4,
+    infiniteScrollIndex: null,
+    fetchLimit: 2,
     uploadProgress: null,
   }),
   getters: {},

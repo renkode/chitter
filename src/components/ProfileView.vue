@@ -113,17 +113,7 @@ async function fetchLikes() {
   });
 }
 
-onBeforeMount(() => {
-  store.setTweets([]);
-});
-
-onMounted(() => {
-  if (user.value === null) return;
-  fetchTweets();
-});
-
-watch(tab, () => {
-  pending.value = true;
+const updateTweets = () => {
   switch (tab.value) {
     case "tweets-and-replies":
       fetchTweetsAndReplies();
@@ -137,6 +127,20 @@ watch(tab, () => {
     default:
       fetchTweets();
   }
+};
+
+onBeforeMount(() => {
+  store.setTweets([]);
+});
+
+onMounted(() => {
+  if (user.value === null) return;
+  fetchTweets();
+});
+
+watch(tab, () => {
+  pending.value = true;
+  updateTweets();
 });
 
 // update profile if it's not dismounted

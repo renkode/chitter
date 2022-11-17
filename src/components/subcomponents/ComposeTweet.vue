@@ -106,7 +106,7 @@ const postTweet = async () => {
     props.isModal && app.modalType === "reply"
       ? app.modalReply.userId
       : await getInitialReplyUser(str.value);
-  const mentionedUsers = (await getMentions(str.value)).filter((v) => v);
+  const mentionedUsers = await getMentions(str.value);
   const type =
     (props.isModal && app.modalType === "reply") || replyingToUser
       ? "reply"
@@ -123,7 +123,7 @@ const postTweet = async () => {
     user.value.id,
     replyingToTweet,
     replyingToUser,
-    mentionedUsers,
+    mentionedUsers ? mentionedUsers.filter((v) => v) : null,
     isViewingTweet
   );
   isUploading.value = false;
