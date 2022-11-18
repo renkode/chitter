@@ -56,9 +56,17 @@ onMounted(async () => {
 
         <div class="trend-container">
           <div class="trend-info">
-            <span class="trend-type">Trending in Video games</span>
+            <span class="trend-type">Video games</span>
             <span class="trend-headline">HE'S UGLY</span>
             <span class="trend-tweets">32,478 Tweets</span>
+          </div>
+        </div>
+
+        <div class="trend-container">
+          <div class="trend-info">
+            <span class="trend-type">Technology</span>
+            <span class="trend-headline">#RIPTwitter</span>
+            <span class="trend-tweets">20,115 Tweets</span>
           </div>
         </div>
 
