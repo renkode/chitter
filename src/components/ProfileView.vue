@@ -166,7 +166,10 @@ watch(tab, () => {
   updateTweets();
 });
 
-// watch(tweets, () => store.sortTweets())
+// update profile whenever info changes
+watch(currentUser, () => {
+  user.value = currentUser.value;
+});
 
 // update profile whenever user changes
 watch(

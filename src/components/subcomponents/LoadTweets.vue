@@ -15,8 +15,6 @@ const loadMoreTweets = () => {
   props.fetch(unfetchedTweets.value.slice(0, store.fetchLimit));
   unfetchedTweets.value = unfetchedTweets.value.slice(store.fetchLimit);
 };
-
-onMounted(() => console.log(props.rawTweets));
 </script>
 
 <template>

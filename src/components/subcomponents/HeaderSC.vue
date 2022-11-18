@@ -35,6 +35,10 @@ watch(
         : await users.getUserByUsername(app.routeUsername);
   }
 );
+
+watch(currentUser, () => {
+  user.value = currentUser.value;
+});
 </script>
 
 <template>

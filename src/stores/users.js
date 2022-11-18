@@ -213,6 +213,9 @@ export const useUsersStore = defineStore("users", {
       const tweets = await this.getUserTweets(userId);
       const newTweets = tweets.filter((t) => t.id !== tweetId);
       this.updateDocInCollection("user-tweets", userId, { tweets: newTweets });
+      this.updateDocInCollection("users", userId, {
+        tweetCount: newTweets.length,
+      });
     },
 
     addRetweet(userId, tweetId, authorId) {
