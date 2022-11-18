@@ -18,15 +18,15 @@ async function getInitialTweets() {
   const querySnapshot = await getDocs(
     query(collection(db, "tweets"), where("type", "!=", "reply"))
   );
-  querySnapshot.forEach((doc) => twts.push(doc));
+  querySnapshot.forEach((doc) => twts.push(Object.assign(doc.data())));
   return store.sortByTimestamp(twts);
   // NOTE: can't use orderby with different field so i still have to download the whole collection anyway lol.
 }
 
 function fetchTweets(arr) {
   fetching.value = true;
-  arr.forEach((doc) => {
-    store.tweets.push(Object.assign(doc.data()));
+  arr.forEach((twt) => {
+    store.tweets.push(twt);
   });
   pending.value = false;
   fetching.value = false;

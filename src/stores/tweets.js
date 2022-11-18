@@ -25,7 +25,7 @@ export const useTweetStore = defineStore("tweets", {
   state: () => ({
     tweets: [],
     infiniteScrollIndex: null,
-    fetchLimit: 2,
+    fetchLimit: 8,
     uploadProgress: null,
   }),
   getters: {},
