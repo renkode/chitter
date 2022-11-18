@@ -1,29 +1,41 @@
 <script setup>
-import { ref, computed, onMounted, watch } from "vue";
-import { useAppStore } from "@/stores/app.js";
+import { ref, computed, watch, onBeforeMount } from "vue";
 import { useTweetStore } from "@/stores/tweets.js";
 import ComposeTweet from "./subcomponents/ComposeTweet.vue";
 import TweetList from "./lists/TweetList.vue";
+import LoadTweets from "./subcomponents/LoadTweets.vue";
 import { db } from "@/firebase.js";
 import { collection, getDocs, query, where } from "firebase/firestore";
 
 const store = useTweetStore();
 const tweets = computed(() => store.tweets);
-const pending = ref(true);
+const rawTweets = ref(await getInitialTweets());
+const pending = ref(true); // initial load
+const fetching = ref(true);
 
-async function fetchTweets() {
-  store.setTweets([]);
+async function getInitialTweets() {
   const twts = [];
-  const q = query(collection(db, "tweets"), where("type", "!=", "reply"));
-  const querySnapshot = await getDocs(q);
-  querySnapshot.forEach((doc) => {
-    twts.push(Object.assign(doc.data()));
-  });
-  store.setTweets(store.sortByTimestamp(twts));
-  pending.value = false;
+  const querySnapshot = await getDocs(
+    query(collection(db, "tweets"), where("type", "!=", "reply"))
+  );
+  querySnapshot.forEach((doc) => twts.push(doc));
+  return store.sortByTimestamp(twts);
+  // NOTE: can't use orderby with different field so i still have to download the whole collection anyway lol.
 }
 
-onMounted(() => fetchTweets());
+function fetchTweets(arr) {
+  fetching.value = true;
+  arr.forEach((doc) => {
+    store.tweets.push(Object.assign(doc.data()));
+  });
+  pending.value = false;
+  fetching.value = false;
+}
+
+onBeforeMount(async () => {
+  store.setTweets([]);
+  fetchTweets(rawTweets.value.slice(0, store.fetchLimit));
+});
 
 watch(tweets, () => {
   store.sortTweets();
@@ -35,6 +47,11 @@ watch(tweets, () => {
     <ComposeTweet />
     <div class="tweet-list-container">
       <TweetList :tweets="tweets" :pending="pending" />
+      <LoadTweets
+        :isFetching="fetching"
+        :rawTweets="rawTweets.slice(store.fetchLimit)"
+        :fetch="fetchTweets"
+      />
     </div>
   </div>
 </template>
