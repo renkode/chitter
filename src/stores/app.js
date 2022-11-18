@@ -45,7 +45,7 @@ export const useAppStore = defineStore("app", {
           const user = userCredential.user;
           users.syncCurrentUserToAuth(user.uid);
           this.toast("Welcome!");
-          this.goTo("/chitter/home");
+          this.goTo("/home");
         })
         .catch((error) => {
           const errorCode = error.code;
@@ -78,7 +78,7 @@ export const useAppStore = defineStore("app", {
             user.uid
           );
           this.toast("Welcome!");
-          this.goTo("/chitter/home");
+          this.goTo("/home");
         })
         .catch((error) => {
           const errorCode = error.code;

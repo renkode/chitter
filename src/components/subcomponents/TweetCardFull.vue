@@ -78,9 +78,7 @@ const setReply = () => {
 };
 const shareTweet = () => {
   app.toast("Copied to clipboard");
-  navigator.clipboard.writeText(
-    `${window.location.host}/chitter/status/${props.id}`
-  );
+  navigator.clipboard.writeText(`${window.location.host}/status/${props.id}`);
 };
 </script>
 
