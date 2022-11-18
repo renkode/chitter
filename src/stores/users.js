@@ -288,7 +288,8 @@ export const useUsersStore = defineStore("users", {
     },
 
     async syncNotifications(id) {
-      this.notifications = await this.getNotificationsDoc(id);
+      const doc = await this.getNotificationsDoc(id);
+      if (doc) this.notifications = doc;
     },
 
     async notify(targetId, fromUserId, type, tweetId = null) {

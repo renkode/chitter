@@ -168,7 +168,8 @@ watch(tab, () => {
 
 // update profile whenever info changes
 watch(currentUser, () => {
-  user.value = currentUser.value;
+  if (props.username === users.currentUser.username)
+    user.value = currentUser.value;
 });
 
 // update profile whenever user changes
