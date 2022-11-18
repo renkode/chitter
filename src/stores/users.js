@@ -207,6 +207,7 @@ export const useUsersStore = defineStore("users", {
         isSelfReply,
         timestamp,
       });
+      this.increment(userId, "tweetCount", 1);
     },
 
     async removeTweet(userId, tweetId) {
@@ -236,6 +237,7 @@ export const useUsersStore = defineStore("users", {
         (t) => t.id !== tweetId || t.type !== "retweet"
       );
       this.updateDocInCollection("user-tweets", userId, { tweets: newTweets });
+      this.increment(userId, "tweetCount", -1);
     },
 
     addLike(userId, tweetId) {

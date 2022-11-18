@@ -17,14 +17,14 @@ const toggleAccountMenu = () => {
   <div class="nav-sidebar">
     <nav>
       <ul>
-        <router-link to="/home" class="nav-logo">
+        <router-link :to="{ name: 'Home' }" class="nav-logo">
           <li class="nav-item">
             <span class="nav-icon"
               ><v-icon name="bi-twitter" scale="2.0" fill="white"
             /></span></li
         ></router-link>
 
-        <router-link to="/home" v-if="users.currentUser">
+        <router-link :to="{ name: 'Home' }" v-if="users.currentUser">
           <li class="nav-item">
             <span class="nav-icon"
               ><v-icon
@@ -35,7 +35,7 @@ const toggleAccountMenu = () => {
           </li></router-link
         >
 
-        <router-link to="/explore"
+        <router-link :to="{ name: 'Explore' }"
           ><li class="nav-item">
             <span class="nav-icon stroke"
               ><v-icon name="hi-hashtag" scale="1.6" fill="#ffffff80" /></span
@@ -43,7 +43,7 @@ const toggleAccountMenu = () => {
           </li></router-link
         >
 
-        <router-link to="/notifications" v-if="users.currentUser"
+        <router-link :to="{ name: 'Notifications' }" v-if="users.currentUser"
           ><li class="nav-item">
             <span class="nav-icon notif-icon"
               ><v-icon name="bi-bell" scale="1.7" fill="#ffffff80" />

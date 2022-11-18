@@ -16,53 +16,53 @@ const Error = {
 const routes = [
   {
     path: "",
-    redirect: "/home",
+    redirect: { name: "Home" },
   },
   {
     path: "/",
-    redirect: "/home",
+    redirect: { name: "Home" },
   },
   {
     path: "/chitter",
-    redirect: "/home",
+    redirect: { name: "Home" },
   },
   {
-    path: "/home",
+    path: "/chitter/home",
     name: "Home",
     component: HomeView,
     meta: { requiresAuth: true },
   },
   {
-    path: "/explore",
+    path: "/chitter/explore",
     name: "Explore",
     component: ExploreView,
   },
   {
-    path: "/notifications",
+    path: "/chitter/notifications",
     name: "Notifications",
     component: NotificationView,
     meta: { requiresAuth: true },
   },
   {
-    path: "/:username",
+    path: "/chitter/:username",
     name: "Profile",
     component: ProfileView,
     props: true,
   },
   {
-    path: "/:username/following",
+    path: "/chitter/:username/following",
     name: "Following",
     component: FollowLists,
     props: true,
   },
   {
-    path: "/:username/followers",
+    path: "/chitter/:username/followers",
     name: "Followers",
     component: FollowLists,
     props: true,
   },
   {
-    path: "/status/:id",
+    path: "/chitter/status/:id",
     name: "Tweet",
     component: TweetView,
     props: true,
@@ -83,7 +83,7 @@ router.beforeEach(async (to, from, next) => {
   const app = useAppStore();
   if (app.showModal) app.toggleModal();
   if (to.meta.requiresAuth && !(await user())) {
-    return next("/explore");
+    return next("/chitter/explore");
   } else {
     return next();
   }

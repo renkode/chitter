@@ -25,7 +25,7 @@ const loadMoreTweets = () => {
       @click.stop="loadMoreTweets"
       v-show="!props.isFetching"
     >
-      Load more tweets
+      Show more tweets
     </div>
   </template>
 </template>
