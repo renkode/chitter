@@ -115,7 +115,7 @@ async function setRawTweets() {
     case "media":
       return store.sortByTimestamp(doc.filter((tweet) => tweet.containsMedia));
     case "likes":
-      return user.value.likes;
+      return user.value.likes.reverse();
     default:
       return store.sortByTimestamp(
         doc.filter(
