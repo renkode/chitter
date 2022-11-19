@@ -28,7 +28,6 @@ const notifText = computed(() => {
       return " followed you";
   }
 });
-const fakeMediaUrl = computed(() => ` pic.chitter.com/${props.id}`);
 const isLike = computed(
   () => props.type === "like-origin" || props.type === "like-retweet"
 );
@@ -66,7 +65,9 @@ function handleClick() {
       </div>
       <div class="tweet-text gray-text">
         {{ props.tweetText
-        }}<span v-if="containsMedia">{{ fakeMediaUrl }}</span>
+        }}<span v-if="props.containsMedia">
+          pic.chitter.com/{{ props.id }}</span
+        >
       </div>
     </div>
   </div>

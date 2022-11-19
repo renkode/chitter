@@ -35,7 +35,6 @@ const notifs = ref(
             username: user.username,
             avatarUrl: user.avatarUrl,
             tweetText: tweet ? tweet.text : null,
-            containsMedia: tweet ? tweet.media.length > 0 : null,
             isNew: users.isNewNotification(notif),
           });
         }
@@ -81,7 +80,7 @@ const notifs = ref(
             :name="notif.name"
             :username="notif.username"
             :tweetText="notif.tweetText"
-            :containsMedia="notif.media && notif.media.length > 0"
+            :containsMedia="notif.containsMedia"
             :isNew="notif.isNew"
           />
         </template>
@@ -94,6 +93,7 @@ const notifs = ref(
             :name="notif.name"
             :username="notif.username"
             :isNew="notif.isNew"
+            :containsMedia="notif.containsMedia"
           />
         </template>
       </template>
