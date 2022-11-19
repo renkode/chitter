@@ -35,6 +35,7 @@ const notifs = ref(
             username: user.username,
             avatarUrl: user.avatarUrl,
             tweetText: tweet ? tweet.text : null,
+            containsMedia: tweet ? tweet.media.length > 0 : null,
             isNew: users.isNewNotification(notif),
           });
         }

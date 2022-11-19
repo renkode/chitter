@@ -17,10 +17,10 @@ const pending = ref(true); // initial load
 const fetching = ref(true);
 
 // get all tweets from timeline document, have to update properties if the tweet is a reply and/or retweet
-const fetchTweets = async (arr) => {
+const fetchTweets = (arr) => {
   if (!users.currentId) return;
   fetching.value = true;
-  await Promise.all(
+  Promise.all(
     arr.map(async (t) =>
       Object.assign(await store.getTweet(t.id), {
         type: t.type,
@@ -32,12 +32,12 @@ const fetchTweets = async (arr) => {
     )
   ).then((values) => {
     store.tweets.push(...store.sortByTimestamp(values));
+    pending.value = false;
+    fetching.value = false;
   });
-  pending.value = false;
-  fetching.value = false;
 };
 
-onBeforeMount(async () => {
+onBeforeMount(() => {
   store.setTweets([]);
   fetchTweets(rawTweets.value.slice(0, store.fetchLimit));
 });
