@@ -112,7 +112,8 @@ const postTweet = async () => {
       ? "reply"
       : "status";
   const isViewingTweet = app.routeName === "Tweet";
-  const isViewingOtherProfile = app.routeUsername !== user.value.username;
+  const isViewingOwnProfileOrOtherRoute =
+    app.routeName !== "Profile" || app.routeUsername === user.value.username;
 
   await tweetStore.addTweet(
     type,
@@ -127,7 +128,7 @@ const postTweet = async () => {
     replyingToUser,
     mentionedUsers ? mentionedUsers.filter((v) => v) : null,
     isViewingTweet,
-    isViewingOtherProfile
+    isViewingOwnProfileOrOtherRoute
   );
   isUploading.value = false;
   str.value = "";

@@ -37,7 +37,8 @@ watch(
 );
 
 watch(currentUser, () => {
-  user.value = currentUser.value;
+  if (user.value.username === currentUser.value.username)
+    user.value = currentUser.value;
 });
 </script>
 

@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed, onMounted, watch, onUpdated } from "vue";
+import { ref, computed, watch, onBeforeMount } from "vue";
 import { useTweetStore } from "@/stores/tweets.js";
 import { useUsersStore } from "@/stores/users.js";
 import TweetList from "./lists/TweetList.vue";
@@ -32,12 +32,12 @@ const fetchTweets = async (arr) => {
     )
   ).then((values) => {
     store.tweets.push(...store.sortByTimestamp(values));
-    pending.value = false;
-    fetching.value = false;
   });
+  pending.value = false;
+  fetching.value = false;
 };
 
-onMounted(() => {
+onBeforeMount(async () => {
   store.setTweets([]);
   fetchTweets(rawTweets.value.slice(0, store.fetchLimit));
 });
@@ -51,9 +51,9 @@ watch(tweets, () => {
   <div>
     <ComposeTweet />
     <div class="tweet-list-container">
-      <TweetList v-if="!pending" :tweets="tweets" :pending="pending" />
-      <LoadSpinner v-else-if="!fetching" />
+      <TweetList :tweets="tweets" :pending="pending" />
       <LoadTweets
+        v-if="!pending"
         :isFetching="fetching"
         :rawTweets="rawTweets.slice(store.fetchLimit)"
         :fetch="fetchTweets"

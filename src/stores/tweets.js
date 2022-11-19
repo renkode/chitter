@@ -285,7 +285,7 @@ export const useTweetStore = defineStore("tweets", {
       replyingToUser = null,
       mentionedUsers = null,
       isViewingTweet,
-      isViewingOtherProfile
+      isViewingOwnProfileOrOtherRoute
     ) {
       const users = useUsersStore();
       const tweetId = uid();
@@ -327,7 +327,7 @@ export const useTweetStore = defineStore("tweets", {
         replyingToUser: users.getUsername(replyingToUser),
       });
       if (isViewingTweet) this.tweets.push(temp);
-      if (!isViewingOtherProfile) this.tweets.unshift(temp);
+      if (isViewingOwnProfileOrOtherRoute) this.tweets.unshift(temp);
 
       // update server-side tweets
       await setDoc(doc(db, "tweets", tweetId), newTweet);
