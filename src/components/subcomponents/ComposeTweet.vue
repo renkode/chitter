@@ -111,7 +111,9 @@ const postTweet = async () => {
     (props.isModal && app.modalType === "reply") || replyingToUser
       ? "reply"
       : "status";
-  const isViewingTweet = app.routeName === "Tweet" ? true : false;
+  const isViewingTweet = app.routeName === "Tweet";
+  const isViewingOtherProfile = app.routeUsername !== user.value.username;
+
   await tweetStore.addTweet(
     type,
     sanitizeHtml(str.value, {
@@ -124,7 +126,8 @@ const postTweet = async () => {
     replyingToTweet,
     replyingToUser,
     mentionedUsers ? mentionedUsers.filter((v) => v) : null,
-    isViewingTweet
+    isViewingTweet,
+    isViewingOtherProfile
   );
   isUploading.value = false;
   str.value = "";

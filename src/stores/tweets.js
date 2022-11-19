@@ -284,7 +284,8 @@ export const useTweetStore = defineStore("tweets", {
       replyingToTweet = null,
       replyingToUser = null,
       mentionedUsers = null,
-      isViewingTweet
+      isViewingTweet,
+      isViewingOtherProfile
     ) {
       const users = useUsersStore();
       const tweetId = uid();
@@ -325,7 +326,8 @@ export const useTweetStore = defineStore("tweets", {
       const temp = Object.assign({}, newTweet, {
         replyingToUser: users.getUsername(replyingToUser),
       });
-      isViewingTweet ? this.tweets.push(temp) : this.tweets.unshift(temp);
+      if (isViewingTweet) this.tweets.push(temp);
+      if (!isViewingOtherProfile) this.tweets.unshift(temp);
 
       // update server-side tweets
       await setDoc(doc(db, "tweets", tweetId), newTweet);
