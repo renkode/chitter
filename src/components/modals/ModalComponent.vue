@@ -11,7 +11,7 @@ const app = useAppStore();
 </script>
 
 <template>
-  <div class="modal-overlay" @mouseup.stop.self="app.toggleModal()">
+  <div class="modal-overlay" @mousedown.stop.self="app.toggleModal()">
     <div class="modal-container">
       <Suspense>
         <template #default>
