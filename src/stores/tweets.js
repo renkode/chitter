@@ -406,6 +406,10 @@ export const useTweetStore = defineStore("tweets", {
       users.deleteNotification(userId, id);
       if (tweet.replyingToUser)
         users.deleteNotification(tweet.replyingToUser, id);
+      if (tweet.mentionedUsers)
+        tweet.mentionedUsers.forEach((uid) =>
+          users.deleteNotification(uid, id)
+        );
       return deleteDoc(doc(db, "tweets", id));
     },
   },
