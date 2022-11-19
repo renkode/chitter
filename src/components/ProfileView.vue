@@ -46,7 +46,7 @@ async function fetchTweets(arr) {
         retweetedBy: t.type === "retweet" ? props.username : null,
         timestamp: t.timestamp,
         type: t.type,
-        replyingToUser: t.replyingToUser ? users.currentUser.username : null,
+        replyingToUser: await users.getUsername(t.replyingToUser),
       })
     )
   ).then((values) => {

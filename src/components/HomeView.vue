@@ -31,7 +31,7 @@ const fetchTweets = (arr) => {
       })
     )
   ).then((values) => {
-    store.tweets.push(...store.sortByTimestamp(values));
+    store.tweets.push(...values);
     pending.value = false;
     fetching.value = false;
   });
