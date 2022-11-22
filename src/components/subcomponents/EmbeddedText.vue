@@ -14,29 +14,60 @@ const props = defineProps(["text"]);
 const app = useAppStore();
 const textEl = ref(null);
 
+// remove linebreaks and then put them back because regex is the devil
+function createURLAnchor(str) {
+  const newLineSplit = str.split(/\r?\n/);
+  return newLineSplit
+    .map((word) => {
+      if (urlRegex.test(word)) {
+        return `<a class="blue-link" href="${word}" target="_blank">${word}</a>`;
+      } else {
+        return word;
+      }
+    })
+    .join("\n");
+}
+
+function createHashtagAnchor(str) {
+  const newLineSplit = str.split(/\r?\n/);
+  return newLineSplit
+    .map((word) => {
+      if (hashtagRegex.test(word)) {
+        return `<a class="blue-link">${word}</a>`;
+      } else {
+        return word;
+      }
+    })
+    .join("\n");
+}
+
+function createUsernameAnchor(str) {
+  const newLineSplit = str.split(/\r?\n/);
+  return newLineSplit
+    .map((word) => {
+      if (atRegex.test(word)) {
+        return `<a class="blue-link user-link" data-username=${str.replace(
+          "@",
+          ""
+        )}>${word}</a>`;
+      } else {
+        return word;
+      }
+    })
+    .join("\n");
+}
+
 function embedLinks() {
   if (!props.text || props.text.length === 0) return;
 
   const embedArr = props.text.split(" ").map((str) => {
-    const newLineSplit = str.split(/\r?\n/);
     switch (true) {
       case urlRegex.test(str):
-        return `<a class="blue-link" href="${str}" target="_blank">${str}</a>`;
+        return createURLAnchor(str);
       case hashtagRegex.test(str):
-        return `<a class="blue-link">${str}</a>`;
-      case newLineSplit.some((word) => atRegex.test(word)): // SPLIT BY NEWLINE
-        return newLineSplit
-          .map((word) => {
-            if (atRegex.test(word)) {
-              return `<a class="blue-link user-link" data-username=${str.replace(
-                "@",
-                ""
-              )}>${newLineSplit.filter((word) => atRegex.test(word))[0]}</a>`;
-            } else {
-              return word;
-            }
-          })
-          .join("\n");
+        return createHashtagAnchor(str);
+      case atRegex.test(str):
+        return createUsernameAnchor(str);
       default:
         return str;
     }
