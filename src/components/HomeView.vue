@@ -27,7 +27,7 @@ const fetchTweets = (arr) => {
         retweetedBy:
           t.type === "retweet" ? await users.getName(t.fromUserId) : null,
         replyingToUser: await users.getUsername(t.replyingToUser),
-        timestamp: t.timestamp,
+        //timestamp: t.timestamp,
       })
     )
   ).then((values) => {

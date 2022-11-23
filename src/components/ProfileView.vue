@@ -44,7 +44,7 @@ async function fetchTweets(arr) {
     arr.map(async (t) =>
       Object.assign(await store.getTweet(t.id), {
         retweetedBy: t.type === "retweet" ? props.username : null,
-        timestamp: t.timestamp,
+        //timestamp: t.timestamp,
         type: t.type,
         replyingToUser: await users.getUsername(t.replyingToUser),
       })
