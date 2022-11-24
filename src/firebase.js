@@ -24,7 +24,7 @@ const config = {
 
 // Initialize Firebase
 
-const app = initializeApp(config);
+const firebase = initializeApp(config);
 
 const user = () => {
   return new Promise((resolve, reject) => {
@@ -44,6 +44,6 @@ const db = getFirestore();
 const auth = getAuth();
 setPersistence(auth, browserLocalPersistence);
 
-const storage = getStorage(app);
+const storage = getStorage(firebase);
 
-export { db, auth, storage, user };
+export { firebase, db, auth, storage, user };

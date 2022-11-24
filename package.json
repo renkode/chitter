@@ -17,8 +17,7 @@
     "sanitize-html": "^2.7.3",
     "short-unique-id": "^4.4.4",
     "vue": "^3.2.13",
-    "vue-router": "4",
-    "vuefire": "^2.2.5"
+    "vue-router": "4"
   },
   "devDependencies": {
     "@babel/core": "^7.12.16",

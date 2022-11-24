@@ -26,47 +26,53 @@ const routes = [
     path: "/home",
     name: "Home",
     component: HomeView,
-    meta: { requiresAuth: true },
+    meta: { requiresAuth: true, title: "Latest Tweets" },
   },
   {
     path: "/explore",
     name: "Explore",
     component: ExploreView,
+    meta: { title: "Explore" },
   },
   {
     path: "/notifications",
     name: "Notifications",
     component: NotificationView,
-    meta: { requiresAuth: true },
+    meta: { requiresAuth: true, title: "Notifications" },
   },
   {
     path: "/:username",
     name: "Profile",
     component: ProfileView,
     props: true,
+    meta: { title: "Profile" },
   },
   {
     path: "/:username/following",
     name: "Following",
     component: FollowLists,
     props: true,
+    meta: { title: "Profile" },
   },
   {
     path: "/:username/followers",
     name: "Followers",
     component: FollowLists,
     props: true,
+    meta: { title: "Profile" },
   },
   {
     path: "/status/:id",
     name: "Tweet",
     component: TweetView,
     props: true,
+    meta: { title: "Tweet" },
   },
 
   {
     path: "/:catchAll(.*)",
     component: Error,
+    meta: { title: "Chitter" },
   },
 ];
 
@@ -76,6 +82,7 @@ const router = createRouter({
 });
 
 router.beforeEach(async (to, from, next) => {
+  document.title = `${to.meta.title} / Chitter`;
   const app = useAppStore();
   if (app.showModal) app.toggleModal();
   if (to.meta.requiresAuth && !(await user())) {

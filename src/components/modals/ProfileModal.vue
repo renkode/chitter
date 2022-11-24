@@ -183,7 +183,7 @@ onMounted(() => {
             name="nameInput"
             label="Name"
             :validation="[
-              { errorText: 'Name can\'t be blank', hasError: nameError },
+              { errorText: 'Name can\'t be blank.', hasError: nameError },
             ]"
             minLength="1"
             maxLength="50"

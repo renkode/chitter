@@ -1,6 +1,6 @@
 import { createApp } from "vue";
 import { createPinia } from "pinia";
-import { firestorePlugin } from "vuefire";
+import { firebase } from "./firebase.js";
 import router from "./router/index.js";
 
 import App from "./App.vue";
@@ -65,5 +65,5 @@ addIcons(
 const pinia = createPinia();
 const app = createApp(App);
 app.component("v-icon", OhVueIcon);
-app.use(pinia, firestorePlugin);
+app.use(pinia, firebase);
 app.use(router).mount("#app");
