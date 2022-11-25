@@ -1,5 +1,5 @@
 <script setup>
-import { computed, onMounted, onUnmounted } from "vue";
+import { computed, onUnmounted } from "vue";
 import { useUsersStore } from "@/stores/users.js";
 import NotificationList from "./lists/NotificationList.vue";
 

@@ -77,7 +77,7 @@ export const useTweetStore = defineStore("tweets", {
 
     async getTimelineTweets(id) {
       const docRef = await getDoc(doc(db, "timelines", id));
-      if (docRef.exists()) return docRef.data().tweets;
+      if (docRef.exists()) return this.sortByTimestamp(docRef.data().tweets);
       return null;
     },
 

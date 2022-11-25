@@ -4,15 +4,12 @@ import { useTweetStore } from "@/stores/tweets.js";
 import { useUsersStore } from "@/stores/users.js";
 import TweetList from "./lists/TweetList.vue";
 import ComposeTweet from "./subcomponents/ComposeTweet.vue";
-import LoadSpinner from "./subcomponents/LoadSpinner.vue";
 import LoadTweets from "./subcomponents/LoadTweets.vue";
 
 const store = useTweetStore();
 const users = useUsersStore();
 const tweets = computed(() => store.tweets);
-const rawTweets = ref(
-  store.sortByTimestamp(await store.getTimelineTweets(users.currentId))
-);
+const rawTweets = ref(await store.getTimelineTweets(users.currentId));
 const pending = ref(true); // initial load
 const fetching = ref(true);
 
@@ -40,10 +37,6 @@ const fetchTweets = (arr) => {
 onBeforeMount(() => {
   store.setTweets([]);
   fetchTweets(rawTweets.value.slice(0, store.fetchLimit));
-});
-
-watch(tweets, () => {
-  store.sortTweets();
 });
 </script>
 

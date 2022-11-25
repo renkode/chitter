@@ -38,9 +38,9 @@ const setTab = (newTab) => {
 };
 
 // functions for fetching tweets based on tab
-async function fetchTweets(arr) {
+function fetchTweets(arr) {
   // add retweetedBy property if applicable and update type/timestamp for retweets
-  await Promise.all(
+  Promise.all(
     arr.map(async (t) =>
       Object.assign(await store.getTweet(t.id), {
         retweetedBy: t.type === "retweet" ? props.username : null,
@@ -50,15 +50,15 @@ async function fetchTweets(arr) {
       })
     )
   ).then((values) => {
+    store.tweets.push(...values);
     pending.value = false;
     fetching.value = false;
-    store.tweets.push(...values);
   });
 }
 
-async function fetchTweetsAndReplies(arr) {
+function fetchTweetsAndReplies(arr) {
   // add replyingToUser property if applicable
-  await Promise.all(
+  Promise.all(
     arr.map(async (t) =>
       Object.assign(await store.getTweet(t.id), {
         user: await users.getUserProps(t.authorId),
@@ -66,14 +66,14 @@ async function fetchTweetsAndReplies(arr) {
       })
     )
   ).then((values) => {
+    store.tweets.push(...values);
     pending.value = false;
     fetching.value = false;
-    store.tweets.push(...values);
   });
 }
 
-async function fetchMedia(arr) {
-  await Promise.all(
+function fetchMedia(arr) {
+  Promise.all(
     arr.map(async (t) =>
       store.getTweet(t.id).then(async (data) =>
         Object.assign(data, {
@@ -82,14 +82,14 @@ async function fetchMedia(arr) {
       )
     )
   ).then((values) => {
+    store.tweets.push(...values);
     pending.value = false;
     fetching.value = false;
-    store.tweets.push(...values);
   });
 }
 
-async function fetchLikes(arr) {
-  return Promise.all(
+function fetchLikes(arr) {
+  Promise.all(
     arr.map(async (id) =>
       store.getTweet(id).then(async (data) =>
         Object.assign(data, {
@@ -98,9 +98,9 @@ async function fetchLikes(arr) {
       )
     )
   ).then((values) => {
+    store.tweets.push(...values);
     pending.value = false;
     fetching.value = false;
-    store.tweets.push(...values);
   });
 }
 

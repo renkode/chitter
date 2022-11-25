@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed, watch, onBeforeMount } from "vue";
+import { ref, computed, onBeforeMount } from "vue";
 import { useTweetStore } from "@/stores/tweets.js";
 import ComposeTweet from "./subcomponents/ComposeTweet.vue";
 import TweetList from "./lists/TweetList.vue";
@@ -35,10 +35,6 @@ function fetchTweets(arr) {
 onBeforeMount(async () => {
   store.setTweets([]);
   fetchTweets(rawTweets.value.slice(0, store.fetchLimit));
-});
-
-watch(tweets, () => {
-  store.sortTweets();
 });
 </script>
 
