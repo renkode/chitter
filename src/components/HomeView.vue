@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed, watch, onBeforeMount } from "vue";
+import { ref, computed, onBeforeMount } from "vue";
 import { useTweetStore } from "@/stores/tweets.js";
 import { useUsersStore } from "@/stores/users.js";
 import TweetList from "./lists/TweetList.vue";
